@@ -17,6 +17,7 @@ public class Query {
   private int limit;
   private int offset;
   private boolean includeCount;
+  private Circle circle;
 
   /**
    * Sets a full text search query
@@ -44,21 +45,18 @@ public class Query {
     return this;
   }
 
-  public String toUrlPairs() {
-    StringBuilder sbul = new StringBuilder();
+  public Query circle(Circle circle) {
+    this.circle = circle;
+    return this;
+  }
 
+  public String toUrlPairs() {
     return Joiner.on("&").skipNulls().join(
         urlPair("q", q),
         urlPair("limit", limit),
         urlPair("offset", offset),
-        urlPair("include_count", includeCount));
-
-
-    //    urlPairAppend(sbul, "q", q);
-    //    urlPairAppend(sbul, "limit", limit);
-    //    urlPairAppend(sbul, "offset", offset);
-    //    urlPairAppend(sbul, "include_count", includeCount);
-    //    return sbul.toString();
+        urlPair("include_count", includeCount),
+        urlPair("geo", geo()));
   }
 
   private String urlPair(String name, Object val) {
@@ -73,14 +71,11 @@ public class Query {
     }
   }
 
-  private void urlPairAppend(StringBuilder sbul, String name, Object val) {
-    if(val != null) {
-      try {
-        sbul.append(name + "=" +
-            (val instanceof String ? URLEncoder.encode(val.toString(), "UTF-8") : val));
-      } catch (UnsupportedEncodingException e) {
-        throw new RuntimeException(e);
-      }
+  private String geo() {
+    if(circle != null) {
+      return circle.toJsonStr();
+    } else {
+      return null;
     }
   }
 

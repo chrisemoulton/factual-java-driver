@@ -88,10 +88,11 @@ public class Factual {
     Factual factual = new Factual("YOUR_KEY", "YOUR_SECRET");
 
     Results results = factual.fetch("places", new Query()
-    .q("starbucks santa monica")
+    .q("starbucks")
     .limit(10)
     .includeCount(true)
-    .offset(8));
+    .offset(8)
+    .circle(new Circle(34.06021, -118.41828, 5000)));
 
     System.out.println("status: " + results.getStatus());
     System.out.println("total underlying rows: " + results.getTotalRowCount());

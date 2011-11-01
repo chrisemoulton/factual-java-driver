@@ -1,0 +1,25 @@
+package com.factual;
+
+
+/**
+ * Represents a geographic sub query confining results to a circle.
+ *
+ * @author aaron
+ */
+public class Circle {
+  private final double lat;
+  private final double lon;
+  private final int meters;
+
+
+  public Circle(double lat, double lon, int meters) {
+    this.lat = lat;
+    this.lon = lon;
+    this.meters = meters;
+  }
+
+  public String toJsonStr() {
+    return "{\"$circle\":{\"$center\":[" + lat + "," + lon + "],\"$meters\":" + meters + "}}";
+  }
+
+}
