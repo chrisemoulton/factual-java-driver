@@ -69,16 +69,15 @@
         </configuration>
       </plugin>
       <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.1</version>
-        <configuration>
-          <descriptors>
-            <descriptor>jar-with-dependencies.xml</descriptor>
-          </descriptors>
-          <finalName>datastore-commons</finalName>
-          <outputDirectory>target</outputDirectory>
-          <workDirectory>target/assembly/work</workDirectory>
-        </configuration>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
