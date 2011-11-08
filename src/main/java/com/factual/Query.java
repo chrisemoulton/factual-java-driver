@@ -20,7 +20,7 @@ public class Query {
   private int offset;
   private boolean includeRowCount;
   private Circle circle;
-  private final List<Logic> rowFilters = Lists.newArrayList();
+  private final List<Pred> rowFilters = Lists.newArrayList();
 
 
   /**
@@ -65,12 +65,12 @@ public class Query {
   }
 
   public Query filter(String field, String val) {
-    rowFilters.add(new Logic("$eq", field, val));
+    rowFilters.add(new Pred("$eq", field, val));
     return this;
   }
 
   public Query filter(String op, Object... args) {
-    rowFilters.add(new Logic(op, args));
+    rowFilters.add(new Pred(op, args));
     return this;
   }
 
@@ -120,8 +120,8 @@ public class Query {
     if(rowFilters.isEmpty()) {
       return null;
     } else {
-      Logic[] preds = rowFilters.toArray(new Logic[]{});
-      return new Logic("$and", preds).toString();
+      Pred[] preds = rowFilters.toArray(new Pred[]{});
+      return new Pred("$and", preds).toJsonStr();
     }
   }
 
