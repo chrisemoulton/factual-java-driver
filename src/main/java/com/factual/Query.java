@@ -64,6 +64,12 @@ public class Query {
     return this;
   }
 
+  /**
+   * Adds the specified row filter predicate to this Query. The predicate may be
+   * arbitrarily complex.
+   * 
+   * @return this Query.
+   */
   public Query filter(Pred pred) {
     rowFilters.add(pred);
     return this;
@@ -80,6 +86,11 @@ public class Query {
     return this;
   }
 
+  /**
+   * Convenience method for adding a top-level row filter to this Query.
+   * 
+   * @return this Query.
+   */
   public Query filter(String op, Object... args) {
     rowFilters.add(new Pred(op, args));
     return this;

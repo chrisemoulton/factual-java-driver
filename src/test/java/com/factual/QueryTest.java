@@ -41,4 +41,33 @@ public class QueryTest {
         decoded);
   }
 
+  /**
+   * Tests setting a complicated row filter via query.filter(Pred)
+   * <p>
+   * <pre>
+   * {$and:[
+   *   {region:{$in:["MA","VT","NH"]}},
+   *   {$or:[
+   *     {first_name:{$eq:"Chun"}},
+   *     {last_name:{$eq:"Kok"}}]}]}
+   * </pre>
+   */
+  @Test
+  public void testFilter_Query_complicated() throws UnsupportedEncodingException {
+    Pred in = new Pred("$in", "region", "MA", "VT", "NH");
+    Pred fname = new Pred("$eq", "first_name", "Chun");
+    Pred lname = new Pred("$eq", "last_name", "Kok");
+    Pred or = new Pred("$or", fname, lname);
+
+    Pred complicated = new Pred("$and", in, or);
+
+    Query query = new Query()
+    .filter(complicated);
+
+    String queryStr = query.toUrlPairs();
+    String decoded = URLDecoder.decode(queryStr, "UTF-8");
+
+    assertEquals("filters={\"$and\":[{\"region\":{\"$in\":[\"MA\",\"VT\",\"NH\"]}},{\"$or\":[{\"first_name\":{\"$eq\":\"Chun\"}},{\"last_name\":{\"$eq\":\"Kok\"}}]}]}",
+        decoded);
+  }
 }
