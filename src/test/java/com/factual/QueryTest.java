@@ -23,7 +23,7 @@ public class QueryTest {
     String queryStr = query.toUrlPairs();
     String decoded = URLDecoder.decode(queryStr, "UTF-8");
 
-    assertEquals("filters={\"$and\":{\"first_name\":{\"$eq\":\"Bradley\"}}}",
+    assertEquals("filters={\"first_name\":{\"$eq\":\"Bradley\"}}",
         decoded);
   }
 

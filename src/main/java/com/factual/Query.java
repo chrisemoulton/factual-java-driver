@@ -64,6 +64,17 @@ public class Query {
     return this;
   }
 
+  public Query filter(Pred pred) {
+    rowFilters.add(pred);
+    return this;
+  }
+
+  /**
+   * Convenience method for adding a top-level row filter for "<tt>field</tt>
+   * must equal <tt>val</tt>.
+   * 
+   * @return this Query.
+   */
   public Query filter(String field, String val) {
     rowFilters.add(new Pred("$eq", field, val));
     return this;
@@ -119,9 +130,11 @@ public class Query {
   private String rowFiltersJsonOrNull() {
     if(rowFilters.isEmpty()) {
       return null;
+    } else if(rowFilters.size() == 1) {
+      return rowFilters.get(0).toJsonStr();
     } else {
       Pred[] preds = rowFilters.toArray(new Pred[]{});
-      return new Pred("$and", preds).toJsonStr();
+      return new Pred("$and", (Object[])preds).toJsonStr();
     }
   }
 
