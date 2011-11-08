@@ -15,7 +15,7 @@ import com.google.common.collect.Lists;
  * Represents a logical predicate to be used when filtering. Supports
  * arbitrarily complex nesting with other Preds.
  * <p>
- * Knows how to represent itself as JSON, ready to be sent used as filters in
+ * Knows how to represent itself as JSON, ready to be used as filters in
  * Factual's public API.
  * 
  * @author aaron
@@ -38,9 +38,12 @@ public class Pred {
     if(isSpecialForm()) {
       return "{\"" + op + "\":" + toString(args) + "}";
     } else {
-      Object[] rest = Arrays.copyOfRange(args, 1, args.length);
-      return "{\"" + args[0] + "\":{\"" + op + "\":" + toString(rest) + "}}";
+      return "{\"" + args[0] + "\":{\"" + op + "\":" + toString(rest(args)) + "}}";
     }
+  }
+
+  private Object[] rest(Object...objs) {
+    return Arrays.copyOfRange(objs, 1, objs.length);
   }
 
   private boolean isSpecialForm() {
