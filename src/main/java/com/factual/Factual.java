@@ -15,12 +15,14 @@ import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 
 /**
- * Represents the public Factual API.
+ * Represents the public Factual API. Supports running queries against Factual
+ * and inspecting the response. Supports the same levels of authentication
+ * supported by Factual's API.
  * 
  * @author aaron
  */
 public class Factual {
-  private static final String FACT_HOME = "http://api.v3.factual.com/t/";
+  private String factHome = "http://api.v3.factual.com/t/";
   private final String key;
   private final OAuthHmacSigner signer;
 
@@ -38,21 +40,33 @@ public class Factual {
   }
 
   /**
-   * Runs <tt>query</tt> against a Factual table.
+   * Change the base URL at which to contact Factual's API.
+   * <p>
+   * Example value: <tt>http://staging.api.v3.factual.com/t/</tt>
    * 
-   * @param table
+   * @param urlBase
+   *          the base URL at which to contact Factual's API.
+   */
+  public void setFactHome(String urlBase) {
+    this.factHome = urlBase;
+  }
+
+  /**
+   * Runs <tt>query</tt> against the specified Factual table.
+   * 
+   * @param tableName
    *          the name of the table you wish to query (e.g., "places")
    * @param query
    *          the query you wish to run against <tt>table</tt>.
-   * @return the results of running <tt>query</tt> against Factual.
+   * @return the response of running <tt>query</tt> against Factual.
    */
-  public Results fetch(String table, Query query) {
-    return Results.fromJson(request(table, query));
+  public Response fetch(String tableName, Query query) {
+    return Response.fromJson(request(tableName, query));
   }
 
-  private String request(String table, Query query) {
+  private String request(String tableName, Query query) {
     GenericUrl url;
-    url = new GenericUrl(FACT_HOME + table + "?" + query.toUrlPairs());
+    url = new GenericUrl(factHome + tableName + "?" + query.toUrlPairs());
     System.out.println("GURL:" + url);
     String requestMethod = "GET";
 
@@ -87,20 +101,21 @@ public class Factual {
   public static void main(String[] args) {
     Factual factual = new Factual("YOUR_KEY", "YOUR_SECRET");
 
-    Results results = factual.fetch("places", new Query()
-    .q("starbucks")
+    Response response = factual.fetch("places", new Query()
+    .fullTextSearch("starbucks")
     .limit(10)
-    .includeCount(true)
+    .includeRowCount(true)
     .offset(8)
-    .circle(new Circle(34.06021, -118.41828, 5000)));
+    .within(new Circle(34.06021, -118.41828, 5000)));
 
-    System.out.println("status: " + results.getStatus());
-    System.out.println("total underlying rows: " + results.getTotalRowCount());
+    System.out.println("status: " + response.getStatus());
+    System.out.println("total underlying rows: " + response.getTotalRowCount());
     System.out.println();
     System.out.println("Starbucks Addresses:");
-    for(String addr : results.mapStrings("address")) {
+    for(String addr : response.mapStrings("address")) {
       System.out.println(addr);
     }
+
   }
 
 }
