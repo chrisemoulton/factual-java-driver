@@ -28,7 +28,6 @@ public class PredTest {
     Pred complicated = new Pred("$and", in, or);
 
     String predJsonStr = complicated.toJsonStr();
-    System.out.println(predJsonStr);
 
     assertEquals("{\"$and\":[{\"region\":{\"$in\":[\"MA\",\"VT\",\"NH\"]}},{\"$or\":[{\"first_name\":{\"$eq\":\"Chun\"}},{\"last_name\":{\"$eq\":\"Kok\"}}]}]}",
         predJsonStr);

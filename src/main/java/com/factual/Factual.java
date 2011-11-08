@@ -67,7 +67,6 @@ public class Factual {
   private String request(String tableName, Query query) {
     GenericUrl url;
     url = new GenericUrl(factHome + tableName + "?" + query.toUrlPairs());
-    System.out.println("GURL:" + url);
     String requestMethod = "GET";
 
     // Configure OAuth request params
@@ -96,26 +95,6 @@ public class Factual {
     } catch (GeneralSecurityException e) {
       throw new RuntimeException(e);
     }
-  }
-
-  public static void main(String[] args) {
-    Factual factual = new Factual("YOUR_KEY", "YOUR_SECRET");
-
-    Response response = factual.fetch("places", new Query()
-    .fullTextSearch("starbucks")
-    .limit(10)
-    .includeRowCount(true)
-    .offset(8)
-    .within(new Circle(34.06021, -118.41828, 5000)));
-
-    System.out.println("status: " + response.getStatus());
-    System.out.println("total underlying rows: " + response.getTotalRowCount());
-    System.out.println();
-    System.out.println("Starbucks Addresses:");
-    for(String addr : response.mapStrings("address")) {
-      System.out.println(addr);
-    }
-
   }
 
 }

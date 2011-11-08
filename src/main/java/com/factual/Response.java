@@ -1,15 +1,13 @@
 package com.factual;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
@@ -51,52 +49,57 @@ public class Response {
 
   /**
    * @return a Collection of all String values found in this Response's data
-   *         rows as the <tt>attr</tt> attribute.
+   *         rows as the <tt>field</tt> attribute.
    */
-  public Collection<String> mapStrings(final String attr) {
+  public Collection<String> mapStrings(final String field) {
     return Collections2.transform(data, new Function<Map<String, Object>, String>() {
       @Override
       public String apply(Map<String, Object> row) {
-        Object val = row.get(attr);
+        Object val = row.get(field);
         return val != null ? val.toString() : null;
       }});
   }
 
+  /**
+   * Parses a <tt>json</tt> response (ostensibly from Factual) and returns a
+   * Response object representing the full response.
+   * 
+   * @return a Response object representing the full response <tt>json</tt>.
+   */
   public static Response fromJson(String json) {
     Response response = new Response();
-    ObjectMapper mapper = new ObjectMapper();
     try {
-      JsonNode root = mapper.readValue(json, JsonNode.class);
-      response.version = root.get("version").toString();
-      response.status = root.get("status").toString();
+      JSONObject root = new JSONObject(json);
+      response.version = root.getString("version");
+      response.status = root.getString("status");
 
-      response.totalRowCount = root.get("response").get("total_row_count").asInt(-1);
+      JSONObject resp = root.getJSONObject("response");
+      if(resp.has("total_row_count")) {
+        response.totalRowCount = resp.getInt("total_row_count");
+      }
 
-      response.data = data(root.get("response").get("data").getElements());
+      response.data = data(resp.getJSONArray("data"));
       return response;
-    } catch (JsonParseException e) {
-      throw new RuntimeException(e);
-    } catch (JsonMappingException e) {
-      throw new RuntimeException(e);
-    } catch (IOException e) {
+    } catch (JSONException e) {
       throw new RuntimeException(e);
     }
   }
 
-  private static List<Map<String, Object>> data(Iterator<JsonNode> rowNodes) {
+  private static List<Map<String, Object>> data(JSONArray arr) throws JSONException {
     List<Map<String, Object>> data = Lists.newArrayList();
-    while(rowNodes.hasNext()) {
-      data.add(row(rowNodes.next()));
+    for(int i=0; i<arr.length(); i++) {
+      data.add(row(arr.getJSONObject(i)));
     }
     return data;
   }
 
-  private static Map<String, Object> row(JsonNode rowNode) {
+  private static Map<String, Object> row(JSONObject jo) throws JSONException {
     Map<String, Object> row = Maps.newHashMap();
-    Iterator<Map.Entry<String, JsonNode>> entries = rowNode.getFields();
-    while(entries.hasNext()) {
-      Map.Entry<String, JsonNode> entry = entries.next();
-      row.put(entry.getKey(), entry.getValue());
+    Iterator iter = jo.keys();
+    while(iter.hasNext()) {
+      String key = iter.next().toString();
+      Object value = jo.get(key);
+      row.put(key, value);
     }
     return row;
   }

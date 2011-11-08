@@ -48,6 +48,18 @@ public class Query {
   }
 
   /**
+   * The response will include a count of the total number of rows in the table
+   * that conform to the request based on included filters. This will increase
+   * the time required to return a response. The default behavior is to NOT
+   * include a row count.
+   * 
+   * @return this Query, marked to return total row count when run.
+   */
+  public Query includeRowCount() {
+    return includeRowCount(true);
+  }
+
+  /**
    * When true, the response will include a count of the total number of rows in
    * the table that conform to the request based on included filters.
    * Requesting the row count will increase the time required to return a
