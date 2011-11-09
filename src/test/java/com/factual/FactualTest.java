@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.BeforeClass;
@@ -116,7 +115,6 @@ public class FactualTest {
 
   /**
    * {"$or":[{"tel":{"$blank":true}},{"tel":{"$bw":"(212)"}}]}
-   * @throws UnsupportedEncodingException
    */
   @Test
   public void testRowFilters_2_ORs() {

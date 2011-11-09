@@ -89,9 +89,22 @@ public class Query {
 
   /**
    * Convenience method for adding a top-level row filter for "<tt>field</tt>
-   * must equal <tt>val</tt>.
+   * must equal <tt>val</tt>".
+   * <p>
    * 
-   * @return this Query.
+   * This is equivalent to:
+   * 
+   * <pre>
+   * .filter("$eq", field, val)
+   * </pre>
+   * 
+   * Which is also equivalent to:
+   * 
+   * <pre>
+   * .filter(new Pred("$eq", field, val))
+   * </pre>
+   * 
+   * @return this Query, with the specified row filter added.
    */
   public Query filter(String field, String val) {
     rowFilters.add(new Pred("$eq", field, val));
@@ -99,7 +112,19 @@ public class Query {
   }
 
   /**
-   * Convenience method for adding a top-level row filter to this Query.
+   * Convenience method for adding a top-level row filter to this Query. Examples:
+   * <p>
+   * <pre>
+   * .filter("$eq", "name", "Starbucks")
+   * </pre>
+   * 
+   * <pre>
+   * .filter("$blank", "tel", false)
+   * </pre>
+   * 
+   * <pre>
+   * .filter("$in", "region", "MA", "VT", "NH")
+   * </pre>
    * 
    * @return this Query.
    */
@@ -120,7 +145,7 @@ public class Query {
     return this;
   }
 
-  public String toUrlPairs() {
+  protected String toUrlPairs() {
     return Joiner.on("&").skipNulls().join(
         urlPair("q", fullTextSearch),
         (limit > 0 ? urlPair("limit", limit) : null),
