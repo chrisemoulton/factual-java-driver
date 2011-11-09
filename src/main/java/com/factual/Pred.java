@@ -88,6 +88,19 @@ public class Pred {
     }
   }
 
+  /**
+   * Handles lists like the value for $in, e.g. for...
+   * 
+   * <pre>
+   * "$in", "region", "MA", "VT", "NH"
+   * </pre>
+   * 
+   * ... so that "MA", "VT", and "NH" would be <tt>objs</tt>, and would turn
+   * into: "MA, VT, NH".
+   * <p>
+   * This special case is required, since our public API doesn't treat the
+   * argument to $in as a real JSON list.
+   */
   private String simpleList(Object... objs) {
     if(objs.length == 1) {
       return toJsonStrReflect(objs[0]);
