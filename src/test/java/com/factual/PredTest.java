@@ -29,7 +29,7 @@ public class PredTest {
 
     String predJsonStr = complicated.toJsonStr();
 
-    assertEquals("{\"$and\":[{\"region\":{\"$in\":[\"MA\",\"VT\",\"NH\"]}},{\"$or\":[{\"first_name\":{\"$eq\":\"Chun\"}},{\"last_name\":{\"$eq\":\"Kok\"}}]}]}",
+    assertEquals("{\"$and\":[{\"region\":{\"$in\":\"MA,VT,NH\"}},{\"$or\":[{\"first_name\":{\"$eq\":\"Chun\"}},{\"last_name\":{\"$eq\":\"Kok\"}}]}]}",
         predJsonStr);
   }
 

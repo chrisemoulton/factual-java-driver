@@ -26,6 +26,32 @@ public class Pred {
   private final ObjectMapper objectMapper = new ObjectMapper();
 
 
+  /**
+   * Constructs a predicate. Operator always comes first, e.g. "$and", "$or",
+   * "$in", "$eq", etc.
+   * <p>
+   * After the operator can be any number of args, which will
+   * be handled properly depending on the operator.
+   * <p>
+   * Preds can be nested within each other (e.g., for "$and"s and "$or"s).
+   * <p>
+   * Examples:
+   * 
+   * <pre>new Pred("$eq", "first_name", "Chun")</pre>
+   * 
+   * <pre>new Pred("$in", "region", "MA", "VT", "NH")</pre>
+   * 
+   * <pre>new Pred("$or",
+   *                      new Pred("$eq", "first_name", "Chun")
+   *                      new Pred("$eq", "last_name", "Kok"))</pre>
+   * 
+   * 
+   * @param op
+   *          the operator, e.g. "$and", "$or", "$in", "$eq", etc.
+   * @param args
+   *          an arbitrary number of args, to be handled properly depending on
+   *          the operator.
+   */
   public Pred(String op, Object... args) {
     this.op = op;
     this.args = args;
@@ -36,9 +62,9 @@ public class Pred {
    */
   public String toJsonStr() {
     if(isSpecialForm()) {
-      return "{\"" + op + "\":" + toString(args) + "}";
+      return "{\"" + op + "\":" + complexList(args) + "}";
     } else {
-      return "{\"" + args[0] + "\":{\"" + op + "\":" + toString(rest(args)) + "}}";
+      return "{\"" + args[0] + "\":{\"" + op + "\":" + simpleList(rest(args)) + "}}";
     }
   }
 
@@ -50,7 +76,7 @@ public class Pred {
     return "$and".equals(op) || "$or".equals(op);
   }
 
-  private String toString(Object... objs) {
+  private String complexList(Object... objs) {
     if(objs.length == 1) {
       return toJsonStrReflect(objs[0]);
     } else {
@@ -59,6 +85,14 @@ public class Pred {
         elems.add(toJsonStrReflect(obj));
       }
       return "[" + Joiner.on(",").join(elems) + "]";
+    }
+  }
+
+  private String simpleList(Object... objs) {
+    if(objs.length == 1) {
+      return toJsonStrReflect(objs[0]);
+    } else {
+      return "\"" + Joiner.on(",").join(objs) + "\"";
     }
   }
 
@@ -81,4 +115,5 @@ public class Pred {
       throw new RuntimeException(e);
     }
   }
+
 }

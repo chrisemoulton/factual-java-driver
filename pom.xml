@@ -16,9 +16,9 @@
       <version>r09</version>
     </dependency>
 	<dependency>
-	    <groupId>com.google.api.client</groupId>
-	    <artifactId>google-api-client</artifactId>
-	    <version>1.4.1-beta</version>
+	  <groupId>com.google.api.client</groupId>
+	  <artifactId>google-api-client</artifactId>
+	  <version>1.4.1-beta</version>
 	</dependency>
     <!--dependency>
       <groupId>net.sf.json-lib</groupId>
@@ -26,26 +26,36 @@
       <version>2.2.3</version>
       <type>jar</type>
     </dependency-->
-<dependency>
-    <groupId>org.codehaus.jackson</groupId>
-    <artifactId>jackson-core-asl</artifactId>
-    <version>1.9.1</version>
-</dependency>
-<dependency>
-    <groupId>org.codehaus.jackson</groupId>
-    <artifactId>jackson-core-lgpl</artifactId>
-    <version>1.9.1</version>
-</dependency>
-<dependency>
-    <groupId>org.codehaus.jackson</groupId>
-    <artifactId>jackson-mapper-asl</artifactId>
-    <version>1.9.1</version>
-</dependency>
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-core-asl</artifactId>
+      <version>1.9.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-core-lgpl</artifactId>
+      <version>1.9.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-mapper-asl</artifactId>
+      <version>1.9.1</version>
+    </dependency>
 	<dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
       <version>1.7.2</version>
     </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.1</version>
+    </dependency>
+<dependency>
+    <groupId>org.json</groupId>
+    <artifactId>json</artifactId>
+    <version>20090211</version>
+</dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
