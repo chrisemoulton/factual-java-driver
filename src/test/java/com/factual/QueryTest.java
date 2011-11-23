@@ -20,7 +20,7 @@ public class QueryTest {
     Query query = new Query()
     .filter("first_name", "Bradley");
 
-    String queryStr = query.toUrlPairs();
+    String queryStr = query.toUrlQuery();
     String decoded = URLDecoder.decode(queryStr, "UTF-8");
 
     assertEquals("filters={\"first_name\":{\"$eq\":\"Bradley\"}}",
@@ -34,7 +34,7 @@ public class QueryTest {
     .filter("region", "CA")
     .filter("locality", "Los Angeles");
 
-    String queryStr = query.toUrlPairs();
+    String queryStr = query.toUrlQuery();
     String decoded = URLDecoder.decode(queryStr, "UTF-8");
 
     assertEquals("filters={\"$and\":[{\"first_name\":{\"$eq\":\"Bradley\"}},{\"region\":{\"$eq\":\"CA\"}},{\"locality\":{\"$eq\":\"Los Angeles\"}}]}",
@@ -64,7 +64,7 @@ public class QueryTest {
     Query query = new Query()
     .filter(complicated);
 
-    String queryStr = query.toUrlPairs();
+    String queryStr = query.toUrlQuery();
     String decoded = URLDecoder.decode(queryStr, "UTF-8");
 
     assertEquals("filters={\"$and\":[{\"region\":{\"$in\":\"MA,VT,NH\"}},{\"$or\":[{\"first_name\":{\"$eq\":\"Chun\"}},{\"last_name\":{\"$eq\":\"Kok\"}}]}]}",

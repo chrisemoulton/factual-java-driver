@@ -13,6 +13,7 @@ import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.common.io.Closeables;
 
 /**
  * Represents the public Factual API. Supports running queries against Factual
@@ -40,7 +41,9 @@ public class Factual {
   }
 
   /**
-   * Change the base URL at which to contact Factual's API.
+   * Change the base URL at which to contact Factual's API. This
+   * may be useful if you want to talk to a test or staging
+   * server.
    * <p>
    * Example value: <tt>http://staging.api.v3.factual.com/t/</tt>
    * 
@@ -66,7 +69,7 @@ public class Factual {
 
   private String request(String tableName, Query query) {
     GenericUrl url;
-    url = new GenericUrl(factHome + tableName + "?" + query.toUrlPairs());
+    url = new GenericUrl(factHome + tableName + "?" + query.toUrlQuery());
     String requestMethod = "GET";
 
     // Configure OAuth request params
@@ -76,6 +79,7 @@ public class Factual {
     params.computeTimestamp();
     params.signer = signer;
 
+    BufferedReader br = null;
     try {
       // generate the signature
       params.computeSignature(requestMethod, url);
@@ -87,13 +91,15 @@ public class Factual {
 
       // get the response
       HttpResponse response = request.execute();
-      BufferedReader br = new BufferedReader(new InputStreamReader(response.getContent()));
+      br = new BufferedReader(new InputStreamReader(response.getContent()));
 
       return br.readLine();
     } catch (IOException e) {
       throw new RuntimeException(e);
     } catch (GeneralSecurityException e) {
       throw new RuntimeException(e);
+    } finally {
+      Closeables.closeQuietly(br);
     }
   }
 

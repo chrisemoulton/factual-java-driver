@@ -10,7 +10,7 @@ import com.google.common.collect.Lists;
 /**
  * Represents a top level Factual query. Knows how to represent the query as URL
  * encoded key value pairs, ready for the query string in a GET request. (See
- * {@link #toUrlPairs()})
+ * {@link #toUrlQuery()})
  * 
  * @author aaron
  */
@@ -37,11 +37,24 @@ public class Query {
     return this;
   }
 
+  /**
+   * Sets the maximum amount of records to return from this Query.
+   * @param limit the maximum amount of records to return from this Query.
+   * @return this Query
+   */
   public Query limit(int limit) {
     this.limit = limit;
     return this;
   }
 
+  /**
+   * Sets how many records in to start getting results (i.e., the page offset)
+   * for this Query.
+   * 
+   * @param offset
+   *          the page offset for this Query.
+   * @return this Query
+   */
   public Query offset(int offset) {
     this.offset = offset;
     return this;
@@ -145,7 +158,24 @@ public class Query {
     return this;
   }
 
-  protected String toUrlPairs() {
+  /**
+   * Builds and returns the query string to represent this Query when talking to
+   * Factual's API. Provides proper URL encoding and escaping.
+   * <p>
+   * Example output:
+   * <pre>
+   * filters=%7B%22%24and%22%3A%5B%7B%22region%22%3A%7B%22%24in%22%3A%22MA%2CVT%2CNH%22%7D%7D%2C%7B%22%24or%22%3A%5B%7B%22first_name%22%3A%7B%22%24eq%22%3A%22Chun%22%7D%7D%2C%7B%22last_name%22%3A%7B%22%24eq%22%3A%22Kok%22%7D%7D%5D%7D%5D%7D
+   * </pre>
+   * <p>
+   * (After decoding, the above example would be used by the server as:)
+   * <pre>
+   * filters={"$and":[{"region":{"$in":"MA,VT,NH"}},{"$or":[{"first_name":{"$eq":"Chun"}},{"last_name":{"$eq":"Kok"}}]}]}
+   * </pre>
+   * 
+   * @return the query string to represent this Query when talking to Factual's
+   *         API.
+   */
+  protected String toUrlQuery() {
     return Joiner.on("&").skipNulls().join(
         urlPair("q", fullTextSearch),
         (limit > 0 ? urlPair("limit", limit) : null),

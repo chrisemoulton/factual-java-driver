@@ -28,14 +28,30 @@ public class Response {
   private List<Map<String, Object>> data = Lists.newArrayList();
 
 
+  /**
+   * The status returned by the Factual API server, e.g. "ok".
+   * 
+   * @return status returned by the Factual API server.
+   */
   public String getStatus() {
     return status;
   }
 
+  /**
+   * The version tag returned by the Factual API server, e.g. "3".
+   * 
+   * @return the version tag returned by the Factual API server.
+   */
   public String getVersion() {
     return version;
   }
 
+  /**
+   * The main data returned by Factual. Represented as a collection of Maps, where each map
+   * is a record in the results.
+   * 
+   * @return the main data returned by Factual.
+   */
   public List<Map<String, Object>> getData() {
     return data;
   }
@@ -95,7 +111,7 @@ public class Response {
 
   private static Map<String, Object> row(JSONObject jo) throws JSONException {
     Map<String, Object> row = Maps.newHashMap();
-    Iterator iter = jo.keys();
+    Iterator<?> iter = jo.keys();
     while(iter.hasNext()) {
       String key = iter.next().toString();
       Object value = jo.get(key);
