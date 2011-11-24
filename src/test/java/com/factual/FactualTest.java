@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.BeforeClass;
@@ -38,7 +39,7 @@ public class FactualTest {
    */
   @Test
   public void testCoreExample1() {
-    Response resp = factual.fetch("places",
+    ReadResponse resp = factual.read("places",
         new Query().filter("country", "US"));
 
     assertOk(resp);
@@ -51,7 +52,7 @@ public class FactualTest {
    */
   @Test
   public void testCoreExample2() {
-    Response resp = factual.fetch("places", new Query()
+    ReadResponse resp = factual.read("places", new Query()
     .filter("$bw", "name", "Star")
     .includeRowCount());
 
@@ -65,7 +66,7 @@ public class FactualTest {
    */
   @Test
   public void testCoreExample3() {
-    Response resp = factual.fetch("places", new Query()
+    ReadResponse resp = factual.read("places", new Query()
     .fullTextSearch("Fried Chicken, Los Angeles"));
 
     assertOk(resp);
@@ -77,7 +78,7 @@ public class FactualTest {
    */
   @Test
   public void testCoreExample4() {
-    Response resp = factual.fetch("places", new Query()
+    ReadResponse resp = factual.read("places", new Query()
     .fullTextSearch("Fried Chicken, Los Angeles")
     .offset(20)
     .limit(5));
@@ -92,7 +93,7 @@ public class FactualTest {
    */
   @Test
   public void testCoreExample5() {
-    Response resp = factual.fetch("places", new Query()
+    ReadResponse resp = factual.read("places", new Query()
     .filter("name", "Stand")
     .within(new Circle(34.06018, -118.41835, 5000)));
 
@@ -104,7 +105,7 @@ public class FactualTest {
    */
   @Test
   public void testRowFilters_2beginsWith() {
-    Response resp = factual.fetch("places", new Query()
+    ReadResponse resp = factual.read("places", new Query()
     .filter("$bw", "name", "McDonald's")
     .filter("$bw", "category", "Food & Beverage"));
 
@@ -122,7 +123,7 @@ public class FactualTest {
     Pred bw = new Pred("$bw", "name", "Star");
     Pred starOrTelBlank = new Pred("$or", tel, bw);
 
-    Response resp = factual.fetch("places", new Query()
+    ReadResponse resp = factual.read("places", new Query()
     .filter(starOrTelBlank));
 
     assertOk(resp);
@@ -148,7 +149,7 @@ public class FactualTest {
 
     Pred complicated = new Pred("$and", in, orStarCoffee);
 
-    Response resp = factual.fetch("places", new Query()
+    ReadResponse resp = factual.read("places", new Query()
     .filter(complicated));
 
     assertOk(resp);
@@ -159,24 +160,101 @@ public class FactualTest {
   public void testSimpleTel() {
     Pred tel = new Pred("$bw", "tel", "(212)");
 
-    Response resp = factual.fetch("places", new Query()
+    ReadResponse resp = factual.read("places", new Query()
     .filter(tel));
 
     assertOk(resp);
   }
 
-  private static final void assertOk(Response resp) {
-    assertEquals("ok", resp.getStatus());
-    assertFalse(resp.getData().isEmpty());
+  @Test
+  public void testCrosswalk_ex1() {
+    CrosswalkResponse resp =
+      factual.fetch("places", new CrosswalkQuery()
+      .factualId("97598010-433f-4946-8fd5-4a6dd1639d77"));
+    List<Crosswalk> crosswalks = resp.getCrosswalks();
+
+    assertOk(resp);
+    assertFalse(crosswalks.isEmpty());
+    assertFactualId(crosswalks, "97598010-433f-4946-8fd5-4a6dd1639d77");
   }
 
-  private void assertAll(Response resp, String field, String expected) {
+  @Test
+  public void testCrosswalk_ex2() {
+    CrosswalkResponse resp =
+      factual.fetch("places", new CrosswalkQuery()
+      .factualId("97598010-433f-4946-8fd5-4a6dd1639d77")
+      .only("loopt"));
+    List<Crosswalk> crosswalks = resp.getCrosswalks();
+
+    assertOk(resp);
+    assertEquals(1, crosswalks.size());
+    assertFactualId(crosswalks, "97598010-433f-4946-8fd5-4a6dd1639d77");
+    assertNamespace(crosswalks, "loopt");
+  }
+
+  @Test
+  public void testCrosswalk_ex3() {
+    CrosswalkResponse resp =
+      factual.fetch("places", new CrosswalkQuery()
+      .namespace("foursquare")
+      .namespaceId("4ae4df6df964a520019f21e3"));
+    List<Crosswalk> crosswalks = resp.getCrosswalks();
+
+    assertOk(resp);
+    assertFalse(crosswalks.isEmpty());
+    // The Stand
+    assertFactualId(crosswalks, "97598010-433f-4946-8fd5-4a6dd1639d77");
+  }
+
+  @Test
+  public void testCrosswalk_ex4() {
+    CrosswalkResponse resp =
+      factual.fetch("places", new CrosswalkQuery()
+      .namespace("foursquare")
+      .namespaceId("4ae4df6df964a520019f21e3")
+      .only("yelp"));
+    List<Crosswalk> crosswalks = resp.getCrosswalks();
+
+    assertOk(resp);
+    assertFalse(crosswalks.isEmpty());
+    assertNamespace(crosswalks, "yelp");
+  }
+
+  @Test
+  public void testCrosswalk_limit() {
+    CrosswalkResponse resp =
+      factual.fetch("places", new CrosswalkQuery()
+      .factualId("97598010-433f-4946-8fd5-4a6dd1639d77")
+      .limit(1));
+    List<Crosswalk> crosswalks = resp.getCrosswalks();
+
+    assertOk(resp);
+    assertEquals(1, crosswalks.size());
+  }
+
+  private void assertFactualId(List<Crosswalk> crosswalks, String id) {
+    for(Crosswalk cw : crosswalks) {
+      assertEquals(id, cw.getFactualId());
+    }
+  }
+
+  private void assertNamespace(List<Crosswalk> crosswalks, String ns) {
+    for(Crosswalk cw : crosswalks) {
+      assertEquals(ns, cw.getNamespace());
+    }
+  }
+
+  private static final void assertOk(Response resp) {
+    assertEquals("ok", resp.getStatus());
+  }
+
+  private void assertAll(ReadResponse resp, String field, String expected) {
     for(String out : resp.mapStrings(field)) {
       assertEquals(expected, out);
     }
   }
 
-  private void assertStartsWith(Response resp, String field, String substr) {
+  private void assertStartsWith(ReadResponse resp, String field, String substr) {
     for(String out : resp.mapStrings(field)) {
       assertTrue(out.startsWith(substr));
     }

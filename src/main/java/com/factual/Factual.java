@@ -23,7 +23,7 @@ import com.google.common.io.Closeables;
  * @author aaron
  */
 public class Factual {
-  private String factHome = "http://api.v3.factual.com/t/";
+  private String factHome = "http://api.v3.factual.com/";
   private final String key;
   private final OAuthHmacSigner signer;
 
@@ -55,21 +55,32 @@ public class Factual {
   }
 
   /**
-   * Runs <tt>query</tt> against the specified Factual table.
+   * Runs a read <tt>query</tt> against the specified Factual table.
    * 
    * @param tableName
    *          the name of the table you wish to query (e.g., "places")
    * @param query
-   *          the query you wish to run against <tt>table</tt>.
+   *          the read query to run against <tt>table</tt>.
    * @return the response of running <tt>query</tt> against Factual.
    */
-  public Response fetch(String tableName, Query query) {
-    return Response.fromJson(request(tableName, query));
+  public ReadResponse read(String tableName, Query query) {
+    return new ReadResponse(request(urlForFetch(tableName, query)));
   }
 
-  private String request(String tableName, Query query) {
-    GenericUrl url;
-    url = new GenericUrl(factHome + tableName + "?" + query.toUrlQuery());
+  public CrosswalkResponse fetch(String tableName, CrosswalkQuery query) {
+    return new CrosswalkResponse(request(urlForCrosswalk(tableName, query)));
+  }
+
+  private String urlForCrosswalk(String tableName, CrosswalkQuery query) {
+    return factHome + tableName + "/crosswalk?" + query.toUrlQuery();
+  }
+
+  private String urlForFetch(String tableName, Query query) {
+    return factHome + "t/" + tableName + "?" + query.toUrlQuery();
+  }
+
+  private String request(String urlStr) {
+    GenericUrl url = new GenericUrl(urlStr);
     String requestMethod = "GET";
 
     // Configure OAuth request params
