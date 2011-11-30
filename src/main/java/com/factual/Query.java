@@ -20,7 +20,7 @@ public class Query {
   private int offset;
   private boolean includeRowCount;
   private Circle circle;
-  private final List<Pred> rowFilters = Lists.newArrayList();
+  private final List<Filter> rowFilters = Lists.newArrayList();
 
 
   /**
@@ -89,61 +89,8 @@ public class Query {
     return this;
   }
 
-  /**
-   * Adds the specified row filter predicate to this Query. The predicate may be
-   * arbitrarily complex.
-   * 
-   * @return this Query.
-   */
-  public Query filter(Pred pred) {
-    rowFilters.add(pred);
-    return this;
-  }
-
-  /**
-   * Convenience method for adding a top-level row filter for "<tt>field</tt>
-   * must equal <tt>val</tt>".
-   * <p>
-   * 
-   * This is equivalent to:
-   * 
-   * <pre>
-   * .filter("$eq", field, val)
-   * </pre>
-   * 
-   * Which is also equivalent to:
-   * 
-   * <pre>
-   * .filter(new Pred("$eq", field, val))
-   * </pre>
-   * 
-   * @return this Query, with the specified row filter added.
-   */
-  public Query filter(String field, String val) {
-    rowFilters.add(new Pred("$eq", field, val));
-    return this;
-  }
-
-  /**
-   * Convenience method for adding a top-level row filter to this Query. Examples:
-   * <p>
-   * <pre>
-   * .filter("$eq", "name", "Starbucks")
-   * </pre>
-   * 
-   * <pre>
-   * .filter("$blank", "tel", false)
-   * </pre>
-   * 
-   * <pre>
-   * .filter("$in", "region", "MA", "VT", "NH")
-   * </pre>
-   * 
-   * @return this Query.
-   */
-  public Query filter(String op, Object... args) {
-    rowFilters.add(new Pred(op, args));
-    return this;
+  public FilterBuilder criteria(String fieldName) {
+    return new FilterBuilder(fieldName);
   }
 
   /**
@@ -211,9 +158,26 @@ public class Query {
     } else if(rowFilters.size() == 1) {
       return rowFilters.get(0).toJsonStr();
     } else {
-      Pred[] preds = rowFilters.toArray(new Pred[]{});
-      return new Pred("$and", (Object[])preds).toJsonStr();
+      return new AndFilter(rowFilters).toJsonStr();
     }
+  }
+
+  public QueryBuilder field(String fieldName) {
+    return new QueryBuilder(this, fieldName);
+  }
+
+  public Query or(Filter... filters) {
+    rowFilters.add(new OrFilter(filters));
+    return this;
+  }
+
+  public Query and(Filter... filters) {
+    rowFilters.add(new AndFilter(filters));
+    return this;
+  }
+
+  public void add(Filter filter) {
+    rowFilters.add(filter);
   }
 
 }

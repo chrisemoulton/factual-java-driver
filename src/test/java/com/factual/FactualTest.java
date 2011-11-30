@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -40,7 +41,7 @@ public class FactualTest {
   @Test
   public void testCoreExample1() {
     ReadResponse resp = factual.read("places",
-        new Query().filter("country", "US"));
+        new Query().field("country").equal("US"));
 
     assertOk(resp);
     assertAll(resp, "country", "US");
@@ -53,7 +54,7 @@ public class FactualTest {
   @Test
   public void testCoreExample2() {
     ReadResponse resp = factual.read("places", new Query()
-    .filter("$bw", "name", "Star")
+    .field("name").startsWith("Star")
     .includeRowCount());
 
     assertOk(resp);
@@ -94,7 +95,7 @@ public class FactualTest {
   @Test
   public void testCoreExample5() {
     ReadResponse resp = factual.read("places", new Query()
-    .filter("name", "Stand")
+    .field("name").equal("Stand")
     .within(new Circle(34.06018, -118.41835, 5000)));
 
     assertOk(resp);
@@ -106,8 +107,8 @@ public class FactualTest {
   @Test
   public void testRowFilters_2beginsWith() {
     ReadResponse resp = factual.read("places", new Query()
-    .filter("$bw", "name", "McDonald's")
-    .filter("$bw", "category", "Food & Beverage"));
+    .field("name").startsWith("McDonald's")
+    .field("category").startsWith("Food & Beverage"));
 
     assertOk(resp);
     assertStartsWith(resp, "name", "McDonald");
@@ -115,18 +116,20 @@ public class FactualTest {
   }
 
   /**
-   * {"$or":[{"tel":{"$blank":true}},{"tel":{"$bw":"(212)"}}]}
+   * {"$or":[{"tel":{"$blank":true}},{"name":{"$bw":"Star"}}]}
    */
   @Test
   public void testRowFilters_2_ORs() {
-    Pred tel = new Pred("$blank", "tel", true);
-    Pred bw = new Pred("$bw", "name", "Star");
-    Pred starOrTelBlank = new Pred("$or", tel, bw);
+    Query q = new Query();
+    q.or(
+        q.criteria("tel").isBlank(),
+        q.criteria("name").startsWith("Star")
+    );
 
-    ReadResponse resp = factual.read("places", new Query()
-    .filter(starOrTelBlank));
+    ReadResponse resp = factual.read("places", q);
 
     assertOk(resp);
+    //TODO: verify data
   }
 
   /**
@@ -139,29 +142,44 @@ public class FactualTest {
    *     {name:{$bw:"Star"}},
    *     {name:{$bw:"Coffee"}}]}]}
    * </pre>
+   * @throws UnsupportedEncodingException
    */
   @Test
   public void testComplicated() {
-    Pred in = new Pred("$in", "region", "MA", "VT", "NH");
-    Pred bwStar = new Pred("$bw", "name", "Star");
-    Pred bwCoffee = new Pred("$bw", "name", "Coffee");
-    Pred orStarCoffee = new Pred("$or", bwStar, bwCoffee);
+    Query q = new Query();
+    q.field("region").in("MA","VT","NH");
+    q.or(
+        q.criteria("name").startsWith("Coffee"),
+        q.criteria("name").startsWith("Star")
+    );
 
-    Pred complicated = new Pred("$and", in, orStarCoffee);
-
-    ReadResponse resp = factual.read("places", new Query()
-    .filter(complicated));
+    ReadResponse resp = factual.read("places", q);
 
     assertOk(resp);
+
+    // assert region in {"MA","VT","NH"}
+    for(String region : resp.mapStrings("region")){
+      assertTrue(
+          "MA".equals(region) ||
+          "VT".equals(region) ||
+          "NH".equals(region)
+      );
+    }
+
+    // assert name starts with (coffee || star)
+    for(String name : resp.mapStrings("name")){
+      assertTrue(
+          name.toLowerCase().startsWith("coffee") ||
+          name.toLowerCase().startsWith("star")
+      );
+    }
   }
 
   @Test
   @Ignore("Until our server-side parser properly handles ( and )")
   public void testSimpleTel() {
-    Pred tel = new Pred("$bw", "tel", "(212)");
-
     ReadResponse resp = factual.read("places", new Query()
-    .filter(tel));
+    .field("tel").startsWith("(212)"));
 
     assertOk(resp);
   }
