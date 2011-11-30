@@ -3,6 +3,7 @@ package com.factual;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
@@ -248,6 +249,19 @@ public class FactualTest {
 
     assertOk(resp);
     assertEquals(1, crosswalks.size());
+  }
+
+  @Test
+  public void testApiException() {
+    Factual badness = new Factual("badkey", "badsecret");
+    try{
+      badness.read("places", new Query().field("country").equal(true));
+      fail("Expected to catch a FactualApiException");
+    } catch (FactualApiException e) {
+      assertEquals(401, e.getResponse().statusCode);
+      assertEquals("Unauthorized", e.getResponse().statusMessage);
+      assertTrue(e.getRequestUrl().startsWith("http://api.v3.factual.com/t/places"));
+    }
   }
 
   private void assertFactualId(List<Crosswalk> crosswalks, String id) {

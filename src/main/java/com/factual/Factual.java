@@ -11,6 +11,7 @@ import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.client.http.HttpResponse;
+import com.google.api.client.http.HttpResponseException;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.common.io.Closeables;
@@ -105,8 +106,10 @@ public class Factual {
       br = new BufferedReader(new InputStreamReader(response.getContent()));
 
       return br.readLine();
+    } catch (HttpResponseException e) {
+      throw new FactualApiException(e).requestUrl(urlStr).requestMethod(requestMethod).response(e.response);
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new FactualApiException(e).requestUrl(urlStr).requestMethod(requestMethod);
     } catch (GeneralSecurityException e) {
       throw new RuntimeException(e);
     } finally {
