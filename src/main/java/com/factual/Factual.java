@@ -8,6 +8,7 @@ import java.security.GeneralSecurityException;
 import com.google.api.client.auth.oauth.OAuthHmacSigner;
 import com.google.api.client.auth.oauth.OAuthParameters;
 import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.client.http.HttpResponse;
@@ -24,6 +25,7 @@ import com.google.common.io.Closeables;
  * @author aaron
  */
 public class Factual {
+  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.0";
   private String factHome = "http://api.v3.factual.com/";
   private final String key;
   private final OAuthHmacSigner signer;
@@ -100,6 +102,10 @@ public class Factual {
       HttpTransport transport = new NetHttpTransport();
       HttpRequestFactory f = transport.createRequestFactory(params);
       HttpRequest request = f.buildGetRequest(url);
+
+      HttpHeaders headers = new HttpHeaders();
+      headers.set("X-FACTUAL-LIB", DRIVER_HEADER_TAG);
+      request.headers = headers;
 
       // get the response
       HttpResponse response = request.execute();
