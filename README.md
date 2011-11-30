@@ -51,16 +51,12 @@ The <tt>Query</tt> object provides a fluent interface that allows you to add in 
 	Query q = new Query();
 	q.or(
 	  q.criteria("tel").isBlank(),
-	  q.criteria("name").startsWith("Starbucks")
-        );
+	  q.criteria("name").startsWith("Starbucks"));
 
 ### limit and offset
 
 You can use limit and offset to support basic results paging. For example:
 	Query query = new Query().limit(10).offset(150);
-
-
-
 
 
 ## More Examples
