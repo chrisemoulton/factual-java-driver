@@ -58,7 +58,21 @@ The <tt>Query</tt> object provides a fluent interface that allows you to add in 
 You can use limit and offset to support basic results paging. For example:
 	Query query = new Query().limit(10).offset(150);
 
+# Exception Handling
 
-## More Examples
+If Factual's API indicates an error, a <tt>FactualApiException</tt> unchecked Exception will be thrown. It will contain details about the request you sent and the error that Factual returned.
+
+Here is an example of catching a <tt>FactualApiException</tt> and inspecting it:
+
+	Factual badness = new Factual("BAD_KEY", "BAD_SECRET");
+	try{
+	  badness.read("places", new Query().field("country").equal(true));
+	} catch (FactualApiException e) {
+	  System.out.println("Requested URL: " + e.getRequestUrl());
+	  System.out.println("Error Status Code: " + e.getResponse().statusCode);
+	  System.out.println("Error Response Message: " + e.getResponse().statusMessage);
+	}
+
+# More Examples
 
 See the [detailed integration tests](https://github.com/Factual/factual-java-driver/blob/master/src/test/java/com/factual/FactualTest.java)
