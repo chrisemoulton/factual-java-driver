@@ -52,6 +52,13 @@ public class ReadResponse extends Response {
   }
 
   /**
+   * @return the size of the result set
+   */
+  public int size() {
+    return data.size();
+  }
+
+  /**
    * @return a Collection of all String values found in this Response's data
    *         rows as the <tt>field</tt> attribute.
    */

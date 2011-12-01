@@ -62,6 +62,10 @@ public class QueryBuilder {
     return addFilter("$blank", true);
   }
 
+  public Query isNotBlank() {
+    return addFilter("$blank", false);
+  }
+
   public Query greaterThan(Object arg) {
     return addFilter("$gt", arg);
   }
