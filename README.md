@@ -13,32 +13,30 @@ Factual's [web-based API](http://developer.factual.com) offers:
 
 TODO: JAR_DOWNLOAD_LINK
 
-# Basics
+# Setup
 
-## Setup
-
+  // Create an authenticated handle to Factual
 	Factual factual = new Factual(MY_KEY, MY_SECRET);
 
-## Constructing Read Queries
+# Simple Read Example
 
-The <tt>Query</tt> object provides a fluent interface that allows you to add in constraints for things like limit, offset, full text searches, and row filters.
+  // Create a simple query to get 3 random records:
+  Query q = new Query().limit(3);
 
-Once you've built up the Query you want, you call <tt>.read</tt> on your authorized Factual object, passing in the desired table name.
+  // Run the query on Factual's "places" table:
+  ReadResponse resp = factual.read("places", q);
 
-<tt>.read</tt> takes the table name as the first argument, followed by a <tt>Query</tt>. It returns a ReadResponse, which contains the results of the query.
-
-## Simple Read Example
-
-	;; Fetch 3 random records from Factual's "places" table and print their names
-	ReadResponse resp = factual.read("places", new Query().limit(3));
-	System.out.println(resp.mapStrings("name"));
+  // Print out each record:
+  for(Map record : resp.getData()) {
+    System.out.println(record);
+  }
 	
-### Full Text Search
+# Full Text Search
 
-	Query q = new Query();
+  // Add a row-wide Full Text Search to a query:
 	q.fullTextSearch("Sushi Santa Monica");
 
-### Limit and Offset
+# Limit and Offset
 
 You can use limit and offset to support basic results paging. For example:
 
