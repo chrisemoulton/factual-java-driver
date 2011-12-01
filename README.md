@@ -224,7 +224,7 @@ This takes advantage of the fact that all row filters set at the top level of th
   </tr>
 </table>
 
-NOTE: although these parameters are individually optional, at least one of the following paramater combinations is required:
+NOTE: although these parameters are individually optional, at least one of the following parameter combinations is required:
 
 * factualId
 * namespace and namespaceId
@@ -236,7 +236,7 @@ NOTE: although these parameters are individually optional, at least one of the f
 	.factualId("97598010-433f-4946-8fd5-4a6dd1639d77") // The Stand restaurant
 	.only("loopt");
 
-	// Query for Crosswalk data for The Stand using it's Foursquare ID
+	// Query for Crosswalk data for The Stand using its Foursquare ID
 	CrosswalkQuery q = new CrosswalkQuery()
 	.namespace("foursquare")
 	.namespaceId("4ae4df6df964a520019f21e3");  // Foursquare's id for The Stand
