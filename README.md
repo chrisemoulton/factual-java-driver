@@ -19,22 +19,34 @@ TODO: JAR_DOWNLOAD_LINK
 
 	Factual factual = new Factual(MY_KEY, MY_SECRET);
 
-## Simple Read
-
-	;; Fetch 3 random Places from Factual and print their names
-	ReadResponse resp = factual.read("places", new Query().limit(3));
-	System.out.println(resp.mapStrings("name"));
-        
-<tt>read</tt> takes the table name as the first argument, followed by a <tt>Query</tt>. It returns a ReadResponse, which contains the results of the query.
-
 ## Constructing Read Queries
 
 The <tt>Query</tt> object provides a fluent interface that allows you to add in constraints for things like limit, offset, full text searches, and row filters.
 
-### row filters
+Once you've built up the Query you want, you call <tt>.read</tt> on your authorized Factual object, passing in the desired table name.
+
+<tt>.read</tt> takes the table name as the first argument, followed by a <tt>Query</tt>. It returns a ReadResponse, which contains the results of the query.
+
+## Simple Read Example
+
+	;; Fetch 3 random records from Factual's "places" table and print their names
+	ReadResponse resp = factual.read("places", new Query().limit(3));
+	System.out.println(resp.mapStrings("name"));
+	
+### Full Text Search
+
+	Query q = new Query();
+	q.fullTextSearch("Sushi Santa Monica");
+
+### Limit and Offset
+
+You can use limit and offset to support basic results paging. For example:
+	Query query = new Query().limit(10).offset(150);
+
+### Row Filters
 
 	// Find places whose name field starts with "Starbucks"
-	Query query = new Query().field("name").startsWith("Starbucks")
+	Query query = new Query().field("name").startsWith("Starbucks");
 
 	// Find places with a blank telephone number
 	Query query = new Query().field("tel").isBlank();
@@ -119,7 +131,7 @@ The <tt>Query</tt> object provides a fluent interface that allows you to add in 
 To run full text searches that are constrained to specific fields (versus using .fullTextSearch on the full Query which searches all searchable fields in a table) you can:
 
 	Query q = new Query();
-	q.field("name").fullTextSearch("Fried Chicken")
+	q.field("name").fullTextSearch("Fried Chicken");
 
 #### AND
 
@@ -157,11 +169,6 @@ This takes advantage of the fact that all row filters set at the top level of th
 	    q.criteria("city").equal("Los Angeles")
 	  )
 	);
-
-### limit and offset
-
-You can use limit and offset to support basic results paging. For example:
-	Query query = new Query().limit(10).offset(150);
 
 # Exception Handling
 
