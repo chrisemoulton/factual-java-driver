@@ -41,11 +41,20 @@ The <tt>Query</tt> object provides a fluent interface that allows you to add in 
 
 #### suported predicates
 
-|predicate | description | example|
-|------------- | -------------|
-||equal | <tt>query.field("name").equal("Jerry's Famous Deli")</tt>|
-|startsWith | <tt>query.field("name").startsWith("Jerry")</tt>|
+<table>
+  <tr>
+    <td>Predicate</td>
+    <td>Description</td>
+    <td>Example</td>
+  </tr>
+  <tr>
+    <td>equal</td>
+    <td>equal to</td>
+    <td>q.field("name").equal("Jerry's Famous Deli")</td>
+  </tr>
+</table>    
 
+#### AND
 
 #### OR
 
@@ -53,6 +62,8 @@ The <tt>Query</tt> object provides a fluent interface that allows you to add in 
 	q.or(
 	  q.criteria("tel").isBlank(),
 	  q.criteria("name").startsWith("Starbucks"));
+	  
+#### Combined ANDs and ORs
 
 ### limit and offset
 
