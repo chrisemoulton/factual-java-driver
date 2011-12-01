@@ -43,14 +43,24 @@ The <tt>Query</tt> object provides a fluent interface that allows you to add in 
 
 <table>
   <tr>
-    <td>Predicate</td>
-    <td>Description</td>
-    <td>Example</td>
+    <th>Predicate</th>
+    <th>Description</th>
+    <th>Example</th>
   </tr>
   <tr>
     <td>equal</td>
     <td>equal to</td>
-    <td>q.field("name").equal("Jerry's Famous Deli")</td>
+    <td>q.field("region").equal("CA")</td>
+  </tr>
+  <tr>
+    <td>notEqual</td>
+    <td>not equal to</td>
+    <td>q.field("region").notEqual("CA")</td>
+  </tr>
+  <tr>
+    <td>in</td>
+    <td>equals any of</td>
+    <td>q.field("region").in("MA", "VT", "NH", "RI", "CT")</td>
   </tr>
 </table>    
 
