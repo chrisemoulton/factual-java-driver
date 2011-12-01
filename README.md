@@ -209,11 +209,11 @@ This takes advantage of the fact that all row filters set at the top level of th
   </tr>
   <tr>
     <td>namespace</td>
-    <td>The namespace to search for a third party ID within. A list of <b>currently supported</b> services is [here](http://developer.factual.com/display/docs/Places+API+-+Supported+Crosswalk+Services).</td>
+    <td>The namespace to search for a third party ID within. A list of <b>currently supported</b> services is <a href="http://developer.factual.com/display/docs/Places+API+-+Supported+Crosswalk+Services">here</a>.</td>
     <td><tt>q.namespace("foursquare")</tt></td>
   </tr>
   <tr>
-    <td>namespace_id</td>
+    <td>namespaceId</td>
     <td>The id used by a third party to identify a place.</td>
     <td><tt>q.namespaceId("443338")</tt></td>
   </tr>
@@ -226,8 +226,8 @@ This takes advantage of the fact that all row filters set at the top level of th
 
 NOTE: although these parameters are individually optional, at least one of the following paramater combinations is required:
 
-* factual_id
-* namespace and namespace_id
+* factualId
+* namespace and namespaceId
 
 # Exception Handling
 
