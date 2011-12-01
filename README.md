@@ -41,7 +41,13 @@ Once you've built up the Query you want, you call <tt>.read</tt> on your authori
 ### Limit and Offset
 
 You can use limit and offset to support basic results paging. For example:
+
 	Query query = new Query().limit(10).offset(150);
+	
+### Geo Filters
+
+	Query q = new Query();
+	.within(new Circle(34.06018, -118.41835, 5000)));
 
 ### Row Filters
 
