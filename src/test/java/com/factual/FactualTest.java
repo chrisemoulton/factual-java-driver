@@ -174,10 +174,11 @@ public class FactualTest {
   @Test
   public void testFullTextSearch_on_a_field() {
     ReadResponse resp = factual.read("places", new Query()
-    .fullTextSearch("Fried Chicken"));
+    .field("name").fullTextSearch("Fried Chicken"));
 
     for(String name : resp.mapStrings("name")) {
-      assertTrue(name.toLowerCase().contains("fried") || name.toLowerCase().contains("chicken"));
+      System.out.println(name);
+      assertTrue(name.toLowerCase().contains("frie") || name.toLowerCase().contains("fry") || name.toLowerCase().contains("chicken"));
     }
   }
 
