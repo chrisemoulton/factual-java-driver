@@ -12,7 +12,6 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 
@@ -55,7 +54,7 @@ public class FactualTest {
   @Test
   public void testCoreExample2() {
     ReadResponse resp = factual.read("places", new Query()
-    .field("name").startsWith("Star")
+    .field("name").beginsWith("Star")
     .includeRowCount());
 
     assertOk(resp);
@@ -63,7 +62,7 @@ public class FactualTest {
   }
 
   /**
-   * Do a full-text search of the restaurant databse for rows that match the
+   * Do a full-text search of the restaurant database for rows that match the
    * terms "Fried Chicken, Los Angeles"
    */
   @Test
@@ -108,8 +107,8 @@ public class FactualTest {
   @Test
   public void testRowFilters_2beginsWith() {
     ReadResponse resp = factual.read("places", new Query()
-    .field("name").startsWith("McDonald's")
-    .field("category").startsWith("Food & Beverage"));
+    .field("name").beginsWith("McDonald's")
+    .field("category").beginsWith("Food & Beverage"));
 
     assertOk(resp);
     assertStartsWith(resp, "name", "McDonald");
@@ -133,8 +132,8 @@ public class FactualTest {
     Query q = new Query();
     q.field("region").in("MA","VT","NH");
     q.or(
-        q.criteria("name").startsWith("Coffee"),
-        q.criteria("name").startsWith("Star")
+        q.criteria("name").beginsWith("Coffee"),
+        q.criteria("name").beginsWith("Star")
     );
 
     ReadResponse resp = factual.read("places", q);
@@ -160,12 +159,26 @@ public class FactualTest {
   }
 
   @Test
-  @Ignore("Until our server-side parser properly handles ( and )")
   public void testSimpleTel() {
     ReadResponse resp = factual.read("places", new Query()
-    .field("tel").startsWith("(212)"));
+    .field("tel").beginsWith("(212)"));
+
+    assertStartsWith(resp, "tel", "(212)");
 
     assertOk(resp);
+  }
+
+  /**
+   * Search for places with names that have the terms "Fried Chicken"
+   */
+  @Test
+  public void testFullTextSearch_on_a_field() {
+    ReadResponse resp = factual.read("places", new Query()
+    .fullTextSearch("Fried Chicken"));
+
+    for(String name : resp.mapStrings("name")) {
+      assertTrue(name.toLowerCase().contains("fried") || name.toLowerCase().contains("chicken"));
+    }
   }
 
   @Test
