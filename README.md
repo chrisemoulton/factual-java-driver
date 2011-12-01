@@ -41,10 +41,10 @@ The <tt>Query</tt> object provides a fluent interface that allows you to add in 
 
 #### suported predicates
 
-predicate | description | example
-------------- | -------------
-equal | <tt>query.field("name").equal("Jerry's Famous Deli")</tt>
-startsWith | <tt>query.field("name").startsWith("Jerry")</tt>
+|predicate | description | example|
+|------------- | -------------|
+||equal | <tt>query.field("name").equal("Jerry's Famous Deli")</tt>|
+|startsWith | <tt>query.field("name").startsWith("Jerry")</tt>|
 
 
 #### OR
