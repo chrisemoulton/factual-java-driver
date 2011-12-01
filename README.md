@@ -229,6 +229,21 @@ NOTE: although these parameters are individually optional, at least one of the f
 * factualId
 * namespace and namespaceId
 
+## More Crosswalk Examples
+
+	// Query for Crosswalk data for The Stand, but for just the Loopt namespace:
+	CrosswalkQuery q = new CrosswalkQuery()
+	.factualId("97598010-433f-4946-8fd5-4a6dd1639d77") // The Stand restaurant
+	.only("loopt");
+
+	// Query for Crosswalk data for The Stand using it's Foursquare ID
+	CrosswalkQuery q = new CrosswalkQuery()
+	.namespace("foursquare")
+	.namespaceId("4ae4df6df964a520019f21e3");  // Foursquare's id for The Stand
+
+	// Limit the above Query to ONLY return Yelp.com's Crosswalk data for The Stand:
+	q.only("yelp");
+
 # Exception Handling
 
 If Factual's API indicates an error, a <tt>FactualApiException</tt> unchecked Exception will be thrown. It will contain details about the request you sent and the error that Factual returned.
