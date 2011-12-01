@@ -117,23 +117,6 @@ public class FactualTest {
   }
 
   /**
-   * {"$or":[{"tel":{"$blank":true}},{"name":{"$bw":"Star"}}]}
-   */
-  @Test
-  public void testRowFilters_2_ORs() {
-    Query q = new Query();
-    q.or(
-        q.criteria("tel").isBlank(),
-        q.criteria("name").startsWith("Star")
-    );
-
-    ReadResponse resp = factual.read("places", q);
-
-    assertOk(resp);
-    //TODO: verify data
-  }
-
-  /**
    * Tests a top-level AND with a nested OR and an $in:
    * 
    * <pre>

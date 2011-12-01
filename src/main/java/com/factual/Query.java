@@ -20,6 +20,10 @@ public class Query {
   private int offset;
   private boolean includeRowCount;
   private Circle circle;
+
+  /**
+   * Holds all row filters for this Query. Implicit top-level AND.
+   */
   private final List<Filter> rowFilters = Lists.newArrayList();
 
 
@@ -89,8 +93,26 @@ public class Query {
     return this;
   }
 
+  /**
+   * Begins construction of a new row filter.
+   * 
+   * @param fieldName
+   *          the name of the field on which to filter.
+   * @return A partial representation of the new row filter.
+   */
   public FilterBuilder criteria(String fieldName) {
     return new FilterBuilder(fieldName);
+  }
+
+  /**
+   * Begins construction of a new row filter for this Query.
+   * 
+   * @param fieldName
+   *          the name of the field on which to filter.
+   * @return A partial representation of the new row filter.
+   */
+  public QueryBuilder field(String fieldName) {
+    return new QueryBuilder(this, fieldName);
   }
 
   /**
@@ -103,6 +125,43 @@ public class Query {
   public Query within(Circle circle) {
     this.circle = circle;
     return this;
+  }
+
+  /**
+   * Adds <tt>filters</tt> to this Query, grouped into a logical AND.
+   */
+  public Query and(Filter... filters) {
+    rowFilters.add(new FilterGroup(filters));
+    return this;
+  }
+
+  /**
+   * Used to nest AND'ed predicates.
+   */
+  public Query and(Query... queries) {
+    return popFilters("$and", queries);
+  }
+
+  /**
+   * Adds <tt>filters</tt> to this Query, grouped into a logical OR.
+   */
+  public Query or(Filter... filters) {
+    rowFilters.add(new FilterGroup(filters).asOR());
+    return this;
+  }
+
+  /**
+   * Used to nest OR'ed predicates.
+   */
+  public Query or(Query... queries) {
+    return popFilters("$or", queries);
+  }
+
+  /**
+   * Adds <tt>filter</tt> to this Query.
+   */
+  public void add(Filter filter) {
+    rowFilters.add(filter);
   }
 
   /**
@@ -158,26 +217,29 @@ public class Query {
     } else if(rowFilters.size() == 1) {
       return rowFilters.get(0).toJsonStr();
     } else {
-      return new AndFilter(rowFilters).toJsonStr();
+      return new FilterGroup(rowFilters).toJsonStr();
     }
   }
 
-  public QueryBuilder field(String fieldName) {
-    return new QueryBuilder(this, fieldName);
-  }
-
-  public Query or(Filter... filters) {
-    rowFilters.add(new OrFilter(filters));
+  /**
+   * Pops the newest Filter from each of <tt>queries</tt>,
+   * grouping each popped Filter into one new FilterGroup.
+   * Adds that new FilterGroup as the newest Filter in this
+   * Query.
+   * <p>
+   * The FilterGroup's logic will be determined by <tt>op</tt>.
+   */
+  private Query popFilters(String op, Query... queries) {
+    FilterGroup group = new FilterGroup().op(op);
+    for(Query q : queries) {
+      group.add(pop(q.rowFilters));
+    }
+    add(group);
     return this;
   }
 
-  public Query and(Filter... filters) {
-    rowFilters.add(new AndFilter(filters));
-    return this;
-  }
-
-  public void add(Filter filter) {
-    rowFilters.add(filter);
+  private Filter pop(List<Filter> list) {
+    return list.remove(list.size()-1);
   }
 
 }

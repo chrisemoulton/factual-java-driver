@@ -6,19 +6,46 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 
-public class AndFilter implements Filter {
+/**
+ * Represents a group of Filters as one Filter.
+ * 
+ * @author aaron
+ */
+public class FilterGroup implements Filter {
   private final List<Filter> filters;
+  private String op = "$and";
 
 
-  public AndFilter(List<Filter> filters) {
+  /**
+   * Constructor. Defaults logic to AND.
+   */
+  public FilterGroup(List<Filter> filters) {
     this.filters = filters;
   }
 
-  public AndFilter(Filter... filters) {
+  /**
+   * Constructor. Defaults logic to AND.
+   */
+  public FilterGroup(Filter... filters) {
     this.filters = Lists.newArrayList();
     for(Filter f : filters) {
       this.filters.add(f);
     }
+  }
+
+  /**
+   * Sets this FilterGroup's logic, e.g., "$or".
+   */
+  public FilterGroup op(String op) {
+    this.op = op;
+    return this;
+  }
+
+  /**
+   * Sets this FilterGroup's logic to be OR.
+   */
+  public FilterGroup asOR() {
+    return op("$or");
   }
 
   public void add(Filter filter) {
@@ -26,7 +53,7 @@ public class AndFilter implements Filter {
   }
 
   /**
-   * Produces JSON representation of the represented AND filter logic.
+   * Produces JSON representation for this FilterGroup
    * <p>
    * For example:
    * <pre>
@@ -35,7 +62,7 @@ public class AndFilter implements Filter {
    */
   @Override
   public String toJsonStr() {
-    return "{\"$and\":[" + logicJsonStr() + "]}";
+    return "{\"" + op + "\":[" + logicJsonStr() + "]}";
   }
 
   private String logicJsonStr() {

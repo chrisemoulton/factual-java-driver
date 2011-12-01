@@ -69,24 +69,33 @@ public class QueryTest {
         decoded);
   }
 
-  //  @Test
-  //  public void test() throws UnsupportedEncodingException {
-  //    Query q = new Query();
-  //
-  //    q.and(
-  //        q.or(
-  //            q.criteria("first_name").equal("Chun"),
-  //            q.criteria("last_name").equal("Kok")
-  //        ),
-  //        q.or(
-  //            q.criteria("region").equal("NM"),
-  //            q.criteria("region").equal("CA")
-  //        )
-  //    );
-  //
-  //    String queryStr = q.toUrlQuery();
-  //    String decoded = URLDecoder.decode(queryStr, "UTF-8");
-  //
-  //    System.out.println(decoded);
-  //  }
+  @Test
+  public void testNestedFilterLogic() throws UnsupportedEncodingException {
+    Query q = new Query();
+    q.or(
+        q.or(
+            q.criteria("first_name").equal("Chun"),
+            q.criteria("last_name").equal("Kok")
+        ),
+        q.and(
+            q.criteria("score").equal("38"),
+            q.criteria("city").equal("Los Angeles")
+        )
+    );
+
+    /**
+    filters={"$or":[
+                      {"$and":[
+                                {"score":{"$eq":"38"}},
+                                {"city":{"$eq":"Los Angeles"}}]},
+                      {"$or":[
+                                {"first_name":{"$eq":"Chun"}},
+                                {"last_name":{"$eq":"Kok"}}]}]}
+     */
+    String queryStr = q.toUrlQuery();
+    String decoded = URLDecoder.decode(queryStr, "UTF-8");
+
+    assertEquals("filters={\"$or\":[{\"$and\":[{\"score\":{\"$eq\":\"38\"}},{\"city\":{\"$eq\":\"Los Angeles\"}}]},{\"$or\":[{\"first_name\":{\"$eq\":\"Chun\"}},{\"last_name\":{\"$eq\":\"Kok\"}}]}]}",
+        decoded);
+  }
 }
