@@ -173,6 +173,62 @@ This takes advantage of the fact that all row filters set at the top level of th
 	  )
 	);
 
+# Crosswalk
+
+## Simple Crosswalk Example
+
+	// Build a Crosswalk query to get data for a specific Factual entity:
+	CrosswalkQuery q = new CrosswalkQuery();
+	q.factualId("97598010-433f-4946-8fd5-4a6dd1639d77");
+
+	// Run the query on Factual's "places" table:
+	CrosswalkResponse resp = factual.fetch("places", q);
+
+	// Print out the Crosswalk results:
+	for(Crosswalk cw : resp.getCrosswalks()) {
+	  System.out.println(cw);
+	}
+
+## Crosswalk Filter Parameters
+
+<table>
+  <tr>
+    <th>Filter</th>
+    <th>Description</th>
+    <th>Example</th>
+  </tr>
+  <tr>
+    <td>factualId</td>
+    <td>A Factual ID for an entity in the Factual places database</td>
+    <td><tt>q.factualId("97598010-433f-4946-8fd5-4a6dd1639d77")</tt></td>
+  </tr>
+  <tr>
+    <td>limit</td>
+    <td>A Factual ID for an entity in the Factual places database</td>
+    <td><tt>q.limit(100)</tt></td>
+  </tr>
+  <tr>
+    <td>namespace</td>
+    <td>The namespace to search for a third party ID within. A list of <b>currently supported</b> services is [here](http://developer.factual.com/display/docs/Places+API+-+Supported+Crosswalk+Services).</td>
+    <td><tt>q.namespace("foursquare")</tt></td>
+  </tr>
+  <tr>
+    <td>namespace_id</td>
+    <td>The id used by a third party to identify a place.</td>
+    <td><tt>q.namespaceId("443338")</tt></td>
+  </tr>
+  <tr>
+    <td>only</td>
+    <td>A Factual ID for an entity in the Factual places database</td>
+    <td><tt>q.only("foursquare", "yelp")</tt></td>
+  </tr>
+</table>
+
+NOTE: although these parameters are individually optional, at least one of the following paramater combinations is required:
+
+* factual_id
+* namespace and namespace_id
+
 # Exception Handling
 
 If Factual's API indicates an error, a <tt>FactualApiException</tt> unchecked Exception will be thrown. It will contain details about the request you sent and the error that Factual returned.
