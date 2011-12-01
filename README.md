@@ -47,7 +47,7 @@ You can use limit and offset to support basic results paging. For example:
 	Query query = new Query().field("name").startsWith("Starbucks");
 
 	// Find places with a blank telephone number
-	Query query = new Query().field("tel").isBlank();
+	Query query = new Query().field("tel").blank();
 
 ## Comparison operators
 
@@ -141,14 +141,14 @@ To run full text searches that are constrained to specific fields (versus using 
 	Query q = new Query();
 	q.and(
 	  q.criteria("name").beginsWith("Coffee"),
-	  q.criteria("tel").isBlank()
+	  q.criteria("tel").blank()
 	);
     
 Note that in this case, you could also simply do:
 
 	Query q = new Query()
 	.field("name").beginsWith("Coffee")
-	.field("tel").isBlank();
+	.field("tel").blank();
 
 This takes advantage of the fact that all row filters set at the top level of the Query are AND'ed together.
 
@@ -156,7 +156,7 @@ This takes advantage of the fact that all row filters set at the top level of th
 
 	Query q = new Query();
 	q.or(
-	  q.criteria("tel").isBlank(),
+	  q.criteria("tel").blank(),
 	  q.criteria("name").startsWith("Starbucks"));
 	  
 ## Combined ANDs and ORs
