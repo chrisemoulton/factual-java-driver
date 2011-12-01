@@ -261,4 +261,6 @@ Here is an example of catching a <tt>FactualApiException</tt> and inspecting it:
 
 # More Examples
 
-See the [detailed integration tests](https://github.com/Factual/factual-java-driver/blob/master/src/test/java/com/factual/FactualTest.java)
+See the [standalone demos](src/test/java/com/factual/demo)
+
+See the [integration tests](src/test/java/com/factual/FactualTest.java)
