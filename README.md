@@ -112,9 +112,30 @@ The <tt>Query</tt> object provides a fluent interface that allows you to add in 
     <td>less than or equal to</td>
     <td><tt>q.field("rating").lessThanOrEqual(7.5)</tt></td>
   </tr>
-</table>    
+</table>
+
+#### Search operator
+
+To run full text searches that are constrained to specific fields (versus using .fullTextSearch on the full Query which searches all searchable fields in a table) you can:
+
+	Query q = new Query();
+	q.field("name").fullTextSearch("Fried Chicken")
 
 #### AND
+
+	Query q = new Query();
+	q.and(
+	  q.criteria("name").beginsWith("Coffee"),
+	  q.criteria("tel").isBlank()
+	);
+    
+Note that in this case, you could also simply do:
+
+	Query q = new Query()
+	.field("name").beginsWith("Coffee")
+	.field("tel").isBlank();
+
+This takes advantage of the fact that all row filters set at the top level of the Query are AND'ed together.
 
 #### OR
 
@@ -124,6 +145,18 @@ The <tt>Query</tt> object provides a fluent interface that allows you to add in 
 	  q.criteria("name").startsWith("Starbucks"));
 	  
 #### Combined ANDs and ORs
+
+	Query q = new Query();
+	q.or(
+	  q.or(
+	    q.criteria("first_name").equal("Chun"),
+	    q.criteria("last_name").equal("Kok")
+	  ),
+	  q.and(
+	    q.criteria("score").equal("38"),
+	    q.criteria("city").equal("Los Angeles")
+	  )
+	);
 
 ### limit and offset
 
