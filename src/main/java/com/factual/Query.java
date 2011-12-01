@@ -100,8 +100,8 @@ public class Query {
    *          the name of the field on which to filter.
    * @return A partial representation of the new row filter.
    */
-  public FilterBuilder criteria(String fieldName) {
-    return new FilterBuilder(fieldName);
+  public QueryBuilder criteria(String fieldName) {
+    return new QueryBuilder(this, fieldName);
   }
 
   /**
@@ -128,26 +128,10 @@ public class Query {
   }
 
   /**
-   * Adds <tt>filters</tt> to this Query, grouped into a logical AND.
-   */
-  public Query and(Filter... filters) {
-    rowFilters.add(new FilterGroup(filters));
-    return this;
-  }
-
-  /**
    * Used to nest AND'ed predicates.
    */
   public Query and(Query... queries) {
     return popFilters("$and", queries);
-  }
-
-  /**
-   * Adds <tt>filters</tt> to this Query, grouped into a logical OR.
-   */
-  public Query or(Filter... filters) {
-    rowFilters.add(new FilterGroup(filters).asOR());
-    return this;
   }
 
   /**

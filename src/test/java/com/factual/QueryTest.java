@@ -65,7 +65,7 @@ public class QueryTest {
     String queryStr = q.toUrlQuery();
     String decoded = URLDecoder.decode(queryStr, "UTF-8");
 
-    assertEquals("filters={\"$and\":[{\"region\":{\"$in\":\"[MA,VT,NH]\"}},{\"$or\":[{\"first_name\":{\"$eq\":\"Chun\"}},{\"last_name\":{\"$eq\":\"Kok\"}}]}]}",
+    assertEquals("filters={\"$and\":[{\"region\":{\"$in\":\"[MA,VT,NH]\"}},{\"$or\":[{\"last_name\":{\"$eq\":\"Kok\"}},{\"first_name\":{\"$eq\":\"Chun\"}}]}]}",
         decoded);
   }
 
@@ -95,7 +95,7 @@ public class QueryTest {
     String queryStr = q.toUrlQuery();
     String decoded = URLDecoder.decode(queryStr, "UTF-8");
 
-    assertEquals("filters={\"$or\":[{\"$and\":[{\"score\":{\"$eq\":\"38\"}},{\"city\":{\"$eq\":\"Los Angeles\"}}]},{\"$or\":[{\"first_name\":{\"$eq\":\"Chun\"}},{\"last_name\":{\"$eq\":\"Kok\"}}]}]}",
+    assertEquals("filters={\"$or\":[{\"$and\":[{\"city\":{\"$eq\":\"Los Angeles\"}},{\"score\":{\"$eq\":\"38\"}}]},{\"$or\":[{\"last_name\":{\"$eq\":\"Kok\"}},{\"first_name\":{\"$eq\":\"Chun\"}}]}]}",
         decoded);
   }
 }
