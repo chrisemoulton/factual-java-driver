@@ -108,8 +108,13 @@ You can use limit and offset to support basic results paging. For example:
   </tr>
   <tr>
     <td>blank</td>
-    <td>test to see if a value is blank (or null)</td>
-    <td><tt>q.field("tel").isBlank()</tt></td>
+    <td>is blank or null</td>
+    <td><tt>q.field("tel").blank()</tt></td>
+  </tr>
+  <tr>
+    <td>notBlank</td>
+    <td>is not blank or null</td>
+    <td><tt>q.field("tel").notBlank()</tt></td>
   </tr>
   <tr>
     <td>greaterThan</td>
