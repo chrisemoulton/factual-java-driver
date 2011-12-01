@@ -58,11 +58,11 @@ public class QueryBuilder {
     return addFilter("$nbwin", "[" + Joiner.on(",").join(args) + "]");
   }
 
-  public Query isBlank() {
+  public Query blank() {
     return addFilter("$blank", true);
   }
 
-  public Query isNotBlank() {
+  public Query notBlank() {
     return addFilter("$blank", false);
   }
 
