@@ -261,6 +261,6 @@ Here is an example of catching a <tt>FactualApiException</tt> and inspecting it:
 
 # More Examples
 
-See the [standalone demos](src/test/java/com/factual/demo)
+See the standalone demos in <tt>src/test/java/com/factual/demo</tt>.
 
-See the [integration tests](src/test/java/com/factual/FactualTest.java)
+See the integration tests in <tt>src/test/java/com/factual/FactualTest.java</tt>.
