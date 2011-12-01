@@ -39,7 +39,7 @@ The <tt>Query</tt> object provides a fluent interface that allows you to add in 
 	// Find places with a blank telephone number
 	Query query = new Query().field("tel").isBlank();
 
-#### suported predicates
+#### Comparison operators
 
 <table>
   <tr>
@@ -50,17 +50,67 @@ The <tt>Query</tt> object provides a fluent interface that allows you to add in 
   <tr>
     <td>equal</td>
     <td>equal to</td>
-    <td>q.field("region").equal("CA")</td>
+    <td><tt>q.field("region").equal("CA")</tt></td>
   </tr>
   <tr>
     <td>notEqual</td>
     <td>not equal to</td>
-    <td>q.field("region").notEqual("CA")</td>
+    <td><tt>q.field("region").notEqual("CA")</tt></td>
   </tr>
   <tr>
     <td>in</td>
     <td>equals any of</td>
-    <td>q.field("region").in("MA", "VT", "NH", "RI", "CT")</td>
+    <td><tt>q.field("region").in("MA", "VT", "NH", "RI", "CT")</tt></td>
+  </tr>
+  <tr>
+    <td>notIn</td>
+    <td>does not equal any of</td>
+    <td><tt>q.field("locality").notIn("Los Angeles")</tt></td>
+  </tr>
+  <tr>
+    <td>beginsWith</td>
+    <td>begins with</td>
+    <td><tt>q.field("name").beginsWith("b")</tt></td>
+  </tr>
+  <tr>
+    <td>notBeginsWith</td>
+    <td>does not begins with</td>
+    <td><tt>q.field("name").notBeginsWith("star")</tt></td>
+  </tr>
+  <tr>
+    <td>notBeginsWith</td>
+    <td>begins with any of</td>
+    <td><tt>q.field("name").beginsWithAny("star", "coffee", "tull")</tt></td>
+  </tr>
+  <tr>
+    <td>notBeginsWithAny</td>
+    <td>does not begin with any of</td>
+    <td><tt>q.field("name").notBeginsWithAny("star", "coffee", "tull")</tt></td>
+  </tr>
+  <tr>
+    <td>blank</td>
+    <td>test to see if a value is blank (or null)</td>
+    <td><tt>q.field("tel").isBlank()</tt></td>
+  </tr>
+  <tr>
+    <td>greaterThan</td>
+    <td>greater than</td>
+    <td><tt>q.field("rating").greaterThan(7.5)</tt></td>
+  </tr>
+  <tr>
+    <td>greaterThanOrEqual</td>
+    <td>greater than or equal to</td>
+    <td><tt>q.field("rating").greaterThanOrEqual(7.5)</tt></td>
+  </tr>
+  <tr>
+    <td>lessThan</td>
+    <td>less than</td>
+    <td><tt>q.field("rating").lessThan(7.5)</tt></td>
+  </tr>
+  <tr>
+    <td>lessThanOrEqual</td>
+    <td>less than or equal to</td>
+    <td><tt>q.field("rating").lessThanOrEqual(7.5)</tt></td>
   </tr>
 </table>    
 
