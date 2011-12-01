@@ -46,6 +46,7 @@ You can use limit and offset to support basic results paging. For example:
 	
 ### Geo Filters
 
+	// Find records geographically located with 5000 meters of a latitude, longitude
 	Query q = new Query();
 	.within(new Circle(34.06018, -118.41835, 5000)));
 
