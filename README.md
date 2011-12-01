@@ -74,11 +74,11 @@ The <tt>Query</tt> object provides a fluent interface that allows you to add in 
   </tr>
   <tr>
     <td>notBeginsWith</td>
-    <td>does not begins with</td>
+    <td>does not begin with</td>
     <td><tt>q.field("name").notBeginsWith("star")</tt></td>
   </tr>
   <tr>
-    <td>notBeginsWith</td>
+    <td>beginsWithAny</td>
     <td>begins with any of</td>
     <td><tt>q.field("name").beginsWithAny("star", "coffee", "tull")</tt></td>
   </tr>
