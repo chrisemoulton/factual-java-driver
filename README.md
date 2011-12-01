@@ -1,13 +1,6 @@
 # About
 
-This is the Factual-supported Java driver for Factual's public API. It supports rich queries across Factual's U.S. Places, Crosswalk, and Crossref, and Resolve services.
-
-Factual's [web-based API](http://developer.factual.com) offers:
-
-* Places API: Rich queries across a high quality dataset of U.S. Points of Interest and business entities.
-* Crosswalk: Translation between Factual IDs, third party IDs, and URLs that represent the same entity across the internet.
-* Crossref: Lets you find URLs that contain entities in the Factual places database, or to find the Factual ID of a place mentioned on a URL.
-* Resolve: An entity resolution API that makes partial records complete, matches one entity against another, and assists in de-duping and normalizing datasets.
+This is the Factual-supported Java driver for [Factual's public API](http://developer.factual.com).
 
 # Installation
 
@@ -15,25 +8,25 @@ TODO: JAR_DOWNLOAD_LINK
 
 # Setup
 
-  // Create an authenticated handle to Factual
+	// Create an authenticated handle to Factual
 	Factual factual = new Factual(MY_KEY, MY_SECRET);
 
 # Simple Read Example
 
-  // Create a simple query to get 3 random records:
-  Query q = new Query().limit(3);
+	// Create a simple query to get 3 random records:
+	Query q = new Query().limit(3);
 
-  // Run the query on Factual's "places" table:
-  ReadResponse resp = factual.read("places", q);
+	// Run the query on Factual's "places" table:
+	ReadResponse resp = factual.read("places", q);
 
-  // Print out each record:
-  for(Map record : resp.getData()) {
-    System.out.println(record);
-  }
+	// Print out each record:
+	for(Map record : resp.getData()) {
+	  System.out.println(record);
+	}
 	
 # Full Text Search
 
-  // Add a row-wide Full Text Search to a query:
+	// Add a row-wide Full Text Search to a query:
 	q.fullTextSearch("Sushi Santa Monica");
 
 # Limit and Offset
@@ -42,13 +35,13 @@ You can use limit and offset to support basic results paging. For example:
 
 	Query query = new Query().limit(10).offset(150);
 	
-### Geo Filters
+# Geo Filters
 
 	// Find records geographically located with 5000 meters of a latitude, longitude
 	Query q = new Query();
 	.within(new Circle(34.06018, -118.41835, 5000)));
 
-### Row Filters
+# Row Filters
 
 	// Find places whose name field starts with "Starbucks"
 	Query query = new Query().field("name").startsWith("Starbucks");
@@ -56,7 +49,7 @@ You can use limit and offset to support basic results paging. For example:
 	// Find places with a blank telephone number
 	Query query = new Query().field("tel").isBlank();
 
-#### Comparison operators
+## Comparison operators
 
 <table>
   <tr>
@@ -136,14 +129,14 @@ You can use limit and offset to support basic results paging. For example:
   </tr>
 </table>
 
-#### Search operator
+## Search operator
 
 To run full text searches that are constrained to specific fields (versus using .fullTextSearch on the full Query which searches all searchable fields in a table) you can:
 
 	Query q = new Query();
 	q.field("name").fullTextSearch("Fried Chicken");
 
-#### AND
+## AND
 
 	Query q = new Query();
 	q.and(
@@ -159,14 +152,14 @@ Note that in this case, you could also simply do:
 
 This takes advantage of the fact that all row filters set at the top level of the Query are AND'ed together.
 
-#### OR
+## OR
 
 	Query q = new Query();
 	q.or(
 	  q.criteria("tel").isBlank(),
 	  q.criteria("name").startsWith("Starbucks"));
 	  
-#### Combined ANDs and ORs
+## Combined ANDs and ORs
 
 	Query q = new Query();
 	q.or(
