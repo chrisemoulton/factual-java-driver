@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
+import java.util.List;
 
 import com.google.api.client.auth.oauth.OAuthHmacSigner;
 import com.google.api.client.auth.oauth.OAuthParameters;
@@ -68,6 +69,13 @@ public class Factual {
    */
   public ReadResponse read(String tableName, Query query) {
     return new ReadResponse(request(urlForFetch(tableName, query)));
+  }
+
+  /**
+   * Convenience method to return Crosswalks for the specific query.
+   */
+  public List<Crosswalk> crosswalks(String table, CrosswalkQuery query) {
+    return fetch(table, query).getCrosswalks();
   }
 
   public CrosswalkResponse fetch(String tableName, CrosswalkQuery query) {
