@@ -292,8 +292,12 @@ public class FactualTest {
   /**
    * Reads value from named file in src/test/resources
    */
-  private static String read(String name) throws IOException {
-    return FileUtils.readFileToString(new File("src/test/resources/" + name)).trim();
+  public static String read(String name) {
+    try {
+      return FileUtils.readFileToString(new File("src/test/resources/" + name)).trim();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
 }

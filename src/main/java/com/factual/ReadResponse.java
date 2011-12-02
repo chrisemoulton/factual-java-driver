@@ -41,6 +41,10 @@ public class ReadResponse extends Response {
     }
   }
 
+  public Map<String, Object> first() {
+    return data.get(0);
+  }
+
   /**
    * An ordered collection of the main data returned by Factual. Represented as
    * Maps, where each Map is a record in the results.
@@ -49,6 +53,13 @@ public class ReadResponse extends Response {
    */
   public List<Map<String, Object>> getData() {
     return data;
+  }
+
+  /**
+   * @return the size of the result set
+   */
+  public int size() {
+    return data.size();
   }
 
   /**
