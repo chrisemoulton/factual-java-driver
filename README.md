@@ -8,7 +8,7 @@ You can download the [fully assembled jar](https://github.com/Factual/factual-ja
 
 There's also a [minimal jar](https://github.com/Factual/factual-java-driver/blob/master/bin/factual-java-driver-1.0.jar) in /bin if you want to pull in all the 3rd party dependencies yourself.
 
-Or you build from source. This is a Maven based project and so has a pom.xml file.
+Or you can build from source. This is a Maven based project and so has a pom.xml file.
 
 # Setup
 
