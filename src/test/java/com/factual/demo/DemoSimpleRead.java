@@ -2,7 +2,6 @@ package com.factual.demo;
 
 import static com.factual.FactualTest.read;
 
-import java.io.IOException;
 import java.util.Map;
 
 import com.factual.Factual;
@@ -12,8 +11,8 @@ import com.factual.ReadResponse;
 
 public class DemoSimpleRead {
 
-  @SuppressWarnings("rawtypes")
-  public static void main(String[] args) throws IOException {
+  @SuppressWarnings("unchecked")
+  public static void main(String[] args) {
     String key = read("key.txt");
     String secret = read("secret.txt");
     Factual factual = new Factual(key, secret);

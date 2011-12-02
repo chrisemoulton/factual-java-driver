@@ -29,7 +29,7 @@ public class FactualTest {
 
 
   @BeforeClass
-  public static void connect() throws IOException {
+  public static void connect() {
     String key = read("key.txt");
     String secret = read("secret.txt");
     factual = new Factual(key, secret);
@@ -177,7 +177,6 @@ public class FactualTest {
     .field("name").fullTextSearch("Fried Chicken"));
 
     for(String name : resp.mapStrings("name")) {
-      System.out.println(name);
       assertTrue(name.toLowerCase().contains("frie") || name.toLowerCase().contains("fry") || name.toLowerCase().contains("chicken"));
     }
   }
