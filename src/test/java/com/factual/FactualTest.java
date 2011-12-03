@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.BeforeClass;
@@ -31,7 +32,7 @@ public class FactualTest {
 
 
   @BeforeClass
-  public static void connect() throws IOException {
+  public static void connect() {
     String key = read("key.txt");
     String secret = read("secret.txt");
     factual = new Factual(key, secret);
@@ -190,10 +191,10 @@ public class FactualTest {
   @Test
   public void testFullTextSearch_on_a_field() {
     ReadResponse resp = factual.read("places", new Query()
-    .fullTextSearch("Fried Chicken"));
+    .field("name").fullTextSearch("Fried Chicken"));
 
     for(String name : resp.mapStrings("name")) {
-      assertTrue(name.toLowerCase().contains("fried") || name.toLowerCase().contains("chicken"));
+      assertTrue(name.toLowerCase().contains("frie") || name.toLowerCase().contains("fry") || name.toLowerCase().contains("chicken"));
     }
   }
 
@@ -261,6 +262,22 @@ public class FactualTest {
 
     assertOk(resp);
     assertEquals(1, crosswalks.size());
+  }
+
+  @Test
+  public void testResolve_ex1() {
+    ReadResponse resp =
+      factual.fetch("places", new ResolveQuery()
+      .add("name", "McDonalds")
+      .add("address", "10451 Santa Monica Blvd")
+      .add("region", "CA")
+      .add("postcode", "90025"));
+
+    for(Map record : resp.getData()) {
+      System.out.println(record);
+    }
+
+    assertOk(resp);
   }
 
   @Test

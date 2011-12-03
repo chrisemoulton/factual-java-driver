@@ -82,8 +82,16 @@ public class Factual {
     return new CrosswalkResponse(request(urlForCrosswalk(tableName, query)));
   }
 
+  public ReadResponse fetch(String tableName, ResolveQuery query) {
+    return new ReadResponse(request(urlForResolve(tableName, query)));
+  }
+
   private String urlForCrosswalk(String tableName, CrosswalkQuery query) {
     return factHome + tableName + "/crosswalk?" + query.toUrlQuery();
+  }
+
+  private String urlForResolve(String tableName, ResolveQuery query) {
+    return factHome + tableName + "/resolve?" + query.toUrlQuery();
   }
 
   private String urlForFetch(String tableName, Query query) {

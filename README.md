@@ -4,7 +4,13 @@ This is the Factual-supported Java driver for [Factual's public API](http://deve
 
 # Installation
 
-TODO: JAR_DOWNLOAD_LINK
+You can download the [fully assembled jar](https://github.com/Factual/factual-java-driver/blob/master/bin/factual-java-driver-app.jar?raw=true) from /bin and add it to your project.
+
+There's also a [minimal jar](https://github.com/Factual/factual-java-driver/blob/master/bin/factual-java-driver-1.0.jar?raw=true) in /bin if you want to pull in all the 3rd party dependencies yourself.
+
+NOTE: If you have any problems with the downloaded jar files, make sure you're downloading as "raw".
+
+Or you can build from source. This is a Maven based project and so has a pom.xml file.
 
 # Setup
 
