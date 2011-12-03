@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.BeforeClass;
@@ -273,18 +272,17 @@ public class FactualTest {
       .add("region", "CA")
       .add("postcode", "90025"));
 
-    for(Map record : resp.getData()) {
-      System.out.println(record);
-    }
-
     assertOk(resp);
+    assertNotEmpty(resp);
   }
 
   @Test
   public void testApiException() {
     Factual badness = new Factual("badkey", "badsecret");
     try{
-      badness.read("places", new Query().field("region").equal("CA"));
+      ReadResponse resp = badness.read("places", new Query().field("region").equal("CA"));
+      //System.out.println(resp.getStatus());
+      //System.out.println(resp.mapStrings("region"));
       fail("Expected to catch a FactualApiException");
     } catch (FactualApiException e) {
       assertEquals(401, e.getResponse().statusCode);
