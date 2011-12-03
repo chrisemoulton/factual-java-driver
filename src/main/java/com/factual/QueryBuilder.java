@@ -35,11 +35,11 @@ public class QueryBuilder {
   }
 
   public Query in(Object... args) {
-    return addFilter("$in", "[" + Joiner.on(",").join(args) + "]");
+    return addFilter("$in", Joiner.on(",").join(args));
   }
 
   public Query notIn(Object... args) {
-    return addFilter("$nin", "[" + Joiner.on(",").join(args) + "]");
+    return addFilter("$nin", Joiner.on(",").join(args));
   }
 
   public Query beginsWith(String arg) {
@@ -51,11 +51,11 @@ public class QueryBuilder {
   }
 
   public Query beginsWithAny(Object... args) {
-    return addFilter("$bwin", "[" + Joiner.on(",").join(args) + "]");
+    return addFilter("$bwin", Joiner.on(",").join(args));
   }
 
   public Query notBeginsWithAny(Object... args) {
-    return addFilter("$nbwin", "[" + Joiner.on(",").join(args) + "]");
+    return addFilter("$nbwin", Joiner.on(",").join(args));
   }
 
   public Query blank() {

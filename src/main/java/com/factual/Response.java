@@ -14,6 +14,7 @@ public class Response {
   private String version;
   private String status;
   private int totalRowCount = UNDEFINED;
+  private int includedRows;
 
 
   /**
@@ -42,6 +43,17 @@ public class Response {
   }
 
   /**
+   * @return amount of result rows returned in this response.
+   */
+  public int getIncludedRowCount() {
+    return includedRows;
+  }
+
+  public boolean isEmpty() {
+    return includedRows == 0;
+  }
+
+  /**
    * Parses response metadata from <tt>rootJsonObj</tt> and adds it to <tt>response</tt>
    * 
    * @param response the response object to which to add metadata.
@@ -54,6 +66,9 @@ public class Response {
       JSONObject respJson = rootJsonObj.getJSONObject("response");
       if(respJson.has("total_row_count")) {
         resp.totalRowCount = respJson.getInt("total_row_count");
+      }
+      if(respJson.has("included_rows")) {
+        resp.includedRows = respJson.getInt("included_rows");
       }
     } catch (JSONException e) {
       throw new RuntimeException(e);

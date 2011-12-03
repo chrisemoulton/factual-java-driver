@@ -43,6 +43,13 @@ public class CrosswalkResponse extends Response {
     return crosswalks;
   }
 
+  /**
+   * @return the size of the result set
+   */
+  public int size() {
+    return crosswalks.size();
+  }
+
   private void parseCrosswalks(JSONArray arr) throws JSONException {
     for(int i=0; i<arr.length(); i++) {
       crosswalks.add(crosswalkFrom(arr.getJSONObject(i)));

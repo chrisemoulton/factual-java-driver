@@ -14,6 +14,8 @@ import org.apache.commons.io.FileUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.google.common.base.Joiner;
+
 
 /**
  * Integration tests for the Factual Java driver. Expects your key and secret to be in:
@@ -115,6 +117,16 @@ public class FactualTest {
     assertStartsWith(resp, "category", "Food & Beverage");
   }
 
+  @Test
+  public void testIn() {
+    Query q = new Query().field("region").in("CA", "NM", "FL");
+    ReadResponse resp = factual.read("places", q);
+
+    assertOk(resp);
+    assertNotEmpty(resp);
+    assertIn(resp, "region", "CA", "NM", "FL");
+  }
+
   /**
    * Tests a top-level AND with a nested OR and an $in:
    * 
@@ -139,15 +151,8 @@ public class FactualTest {
     ReadResponse resp = factual.read("places", q);
 
     assertOk(resp);
-
-    // assert region in {"MA","VT","NH"}
-    for(String region : resp.mapStrings("region")){
-      assertTrue(
-          "MA".equals(region) ||
-          "VT".equals(region) ||
-          "NH".equals(region)
-      );
-    }
+    assertNotEmpty(resp);
+    assertIn(resp, "region", "MA", "VT", "NH");
 
     // assert name starts with (coffee || star)
     for(String name : resp.mapStrings("name")){
@@ -155,6 +160,17 @@ public class FactualTest {
           name.toLowerCase().startsWith("coffee") ||
           name.toLowerCase().startsWith("star")
       );
+    }
+  }
+
+  private void assertIn(ReadResponse resp, String field, String... elems) {
+    for(String val : resp.mapStrings(field)){
+      for(String elem : elems) {
+        if(elem.equals(val)) {
+          return;
+        }
+      }
+      fail(val + " was not in " + Joiner.on(", ").join(elems));
     }
   }
 
@@ -251,7 +267,7 @@ public class FactualTest {
   public void testApiException() {
     Factual badness = new Factual("badkey", "badsecret");
     try{
-      badness.read("places", new Query().field("country").equal(true));
+      badness.read("places", new Query().field("region").equal("CA"));
       fail("Expected to catch a FactualApiException");
     } catch (FactualApiException e) {
       assertEquals(401, e.getResponse().statusCode);
@@ -270,6 +286,10 @@ public class FactualTest {
     for(Crosswalk cw : crosswalks) {
       assertEquals(ns, cw.getNamespace());
     }
+  }
+
+  private static final void assertNotEmpty(Response resp) {
+    assertFalse(resp.isEmpty());
   }
 
   private static final void assertOk(Response resp) {
