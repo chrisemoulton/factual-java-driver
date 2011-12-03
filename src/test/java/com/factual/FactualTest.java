@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.BeforeClass;
@@ -245,6 +246,22 @@ public class FactualTest {
 
     assertOk(resp);
     assertEquals(1, crosswalks.size());
+  }
+
+  @Test
+  public void testResolve_ex1() {
+    ReadResponse resp =
+      factual.fetch("places", new ResolveQuery()
+      .add("name", "McDonalds")
+      .add("address", "10451 Santa Monica Blvd")
+      .add("region", "CA")
+      .add("postcode", "90025"));
+
+    for(Map record : resp.getData()) {
+      System.out.println(record);
+    }
+
+    assertOk(resp);
   }
 
   @Test
