@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
 import java.util.List;
+import java.util.Map;
 
 import com.google.api.client.auth.oauth.OAuthHmacSigner;
 import com.google.api.client.auth.oauth.OAuthParameters;
@@ -76,6 +77,14 @@ public class Factual {
    */
   public List<Crosswalk> crosswalks(String table, CrosswalkQuery query) {
     return fetch(table, query).getCrosswalks();
+  }
+
+  public Crosswalk crosswalk(String table, CrosswalkQuery query) {
+    return fetch(table, query).first();
+  }
+
+  public Map<String, Object> resolve(ResolveQuery query) {
+    return fetch("places", query).first();
   }
 
   public CrosswalkResponse fetch(String tableName, CrosswalkQuery query) {
