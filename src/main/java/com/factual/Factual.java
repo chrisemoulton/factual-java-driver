@@ -67,7 +67,7 @@ public class Factual {
    *          the read query to run against <tt>table</tt>.
    * @return the response of running <tt>query</tt> against Factual.
    */
-  public ReadResponse read(String tableName, Query query) {
+  public ReadResponse fetch(String tableName, Query query) {
     return new ReadResponse(request(urlForFetch(tableName, query)));
   }
 

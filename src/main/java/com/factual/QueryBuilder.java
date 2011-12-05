@@ -22,7 +22,15 @@ public class QueryBuilder {
     this.fieldName = fieldName;
   }
 
-  public Query fullTextSearch(Object arg) {
+  /**
+   * Specifies a full text search.
+   * 
+   * @param arg
+   *          the term(s) for which to full text search against.
+   * @return the represented query, with the specified full text search added
+   *         in.
+   */
+  public Query search(Object arg) {
     return addFilter("$search", arg);
   }
 

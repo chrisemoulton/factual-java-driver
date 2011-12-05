@@ -21,7 +21,7 @@ public class DemoSimpleRead {
     Query q = new Query().limit(3);
 
     // Run the query on Factual's "places" table
-    ReadResponse resp = factual.read("places", q);
+    ReadResponse resp = factual.fetch("places", q);
 
     // Print out each record
     for(Map record : resp.getData()) {

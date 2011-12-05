@@ -13,6 +13,10 @@ public class FactualApiException extends RuntimeException {
     super(e);
   }
 
+  public FactualApiException(String msg) {
+    super(msg);
+  }
+
   public FactualApiException requestUrl(String url) {
     this.requestUrl = url;
     return this;

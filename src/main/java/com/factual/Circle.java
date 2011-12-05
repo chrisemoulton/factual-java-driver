@@ -1,5 +1,7 @@
 package com.factual;
 
+import com.factual.data_science_toolkit.Coord;
+
 
 /**
  * Represents a geographic sub query confining results to a circle.
@@ -23,6 +25,10 @@ public class Circle {
     this.lat = lat;
     this.lon = lon;
     this.meters = meters;
+  }
+
+  public Circle(Coord coord, int meters) {
+    this(coord.getLatitude(), coord.getLongitude(), meters);
   }
 
   public String toJsonStr() {

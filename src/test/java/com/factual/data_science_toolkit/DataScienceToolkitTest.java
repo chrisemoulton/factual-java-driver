@@ -10,7 +10,7 @@ public class DataScienceToolkitTest {
   DataScienceToolkit kit = new DataScienceToolkit();
 
   @Test
-  public void testname() {
+  public void testStreetToCoord() {
     Coord coord = kit.streetToCoord("12001 Chalon los angeles ca");
 
     assertEquals("12001 Chalon Rd", coord.getAddress());

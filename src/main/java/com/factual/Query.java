@@ -4,6 +4,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
 
+import com.factual.data_science_toolkit.Coord;
+import com.factual.data_science_toolkit.DataScienceToolkit;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
@@ -32,12 +34,12 @@ public class Query {
    * full text search against various attributes of the underlying table, such
    * as entity name, address, etc.
    * 
-   * @param fullTextSearch
+   * @param term
    *          the text for which to perform a full text search.
    * @return this Query
    */
-  public Query fullTextSearch(String fullTextSearch) {
-    this.fullTextSearch = fullTextSearch;
+  public Query search(String term) {
+    this.fullTextSearch = term;
     return this;
   }
 
@@ -113,6 +115,15 @@ public class Query {
    */
   public QueryBuilder field(String fieldName) {
     return new QueryBuilder(this, fieldName);
+  }
+
+  public Query near(String text, int meters) {
+    Coord coord = new DataScienceToolkit().streetToCoord(text);
+    if(coord != null) {
+      return within(new Circle(coord, meters));
+    } else {
+      throw new FactualApiException("Could not locate place based on text: '" + text + "'");
+    }
   }
 
   /**

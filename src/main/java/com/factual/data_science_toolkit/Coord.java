@@ -45,7 +45,7 @@ public class Coord {
       region = in.getString("region");
       address = in.getString("street_address");
       locality = in.getString("locality");
-      latitude = in.getDouble("longitude");
+      latitude = in.getDouble("latitude");
       longitude = in.getDouble("longitude");
       country = in.getString("country_code");
       confidence = in.getDouble("confidence");
@@ -80,6 +80,11 @@ public class Coord {
 
   public double getConfidence() {
     return confidence;
+  }
+
+  @Override
+  public String toString() {
+    return "[Coord: address=" + address + ", lat=" + latitude + ", lon=" + longitude + "]";
   }
 
 }

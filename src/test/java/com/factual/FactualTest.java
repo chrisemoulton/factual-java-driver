@@ -42,7 +42,7 @@ public class FactualTest {
    */
   @Test
   public void testCoreExample1() {
-    ReadResponse resp = factual.read("places",
+    ReadResponse resp = factual.fetch("places",
         new Query().field("country").equal("US"));
 
     assertOk(resp);
@@ -55,7 +55,7 @@ public class FactualTest {
    */
   @Test
   public void testCoreExample2() {
-    ReadResponse resp = factual.read("places", new Query()
+    ReadResponse resp = factual.fetch("places", new Query()
     .field("name").beginsWith("Star")
     .includeRowCount());
 
@@ -69,8 +69,8 @@ public class FactualTest {
    */
   @Test
   public void testCoreExample3() {
-    ReadResponse resp = factual.read("places", new Query()
-    .fullTextSearch("Fried Chicken, Los Angeles"));
+    ReadResponse resp = factual.fetch("places", new Query()
+    .search("Fried Chicken, Los Angeles"));
 
     assertOk(resp);
   }
@@ -81,8 +81,8 @@ public class FactualTest {
    */
   @Test
   public void testCoreExample4() {
-    ReadResponse resp = factual.read("places", new Query()
-    .fullTextSearch("Fried Chicken, Los Angeles")
+    ReadResponse resp = factual.fetch("places", new Query()
+    .search("Fried Chicken, Los Angeles")
     .offset(20)
     .limit(5));
 
@@ -96,10 +96,11 @@ public class FactualTest {
    */
   @Test
   public void testCoreExample5() {
-    ReadResponse resp = factual.read("places", new Query()
+    ReadResponse resp = factual.fetch("places", new Query()
     .field("name").equal("Stand")
     .within(new Circle(34.06018, -118.41835, 5000)));
 
+    assertNotEmpty(resp);
     assertOk(resp);
   }
 
@@ -108,7 +109,7 @@ public class FactualTest {
    */
   @Test
   public void testRowFilters_2beginsWith() {
-    ReadResponse resp = factual.read("places", new Query()
+    ReadResponse resp = factual.fetch("places", new Query()
     .field("name").beginsWith("McDonald's")
     .field("category").beginsWith("Food & Beverage"));
 
@@ -120,7 +121,7 @@ public class FactualTest {
   @Test
   public void testIn() {
     Query q = new Query().field("region").in("CA", "NM", "FL");
-    ReadResponse resp = factual.read("places", q);
+    ReadResponse resp = factual.fetch("places", q);
 
     assertOk(resp);
     assertNotEmpty(resp);
@@ -148,7 +149,7 @@ public class FactualTest {
         q.criteria("name").beginsWith("Star")
     );
 
-    ReadResponse resp = factual.read("places", q);
+    ReadResponse resp = factual.fetch("places", q);
 
     assertOk(resp);
     assertNotEmpty(resp);
@@ -176,7 +177,7 @@ public class FactualTest {
 
   @Test
   public void testSimpleTel() {
-    ReadResponse resp = factual.read("places", new Query()
+    ReadResponse resp = factual.fetch("places", new Query()
     .field("tel").beginsWith("(212)"));
 
     assertStartsWith(resp, "tel", "(212)");
@@ -189,8 +190,8 @@ public class FactualTest {
    */
   @Test
   public void testFullTextSearch_on_a_field() {
-    ReadResponse resp = factual.read("places", new Query()
-    .field("name").fullTextSearch("Fried Chicken"));
+    ReadResponse resp = factual.fetch("places", new Query()
+    .field("name").search("Fried Chicken"));
 
     for(String name : resp.mapStrings("name")) {
       assertTrue(name.toLowerCase().contains("frie") || name.toLowerCase().contains("fry") || name.toLowerCase().contains("chicken"));
@@ -277,10 +278,20 @@ public class FactualTest {
   }
 
   @Test
+  public void testNear() {
+    ReadResponse resp = factual.fetch("places", new Query()
+    .search("cigars")
+    .near("1801 avenue of the stars, century city, ca", 5000));
+
+    assertOk(resp);
+    assertNotEmpty(resp);
+  }
+
+  @Test
   public void testApiException() {
     Factual badness = new Factual("badkey", "badsecret");
     try{
-      ReadResponse resp = badness.read("places", new Query().field("region").equal("CA"));
+      ReadResponse resp = badness.fetch("places", new Query().field("region").equal("CA"));
       //System.out.println(resp.getStatus());
       //System.out.println(resp.mapStrings("region"));
       fail("Expected to catch a FactualApiException");

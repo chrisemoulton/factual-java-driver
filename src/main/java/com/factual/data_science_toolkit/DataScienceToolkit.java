@@ -15,13 +15,13 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.common.io.Closeables;
 
 /**
- * Represents the public API to the Data Science Toolkit.
+ * Provides a wrapper to Data Science Toolkit's public API.
  * 
  * @author aaron
  */
 public class DataScienceToolkit {
   private static final HttpRequestFactory REQ_FACTORY = new NetHttpTransport().createRequestFactory();
-  private final String home = "http://www.datasciencetoolkit.org/street2coordinates/";
+  private final String home = "http://www.datasciencetoolkit.org/";
 
 
   /**
@@ -38,7 +38,7 @@ public class DataScienceToolkit {
    *         if no match.
    */
   public Coord streetToCoord(String text) {
-    GenericUrl url = new GenericUrl(home);
+    GenericUrl url = new GenericUrl(home + "street2coordinates/");
     url.appendRawPath(text);
 
     BufferedReader br = null;
