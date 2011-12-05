@@ -18,6 +18,7 @@ import com.google.common.collect.Lists;
  */
 public class Query {
   private String fullTextSearch;
+  private String[] fields;
   private int limit;
   private int offset;
   private boolean includeRowCount;
@@ -50,6 +51,11 @@ public class Query {
    */
   public Query limit(int limit) {
     this.limit = limit;
+    return this;
+  }
+
+  public Query only(String... fields) {
+    this.fields = fields;
     return this;
   }
 
@@ -178,6 +184,7 @@ public class Query {
    */
   protected String toUrlQuery() {
     return Joiner.on("&").skipNulls().join(
+        urlPair("select", fieldsJsonOrNull()),
         urlPair("q", fullTextSearch),
         (limit > 0 ? urlPair("limit", limit) : null),
         (offset > 0 ? urlPair("offset", offset) : null),
@@ -193,6 +200,14 @@ public class Query {
       } catch (UnsupportedEncodingException e) {
         throw new RuntimeException(e);
       }
+    } else {
+      return null;
+    }
+  }
+
+  private String fieldsJsonOrNull() {
+    if(fields != null) {
+      return Joiner.on(",").join(fields);
     } else {
       return null;
     }
