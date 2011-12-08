@@ -42,7 +42,11 @@ public class ReadResponse extends Response {
   }
 
   public Map<String, Object> first() {
-    return data.get(0);
+    if(data.isEmpty()) {
+      return null;
+    } else {
+      return data.get(0);
+    }
   }
 
   /**

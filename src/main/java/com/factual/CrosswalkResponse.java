@@ -43,6 +43,14 @@ public class CrosswalkResponse extends Response {
     return crosswalks;
   }
 
+  public Crosswalk first() {
+    if(crosswalks.isEmpty()) {
+      return null;
+    } else {
+      return crosswalks.get(0);
+    }
+  }
+
   /**
    * @return the size of the result set
    */

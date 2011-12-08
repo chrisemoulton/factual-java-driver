@@ -207,7 +207,7 @@ public class Query {
 
   private String fieldsJsonOrNull() {
     if(fields != null) {
-      return Joiner.on(",").join(fields);
+      return "\"" + Joiner.on(",").join(fields) + "\"";
     } else {
       return null;
     }
