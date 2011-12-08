@@ -12,7 +12,6 @@ import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestFactory;
-import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.HttpResponseException;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -124,9 +123,7 @@ public class Factual {
       request.headers = headers;
 
       // get the response
-      HttpResponse response = request.execute();
-      br = new BufferedReader(new InputStreamReader(response.getContent()));
-
+      br = new BufferedReader(new InputStreamReader(request.execute().getContent()));
       return br.readLine();
     } catch (HttpResponseException e) {
       throw new FactualApiException(e).requestUrl(urlStr).requestMethod(requestMethod).response(e.response);
