@@ -52,6 +52,10 @@ public class QueryBuilder {
     return addFilter("$in", Joiner.on(",").join(args));
   }
 
+  public Query notIn(List<Object> args) {
+    return addFilter("$nin", Joiner.on(",").join(args));
+  }
+
   public Query notIn(Object... args) {
     return addFilter("$nin", Joiner.on(",").join(args));
   }
