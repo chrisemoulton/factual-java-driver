@@ -1,5 +1,7 @@
 package com.factual;
 
+import java.util.List;
+
 import com.google.common.base.Joiner;
 
 
@@ -40,6 +42,10 @@ public class QueryBuilder {
 
   public Query notEqual(Object arg) {
     return addFilter("$neq", arg);
+  }
+
+  public Query in(List<Object> args) {
+    return addFilter("$in", Joiner.on(",").join(args));
   }
 
   public Query in(Object... args) {
