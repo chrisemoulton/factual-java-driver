@@ -65,7 +65,7 @@ public class QueryTest {
     String queryStr = q.toUrlQuery();
     String decoded = URLDecoder.decode(queryStr, "UTF-8");
 
-    assertEquals("filters={\"$and\":[{\"region\":{\"$in\":\"[MA,VT,NH]\"}},{\"$or\":[{\"last_name\":{\"$eq\":\"Kok\"}},{\"first_name\":{\"$eq\":\"Chun\"}}]}]}",
+    assertEquals("filters={\"$and\":[{\"region\":{\"$in\":\"MA,VT,NH\"}},{\"$or\":[{\"last_name\":{\"$eq\":\"Kok\"}},{\"first_name\":{\"$eq\":\"Chun\"}}]}]}",
         decoded);
   }
 
