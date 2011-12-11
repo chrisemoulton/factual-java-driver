@@ -128,7 +128,7 @@ public class Factual {
       HttpRequest request = f.buildGetRequest(url);
 
       HttpHeaders headers = new HttpHeaders();
-      headers.set("X-FACTUAL-LIB", DRIVER_HEADER_TAG);
+      headers.set("X-Factual-Lib", DRIVER_HEADER_TAG);
       request.headers = headers;
 
       // get the response
