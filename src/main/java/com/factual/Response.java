@@ -9,7 +9,7 @@ import org.json.JSONObject;
  *
  * @author aaron
  */
-public class Response {
+public abstract class Response {
   public static final int UNDEFINED = -1;
   private String version;
   private String status;
@@ -74,5 +74,18 @@ public class Response {
       throw new RuntimeException(e);
     }
   }
+
+  @Override
+  public String toString() {
+    return getJson();
+  }
+
+  /**
+   * Subclasses of Response must provide access to the original JSON
+   * representation of Factual's response.
+   * 
+   * @return the original JSON representation of Factual's response.
+   */
+  public abstract String getJson();
 
 }

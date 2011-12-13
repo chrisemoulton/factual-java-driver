@@ -17,6 +17,7 @@ import com.google.common.collect.Lists;
  */
 public class CrosswalkResponse extends Response {
   private final List<Crosswalk> crosswalks = Lists.newArrayList();
+  private final String json;
 
 
   /**
@@ -25,6 +26,7 @@ public class CrosswalkResponse extends Response {
    * @param json the JSON response String returned by Factual.
    */
   public CrosswalkResponse(String json) {
+    this.json = json;
     try {
       JSONObject rootJsonObj = new JSONObject(json);
       Response.withMeta(this, rootJsonObj);
@@ -32,6 +34,11 @@ public class CrosswalkResponse extends Response {
     } catch (JSONException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  @Override
+  public String getJson() {
+    return json;
   }
 
   /**

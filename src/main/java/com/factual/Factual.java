@@ -82,8 +82,19 @@ public class Factual {
     return fetch(table, query).first();
   }
 
+  /**
+   * Returns the read response from a Factual Resolve request.
+   * 
+   * @param query
+   *          the Resolve query.
+   * @return the response from Factual for the Resolve request.
+   */
+  public ReadResponse resolves(ResolveQuery query) {
+    return fetch("places", query);
+  }
+
   public Map<String, Object> resolve(ResolveQuery query) {
-    return fetch("places", query).first();
+    return resolves(query).first();
   }
 
   public CrosswalkResponse fetch(String tableName, CrosswalkQuery query) {

@@ -23,6 +23,7 @@ import com.google.common.collect.Maps;
  * @author aaron
  */
 public class ReadResponse extends Response {
+  private final String json;
   private List<Map<String, Object>> data = Lists.newArrayList();
 
 
@@ -32,6 +33,7 @@ public class ReadResponse extends Response {
    * @param json the JSON response String returned by Factual.
    */
   public ReadResponse(String json) {
+    this.json = json;
     try{
       JSONObject rootJsonObj = new JSONObject(json);
       Response.withMeta(this, rootJsonObj);
@@ -39,6 +41,11 @@ public class ReadResponse extends Response {
     } catch (JSONException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  @Override
+  public String getJson() {
+    return json;
   }
 
   public Map<String, Object> first() {
