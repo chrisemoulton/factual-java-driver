@@ -98,4 +98,17 @@ public class QueryTest {
     assertEquals("filters={\"$or\":[{\"$and\":[{\"city\":{\"$eq\":\"Los Angeles\"}},{\"score\":{\"$eq\":\"38\"}}]},{\"$or\":[{\"last_name\":{\"$eq\":\"Kok\"}},{\"first_name\":{\"$eq\":\"Chun\"}}]}]}",
         decoded);
   }
+
+  @Test
+  public void testSorts() throws UnsupportedEncodingException {
+    Query query = new Query()
+    .sortDesc("$distance")
+    .sortAsc("name");
+
+    String queryStr = query.toUrlQuery();
+    String decoded = URLDecoder.decode(queryStr, "UTF-8");
+
+    assertEquals("sort=$distance:desc,name:asc", decoded);
+  }
+
 }

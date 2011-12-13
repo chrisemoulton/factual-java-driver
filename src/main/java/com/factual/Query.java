@@ -30,6 +30,12 @@ public class Query {
    */
   private final List<Filter> rowFilters = Lists.newArrayList();
 
+  /**
+   * Holds all results sorts for this Query. Example contents:
+   * <tt>"$distance:desc","name:asc","locality:asc"</tt>
+   */
+  private final List<String> sorts = Lists.newArrayList();
+
 
   /**
    * Sets a full text search query. Factual will use this value to perform a
@@ -73,6 +79,30 @@ public class Query {
    */
   public String[] getSelectFields() {
     return selectFields;
+  }
+
+  /**
+   * Sets this Query to sort field in ascending order.
+   * 
+   * @param field
+   *          the field to sort in ascending order.
+   * @return this Query
+   */
+  public Query sortAsc(String field) {
+    sorts.add(field + ":asc");
+    return this;
+  }
+
+  /**
+   * Sets this Query to sort field in descending order.
+   * 
+   * @param field
+   *          the field to sort in descending order.
+   * @return this Query
+   */
+  public Query sortDesc(String field) {
+    sorts.add(field + ":desc");
+    return this;
   }
 
   /**
@@ -202,6 +232,7 @@ public class Query {
     return Joiner.on("&").skipNulls().join(
         urlPair("select", fieldsJsonOrNull()),
         urlPair("q", fullTextSearch),
+        urlPair("sort", sortsJsonOrNull()),
         (limit > 0 ? urlPair("limit", limit) : null),
         (offset > 0 ? urlPair("offset", offset) : null),
         (includeRowCount ? urlPair("include_count", true) : null),
@@ -233,6 +264,14 @@ public class Query {
   private String fieldsJsonOrNull() {
     if(selectFields != null) {
       return Joiner.on(",").join(selectFields);
+    } else {
+      return null;
+    }
+  }
+
+  private String sortsJsonOrNull() {
+    if(!sorts.isEmpty()) {
+      return Joiner.on(",").join(sorts);
     } else {
       return null;
     }

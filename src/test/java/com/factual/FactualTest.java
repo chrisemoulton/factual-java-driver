@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.BeforeClass;
@@ -102,6 +103,17 @@ public class FactualTest {
 
     assertNotEmpty(resp);
     assertOk(resp);
+  }
+
+  @Test
+  public void testSort_byDistance() {
+    ReadResponse resp = factual.fetch("places", new Query()
+    .within(new Circle(34.06018, -118.41835, 5000))
+    .sortAsc("$distance"));
+
+    assertNotEmpty(resp);
+    assertOk(resp);
+    assertAscendingDoubles(resp, "$distance");
   }
 
   /**
@@ -331,6 +343,15 @@ public class FactualTest {
   private void assertStartsWith(ReadResponse resp, String field, String substr) {
     for(String out : resp.mapStrings(field)) {
       assertTrue(out.startsWith(substr));
+    }
+  }
+
+  private void assertAscendingDoubles(ReadResponse resp, String field) {
+    Double prev = Double.MIN_VALUE;
+    for(Map<?, ?> rec : resp.getData()) {
+      Double d = (Double)rec.get(field);
+      assertTrue(d >= prev);
+      prev = d;
     }
   }
 
