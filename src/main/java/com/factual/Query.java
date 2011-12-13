@@ -1,6 +1,7 @@
 package com.factual;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.List;
 
@@ -18,9 +19,9 @@ import com.google.common.collect.Lists;
  */
 public class Query {
   private String fullTextSearch;
-  private String[] fields;
-  private int limit;
-  private int offset;
+  private String[] selectFields;
+  private long limit;
+  private long offset;
   private boolean includeRowCount;
   private Circle circle;
 
@@ -49,14 +50,29 @@ public class Query {
    * @param limit the maximum amount of records to return from this Query.
    * @return this Query
    */
-  public Query limit(int limit) {
+  public Query limit(long limit) {
     this.limit = limit;
     return this;
   }
 
+  /**
+   * Sets the fields to select. This is optional; default behaviour is generally
+   * to select all fields in the schema.
+   * 
+   * @param fields
+   *          the fields to select.
+   * @return this Query
+   */
   public Query only(String... fields) {
-    this.fields = fields;
+    this.selectFields = fields;
     return this;
+  }
+
+  /**
+   * @return array of select fields set by only(), null if none.
+   */
+  public String[] getSelectFields() {
+    return selectFields;
   }
 
   /**
@@ -67,7 +83,7 @@ public class Query {
    *          the page offset for this Query.
    * @return this Query
    */
-  public Query offset(int offset) {
+  public Query offset(long offset) {
     this.offset = offset;
     return this;
   }
@@ -193,6 +209,15 @@ public class Query {
         urlPair("geo", geoBoundsJsonOrNull()));
   }
 
+  @Override
+  public String toString() {
+    try {
+      return URLDecoder.decode(toUrlQuery(), "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   private String urlPair(String name, Object val) {
     if(val != null) {
       try {
@@ -206,8 +231,8 @@ public class Query {
   }
 
   private String fieldsJsonOrNull() {
-    if(fields != null) {
-      return "\"" + Joiner.on(",").join(fields) + "\"";
+    if(selectFields != null) {
+      return Joiner.on(",").join(selectFields);
     } else {
       return null;
     }
