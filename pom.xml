@@ -8,7 +8,30 @@
   <packaging>jar</packaging>
 
   <name>factual-java-driver</name>
-  <url>http://maven.apache.org</url>
+  <description>Factual's officially supported Java driver</description>
+  <url>http://github.com/Factual/factual-java-driver</url>
+
+  <scm>
+    <url>https://github.com/Factual/factual-java-driver/tree/master</url>
+    <connection>scm:git:git://github.com/Factual/factual-java-driver.git</connection>
+  </scm>
+
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://raw.github.com/Factual/factual-java-driver/master/LICENSE.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <id>aaron</id>
+      <name>Aaron Crow</name>
+      <email>aaron@factual.com</email>
+    </developer>
+  </developers>
+  
   <dependencies>
     <dependency>
       <groupId>com.google.guava</groupId>
@@ -60,6 +83,19 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>sign-artifacts</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>sign</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>    
+      <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>2.3.2</version>
         <configuration>
@@ -91,7 +127,21 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.8</version>
+      </plugin>      
+      
     </plugins>
   </build>
+  
+  <distributionManagement>
+    <repository>
+      <id>sonatype-nexus-staging</id>
+      <name>Sonatype Staging</name>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>
 
 </project>
