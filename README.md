@@ -12,50 +12,56 @@ The driver is in Maven Central, so you can just add this to your Maven <tt>pom.x
       <version>1.0</version>
     </dependency>
 
+# Basic Design
+
+The driver allows you to create an authenticated handle to Factual.
+
+With a Factual handle, you can send queries and get results back.
+
+Queries are represented by the Query class, which provides a fluent interface to constructing your queries.
+
 # Setup
 
-	// Create an authenticated handle to Factual
-	Factual factual = new Factual(MY_KEY, MY_SECRET);
+    // Create an authenticated handle to Factual
+    Factual factual = new Factual(MY_KEY, MY_SECRET);
+    
+# Simple Query Example
 
-# Simple Read Example
-
-	// Create a simple query to get 3 random records:
-	Query q = new Query().limit(3);
-
-	// Run the query on Factual's "places" table:
-	ReadResponse resp = factual.read("places", q);
-
-	// Print out each record:
-	for(Map record : resp.getData()) {
-	  System.out.println(record);
-	}
+    // Print 3 random records from Factual's Places table:
+    System.out.println(
+      factual.fetch("places", new Query().limit(3)));
 	
 # Full Text Search
 
-	// Add a row-wide Full Text Search to a query:
-	q.fullTextSearch("Sushi Santa Monica");
+    // Print entities that match a full text search for Sushi in Santa Monica:
+    System.out.println(
+        factual.fetch("places", new Query().search("Sushi Santa Monica")));
 
 # Limit and Offset
 
 You can use limit and offset to support basic results paging. For example:
 
-	Query query = new Query().limit(10).offset(150);
+    // Build a Query with offset of 150, limiting the page size to 10:
+    new Query().limit(10).offset(150);
 	
 # Geo Filters
 
-	// Find records geographically located with 5000 meters of a latitude, longitude
-	Query q = new Query();
-	.within(new Circle(34.06018, -118.41835, 5000)));
+You can query Factual for entities located within a geographic area. For example:
+
+    // Build a Query that finds entities located within 5000 meters of a latitude, longitude
+    new Query().within(new Circle(34.06018, -118.41835, 5000));
 
 # Row Filters
 
-	// Find places whose name field starts with "Starbucks"
-	Query query = new Query().field("name").startsWith("Starbucks");
+The driver supports various row filter logic. Examples:
 
-	// Find places with a blank telephone number
-	Query query = new Query().field("tel").blank();
+    // Build a query to find places whose name field starts with "Starbucks"
+    new Query().field("name").beginsWith("Starbucks");
 
-## Comparison operators
+    // Build a query to find places with a blank telephone number
+    new Query().field("tel").blank();
+
+## Supported row filter logic
 
 <table>
   <tr>
@@ -137,26 +143,27 @@ You can use limit and offset to support basic results paging. For example:
 
 ## Search operator
 
-To run full text searches that are constrained to specific fields (versus using .fullTextSearch on the full Query which searches all searchable fields in a table) you can:
+You can run full text searches against specific fields. Example:
 
-	Query q = new Query();
-	q.field("name").fullTextSearch("Fried Chicken");
+    // Build a query to full text search against the name field:
+    new Query().field("name").search("Fried Chicken");
 
 ## AND
 
-	Query q = new Query();
-	q.and(
-	  q.criteria("name").beginsWith("Coffee"),
-	  q.criteria("tel").blank()
-	);
+Queries support logical AND'ing your row filters. For example:
+
+    // Build a query to find entities where the name begins with "Coffee" AND the telephone is blank:
+    Query q = new Query();
+    q.and(
+      q.criteria("name").beginsWith("Coffee"),
+      q.criteria("tel").blank()
+    );
     
-Note that in this case, you could also simply do:
+Note that all row filters set at the top level of the Query are implicitly AND'ed together, so you could also do this:
 
-	Query q = new Query()
-	.field("name").beginsWith("Coffee")
-	.field("tel").blank();
-
-This takes advantage of the fact that all row filters set at the top level of the Query are AND'ed together.
+    new Query()
+      .field("name").beginsWith("Coffee")
+      .field("tel").blank();
 
 ## OR
 
