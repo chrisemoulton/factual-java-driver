@@ -167,40 +167,45 @@ Note that all row filters set at the top level of the Query are implicitly AND'e
 
 ## OR
 
-	Query q = new Query();
-	q.or(
-	  q.criteria("tel").blank(),
-	  q.criteria("name").startsWith("Starbucks"));
+Queries support logical OR'ing your row filters. For example:
+
+    // Build a query to find entities where the name begins with "Coffee" OR the telephone is blank:
+    Query q = new Query();
+    q.or(
+        q.criteria("name").beginsWith("Coffee"),
+        q.criteria("tel").blank());
 	  
 ## Combined ANDs and ORs
 
-	Query q = new Query();
-	q.or(
-	  q.or(
-	    q.criteria("first_name").equal("Chun"),
-	    q.criteria("last_name").equal("Kok")
-	  ),
-	  q.and(
-	    q.criteria("score").equal("38"),
-	    q.criteria("city").equal("Los Angeles")
-	  )
-	);
+You can nest AND and OR logic to whatever level of complexity you need. For example:
+
+    // Build a query to find entities where:
+    // (name begins with "Starbucks") OR (name begins with "Coffee")
+    // OR
+    // (name full text search matches on "tea" AND tel is not blank)
+    Query q = new Query();
+    q.or(
+        q.or(
+            q.criteria("name").beginsWith("Starbucks"),
+            q.criteria("name").beginsWith("Coffee")
+        ),
+        q.and(
+            q.criteria("name").search("tea"),
+            q.criteria("tel").notBlank()
+        )
+    );
 
 # Crosswalk
 
+The driver fully support Factual's Crosswalk feature, which lets you "crosswalk" the web and relate entities between Factual's data and that of other web authorities.
+
+(See [the Crosswalk Blog](http://blog.factual.com/crosswalk-api) for more background.)
+
 ## Simple Crosswalk Example
 
-	// Build a Crosswalk query to get data for a specific Factual entity:
-	CrosswalkQuery q = new CrosswalkQuery();
-	q.factualId("97598010-433f-4946-8fd5-4a6dd1639d77");
-
-	// Run the query on Factual's "places" table:
-	CrosswalkResponse resp = factual.fetch("places", q);
-
-	// Print out the Crosswalk results:
-	for(Crosswalk cw : resp.getCrosswalks()) {
-	  System.out.println(cw);
-	}
+    // Get all Crosswalk data for a specific Places entity, using its Factual ID:
+    factual.fetch("places",
+      new CrosswalkQuery().factualId("97598010-433f-4946-8fd5-4a6dd1639d77"));
 
 ## Crosswalk Filter Parameters
 
@@ -244,18 +249,17 @@ NOTE: although these parameters are individually optional, at least one of the f
 
 ## More Crosswalk Examples
 
-	// Query for Crosswalk data for The Stand, but for just the Loopt namespace:
-	CrosswalkQuery q = new CrosswalkQuery()
-	.factualId("97598010-433f-4946-8fd5-4a6dd1639d77") // The Stand restaurant
-	.only("loopt");
+    // Get Loopt's Crosswalk data for a specific Places entity, using its Factual ID:
+    CrosswalkResponse resp = factual.fetch("places",
+        new CrosswalkQuery()
+          .factualId("97598010-433f-4946-8fd5-4a6dd1639d77")
+          .only("loopt"));
 
-	// Query for Crosswalk data for The Stand using its Foursquare ID
-	CrosswalkQuery q = new CrosswalkQuery()
-	.namespace("foursquare")
-	.namespaceId("4ae4df6df964a520019f21e3");  // Foursquare's id for The Stand
-
-	// Limit the above Query to ONLY return Yelp.com's Crosswalk data for The Stand:
-	q.only("yelp");
+    // Get all Crosswalk data for a specific Places entity, using its Foursquare ID
+    CrosswalkResponse resp = factual.fetch("places",
+        new CrosswalkQuery()
+          .namespace("foursquare")
+          .namespaceId("4ae4df6df964a520019f21e3"));
 
 # Exception Handling
 
@@ -263,17 +267,18 @@ If Factual's API indicates an error, a <tt>FactualApiException</tt> unchecked Ex
 
 Here is an example of catching a <tt>FactualApiException</tt> and inspecting it:
 
-	Factual badness = new Factual("BAD_KEY", "BAD_SECRET");
-	try{
-	  badness.read("places", new Query().field("country").equal(true));
-	} catch (FactualApiException e) {
-	  System.out.println("Requested URL: " + e.getRequestUrl());
-	  System.out.println("Error Status Code: " + e.getResponse().statusCode);
-	  System.out.println("Error Response Message: " + e.getResponse().statusMessage);
-	}
+    Factual badness = new Factual("BAD_KEY", "BAD_SECRET");
+    try{
+      badness.read("places", new Query().field("country").equal(true));
+    } catch (FactualApiException e) {
+      System.out.println("Requested URL: " + e.getRequestUrl());
+      System.out.println("Error Status Code: " + e.getResponse().statusCode);
+      System.out.println("Error Response Message: " + e.getResponse().statusMessage);
+    }
 
 # More Examples
 
-See the standalone demos in <tt>src/test/java/com/factual/demo</tt>.
+For more code examples:
 
-See the integration tests in <tt>src/test/java/com/factual/FactualTest.java</tt>.
+* See the standalone demos in <tt>src/test/java/com/factual/demo</tt>
+* See the integration tests in <tt>src/test/java/com/factual/FactualTest.java</tt>
