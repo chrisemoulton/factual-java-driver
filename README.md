@@ -14,11 +14,11 @@ The driver is in Maven Central, so you can just add this to your Maven <tt>pom.x
 
 # Basic Design
 
-The driver allows you to create an authenticated handle to Factual.
+The driver allows you to create an authenticated handle to Factual. With a Factual handle, you can send queries and get results back.
 
-With a Factual handle, you can send queries and get results back.
+Queries are created using the Query class, which provides a fluent interface to constructing your queries.
 
-Queries are represented by the Query class, which provides a fluent interface to constructing your queries.
+Results are returned as the JSON returned by Factual. Optionally, there are JSON parsing conveniences built into the driver.
 
 # Setup
 
@@ -335,7 +335,7 @@ NOTE: although these parameters are individually optional, at least one of the f
         new CrosswalkQuery()
           .namespace("foursquare")
           .namespaceId("4ae4df6df964a520019f21e3"));
-
+          
 # Exception Handling
 
 If Factual's API indicates an error, a <tt>FactualApiException</tt> unchecked Exception will be thrown. It will contain details about the request you sent and the error that Factual returned.
