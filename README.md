@@ -37,6 +37,29 @@ Queries are represented by the Query class, which provides a fluent interface to
     System.out.println(
         factual.fetch("places", new Query().search("Sushi Santa Monica")));
 
+# Geo Filters
+
+You can query Factual for entities located within a geographic area. For example:
+
+    // Build a Query that finds entities located within 5000 meters of a latitude, longitude
+    new Query().within(new Circle(34.06018, -118.41835, 5000));
+
+# Results sorting
+
+You can have Factual sort your query results for you, on a field by field basis. Simple example:
+
+    // Build a Query to find 10 random entities and sort them by name, ascending:
+    new Query().limit(10).sortAsc("name");
+    
+You can specify more than one sort, and the results will be sorted with the first sort as primary, the second sort or secondary, and so on:
+
+    // Build a Query to find 20 random entities, sorted ascending primarily by region, then by locality, then by name:
+    q = new Query()
+      .limit(20)
+      .sortAsc("region")
+      .sortAsc("locality")
+      .sortDesc("name");
+
 # Limit and Offset
 
 You can use limit and offset to support basic results paging. For example:
@@ -44,12 +67,66 @@ You can use limit and offset to support basic results paging. For example:
     // Build a Query with offset of 150, limiting the page size to 10:
     new Query().limit(10).offset(150);
 	
-# Geo Filters
+# Field Selection
 
-You can query Factual for entities located within a geographic area. For example:
+By default your queries will return all fields in the table. You can use the only modifier to specify the exact set of fields returned. For example:
 
-    // Build a Query that finds entities located within 5000 meters of a latitude, longitude
-    new Query().within(new Circle(34.06018, -118.41835, 5000));
+    // Build a Query that only gets the name, tel, and category fields:
+    new Query().only("name", "tel", "category");
+    
+# All Top Level Query Parameters
+
+<table>
+  <tr>
+    <th>Parameter</th>
+    <th>Description</th>
+    <th>Example</th>
+  </tr>
+  <tr>
+    <td>filters</td>
+    <td>Restrict the data returned to conform to specific conditions.</td>
+    <td>q.field("name").beginsWith("Starbucks")</td>
+  </tr>
+  <tr>
+    <td>include count</td>
+    <td>Include a count of the total number of rows in the dataset that conform to the request based on included filters. Requesting the row count will increase the time required to return a response. The default behavior is to NOT include a row count. When the row count is requested, the Response object will contain a valid total row count via <tt>.getTotalRowCount()</tt>.</td>
+    <td><tt>q.includeRowCount()</tt></td>
+  </tr>
+  <tr>
+    <td>geo</td>
+    <td>Restrict data to be returned to be within a geographical range based.</td>
+    <td>(See the section on Geo Filters)</td>
+  </tr>
+  <tr>
+    <td>limit</td>
+    <td>Maximum number of rows to return. Default is 20. The system maximum is 50. For higher limits please contact Factual, however consider requesting a download of the data if your use case is requesting more data in a single query than is required to fulfill a single end-user's request.</td>
+    <td><tt>q.limit(10)</tt></td>
+  </tr>
+  <tr>
+    <td>search</td>
+    <td>Full text search query string.</td>
+    <td>
+      Find "sushi":<tt>q.search("sushi")</tt><br>
+      Find "sushi" or "sashimi":<tt>q.search("sushi, sashimi")</tt><br>
+      Find "sushi" and "santa" and "monica":<tt>q.search("sushi santa monica")</tt>
+    </td>
+  </tr>
+  <tr>
+    <td>offset</td>
+    <td>Number of rows to skip before returning a page of data. Maximum value is 500 minus any value provided under limit. Default is 0.</td>
+    <td><tt>q.offset(150)</tt></td>
+  </tr>
+  <tr>
+    <td>only</td>
+    <td>What fields to include in the query results.  Note that the order of fields will not necessarily be preserved in the resulting JSON response due to the nature of JSON hashes.</td>
+    <td><tt>q.only("name", "tel", "category")</tt></td>
+  </tr>
+  <tr>
+    <td>sort</td>
+    <td>The field (or secondary fields) to sort data on, as well as the direction of sort.  Supports $distance as a sort option if a geo-filter is specified.  Supports $relevance as a sort option if a full text search is specified either using the q parameter or using the $search operator in the filter parameter.  By default, any query with a full text search will be sorted by relevance.  Any query with a geo filter will be sorted by distance from the reference point.  If both a geo filter and full text search are present, the default will be relevance followed by distance.</td>
+    <td><tt>q.sortAsc("name").sortDesc("$distance")</tt></td>
+  </tr>
+</table>  
 
 # Row Filters
 
@@ -78,6 +155,11 @@ The driver supports various row filter logic. Examples:
     <td>notEqual</td>
     <td>not equal to</td>
     <td><tt>q.field("region").notEqual("CA")</tt></td>
+  </tr>
+  <tr>
+    <td>search</td>
+    <td>full text search</td>
+    <td><tt>q.field("name").search("fried chicken")</tt></td>
   </tr>
   <tr>
     <td>in</td>
@@ -140,13 +222,6 @@ The driver supports various row filter logic. Examples:
     <td><tt>q.field("rating").lessThanOrEqual(7.5)</tt></td>
   </tr>
 </table>
-
-## Search operator
-
-You can run full text searches against specific fields. Example:
-
-    // Build a query to full text search against the name field:
-    new Query().field("name").search("Fried Chicken");
 
 ## AND
 
