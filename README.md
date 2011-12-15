@@ -106,9 +106,9 @@ By default your queries will return all fields in the table. You can use the onl
     <td>search</td>
     <td>Full text search query string.</td>
     <td>
-      Find "sushi":<tt>q.search("sushi")</tt><br>
-      Find "sushi" or "sashimi":<tt>q.search("sushi, sashimi")</tt><br>
-      Find "sushi" and "santa" and "monica":<tt>q.search("sushi santa monica")</tt>
+      Find "sushi":<br><tt>q.search("sushi")</tt><p>
+      Find "sushi" or "sashimi":<br><tt>q.search("sushi, sashimi")</tt><p>
+      Find "sushi" and "santa" and "monica":<br><tt>q.search("sushi santa monica")</tt>
     </td>
   </tr>
   <tr>
