@@ -336,6 +336,34 @@ NOTE: although these parameters are individually optional, at least one of the f
           .namespace("foursquare")
           .namespaceId("4ae4df6df964a520019f21e3"));
           
+# Resolve
+
+The driver fully support Factual's Resolve feature, which lets you start with incomplete data you may have for an entity, and get potential entity matches back from Factual.
+
+Each result record will include a confidence score (<tt>"similarity"</tt>), and a flag indicating whether Factual decided the entity is the correct resolved match with a high degree of accuracy (<tt>"resolved"</tt>).
+
+For any Resolve query, there will be 0 or 1 entities returned with <tt>"resolved"=true</tt>. If there was a full match, it is guaranteed to be the first record in the JSON response.
+
+(See [the Resolve Blog](http://blog.factual.com/factual-resolve) for more background.)
+
+## Simple Resolve Examples
+
+The <tt>resolves</tt> method gives you all possible matches:
+
+    // Get all entities that are possibly a match
+    ReadResponse resp = factual.resolves(new ResolveQuery()
+      .add("name", "Buena Vista")
+      .add("latitude", 34.06)
+      .add("longitude", -118.40));
+      
+The <tt>resolve</tt> method gives you the one full match if there is one, or null:
+
+    // Get the entity that is a full match, or null:
+    Map rec = factual.resolve(new ResolveQuery()
+    .add("name", "Buena Vista")
+    .add("latitude", 34.06)
+    .add("longitude", -118.40));
+      
 # Exception Handling
 
 If Factual's API indicates an error, a <tt>FactualApiException</tt> unchecked Exception will be thrown. It will contain details about the request you sent and the error that Factual returned.
