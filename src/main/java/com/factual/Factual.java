@@ -26,7 +26,7 @@ import com.google.common.io.Closeables;
  * @author aaron
  */
 public class Factual {
-  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.0";
+  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.0.1";
   private String factHome = "http://api.v3.factual.com/";
   private final String key;
   private final OAuthHmacSigner signer;
