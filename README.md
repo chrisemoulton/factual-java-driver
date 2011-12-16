@@ -342,16 +342,27 @@ The driver fully support Factual's Resolve feature, which lets you start with in
 
 Each result record will include a confidence score (<tt>"similarity"</tt>), and a flag indicating whether Factual decided the entity is the correct resolved match with a high degree of accuracy (<tt>"resolved"</tt>).
 
-For any resolve query, there will be 0 or 1 entities returned with <tt>"resolved"=true</tt>
+For any Resolve query, there will be 0 or 1 entities returned with <tt>"resolved"=true</tt>. If there was a full match, it is gauranteed to be the first record in the JSON response.
 
 (See [the Resolve Blog](http://blog.factual.com/factual-resolve) for more background.)
 
-## Simple Resolve Example
+## Simple Resolve Examples
 
+The <tt>resolves</tt> method gives you all possible matches:
+
+    // Get all entities that are possibly a match
     ReadResponse resp = factual.resolves(new ResolveQuery()
       .add("name", "Buena Vista")
       .add("latitude", 34.06)
       .add("longitude", -118.40));
+      
+The <tt>resolve</tt> method gives you the one full match if there is one, or null:
+
+    // Get the entity that is a full match, or null:
+    Map rec = factual.resolve(new ResolveQuery()
+    .add("name", "Buena Vista")
+    .add("latitude", 34.06)
+    .add("longitude", -118.40));
       
 # Exception Handling
 
