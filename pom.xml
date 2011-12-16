@@ -19,7 +19,7 @@
   <licenses>
     <license>
       <name>The Apache Software License, Version 2.0</name>
-      <url>http://raw.github.com/Factual/factual-java-driver/master/LICENSE.txt</url>
+      <url>http://github.com/Factual/factual-java-driver/blob/master/LICENSE.txt</url>
       <distribution>repo</distribution>
     </license>
   </licenses>
