@@ -78,29 +78,71 @@ public class Factual {
     return fetch(table, query).getCrosswalks();
   }
 
-  public Crosswalk crosswalk(String table, CrosswalkQuery query) {
-    return fetch(table, query).first();
+  /**
+   * Query's Factual for the Crosswalk data matching the specified
+   * <tt>query</tt>.
+   * 
+   * @param tableName
+   *          the name of the table to crosswalk.
+   * @param query
+   *          the Crosswalk query.
+   * @return Factual's response to the Crosswalk query.
+   */
+  public CrosswalkResponse fetch(String tableName, CrosswalkQuery query) {
+    return new CrosswalkResponse(request(urlForCrosswalk(tableName, query)));
   }
 
   /**
-   * Returns the read response from a Factual Resolve request.
+   * Asks Factual to resolve the Places entity for the attributes specified by
+   * <tt>query</tt>.
+   * <p>
+   * Returns the read response from a Factual Resolve request, which includes
+   * all records that are potential matches.
    * 
    * @param query
-   *          the Resolve query.
+   *          the Resolve query to run against Factual's Places table.
    * @return the response from Factual for the Resolve request.
    */
   public ReadResponse resolves(ResolveQuery query) {
     return fetch("places", query);
   }
 
+  /**
+   * Asks Factual to resolve the Places entity for the attributes specified by
+   * <tt>query</tt>. Returns a record representing the resolved entity if
+   * Factual successfully identified the entity with full confidence, or null if
+   * the entity was not resolved.
+   * 
+   * @param query
+   *          a Resolve query with partial attributes for an entity.
+   * @return a record representing the resolved entity if Factual successfully
+   *         identified the entity with full confidence, or null if the entity
+   *         was not resolved.
+   */
   public Map<String, Object> resolve(ResolveQuery query) {
     return resolves(query).first();
   }
 
-  public CrosswalkResponse fetch(String tableName, CrosswalkQuery query) {
-    return new CrosswalkResponse(request(urlForCrosswalk(tableName, query)));
-  }
-
+  /**
+   * Asks Factual to resolve the entity for the attributes specified by
+   * <tt>query</tt>, within the table called <tt>tableName</tt>.
+   * <p>
+   * Returns the read response from a Factual Resolve request, which includes
+   * all records that are potential matches.
+   * <p>
+   * Each result record will include a confidence score (<tt>"similarity"</tt>),
+   * and a flag indicating whether Factual decided the entity is the correct
+   * resolved match with a high degree of accuracy (<tt>"resolved"</tt>).
+   * <p>
+   * There will be 0 or 1 entities returned with "resolved"=true. If there was a
+   * full match, it is guaranteed to be the first record in the response.
+   * 
+   * @param tableName
+   *          the name of the table to resolve within.
+   * @param query
+   *          a Resolve query with partial attributes for an entity.
+   * @return the response from Factual for the Resolve request.
+   */
   public ReadResponse fetch(String tableName, ResolveQuery query) {
     return new ReadResponse(request(urlForResolve(tableName, query)));
   }

@@ -13,16 +13,13 @@ public class DemoCrosswalk3 {
   private static String secret = read("secret.txt");
   private static Factual factual = new Factual(key, secret);
 
-  /**
-   * Get all third party IDs or URIs for The Stand using it's Foursquare ID
-   */
   public static void main(String[] args) {
-    CrosswalkQuery q = new CrosswalkQuery()
-    .namespace("foursquare")
-    .namespaceId("4ae4df6df964a520019f21e3");  // Foursquare's id for The Stand
 
-    // Run the query on Factual's "places" table:
-    CrosswalkResponse resp = factual.fetch("places", q);
+    // Get all Crosswalk data for a specific Places entity, using its Foursquare ID
+    CrosswalkResponse resp = factual.fetch("places",
+        new CrosswalkQuery()
+    .namespace("foursquare")
+    .namespaceId("4ae4df6df964a520019f21e3"));
 
     // Print out the Crosswalk results:
     for(Crosswalk cw : resp.getCrosswalks()) {

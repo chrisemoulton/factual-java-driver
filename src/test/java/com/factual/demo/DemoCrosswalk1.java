@@ -14,14 +14,10 @@ public class DemoCrosswalk1 {
   private static Factual factual = new Factual(key, secret);
 
   public static void main(String[] args) {
-    // Build a Crosswalk query to get data for a specific Factual entity:
-    CrosswalkQuery q = new CrosswalkQuery();
-    q.factualId("97598010-433f-4946-8fd5-4a6dd1639d77");
+    // Get all Crosswalk data for a specific Places entity, using its on Factual ID:
+    CrosswalkResponse resp = factual.fetch("places",
+        new CrosswalkQuery().factualId("97598010-433f-4946-8fd5-4a6dd1639d77"));
 
-    // Run the query on Factual's "places" table:
-    CrosswalkResponse resp = factual.fetch("places", q);
-
-    // Print out the Crosswalk results:
     for(Crosswalk cw : resp.getCrosswalks()) {
       System.out.println(cw);
     }

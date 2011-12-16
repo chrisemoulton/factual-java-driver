@@ -49,6 +49,10 @@ public abstract class Response {
     return includedRows;
   }
 
+  /**
+   * @return true if Factual's response did not include any results records for
+   *         the query, false otherwise.
+   */
   public boolean isEmpty() {
     return includedRows == 0;
   }

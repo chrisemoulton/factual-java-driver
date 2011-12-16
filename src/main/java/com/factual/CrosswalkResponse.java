@@ -50,6 +50,9 @@ public class CrosswalkResponse extends Response {
     return crosswalks;
   }
 
+  /**
+   * @return the first Crosswalk hit or null if no data was returned.
+   */
   public Crosswalk first() {
     if(crosswalks.isEmpty()) {
       return null;

@@ -2,7 +2,12 @@ package com.factual;
 
 import com.google.api.client.http.HttpResponse;
 
-
+/**
+ * Represents an Exception that happened while communicating with Factual.
+ * Includes information about the request that triggered the problem.
+ * 
+ * @author aaron
+ */
 public class FactualApiException extends RuntimeException {
   private String requestUrl;
   private String requestMethod;
@@ -32,14 +37,24 @@ public class FactualApiException extends RuntimeException {
     return this;
   }
 
+  /**
+   * @return the URL used to make the offending request to Factual.
+   */
   public String getRequestUrl() {
     return requestUrl;
   }
 
+  /**
+   * @return the HTTP request method used to make the offending request to Factual.
+   */
   public String getRequestMethod() {
     return requestMethod;
   }
 
+  /**
+   * @return the full HttpResponse object, representing the problematic response
+   *         from Factual.
+   */
   public HttpResponse getResponse() {
     return response;
   }

@@ -43,11 +43,17 @@ public class ReadResponse extends Response {
     }
   }
 
+  /**
+   * @return The full JSON response from Factual
+   */
   @Override
   public String getJson() {
     return json;
   }
 
+  /**
+   * @return the first data record or null if no data was returned.
+   */
   public Map<String, Object> first() {
     if(data.isEmpty()) {
       return null;
