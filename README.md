@@ -342,7 +342,7 @@ The driver fully support Factual's Resolve feature, which lets you start with in
 
 Each result record will include a confidence score (<tt>"similarity"</tt>), and a flag indicating whether Factual decided the entity is the correct resolved match with a high degree of accuracy (<tt>"resolved"</tt>).
 
-For any Resolve query, there will be 0 or 1 entities returned with <tt>"resolved"=true</tt>. If there was a full match, it is gauranteed to be the first record in the JSON response.
+For any Resolve query, there will be 0 or 1 entities returned with <tt>"resolved"=true</tt>. If there was a full match, it is guaranteed to be the first record in the JSON response.
 
 (See [the Resolve Blog](http://blog.factual.com/factual-resolve) for more background.)
 
