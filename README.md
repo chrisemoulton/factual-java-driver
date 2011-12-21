@@ -21,8 +21,6 @@ You can download the individual driver jar, and view the pom.xml file, here:
 
 The pom.xml tells you what dependencies you'll need to plug into your project to get the driver to work (see the <dependencies> section).
 
-via [Factual on search.maven.org](http://search.maven.org/#search%7Cga%7C1%7Cfactual)
-
 # Basic Design
 
 The driver allows you to create an authenticated handle to Factual. With a Factual handle, you can send queries and get results back.
