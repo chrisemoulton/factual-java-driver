@@ -150,23 +150,23 @@ public class Query {
   /**
    * Begins construction of a new row filter.
    * 
-   * @param fieldName
+   * @param field
    *          the name of the field on which to filter.
    * @return A partial representation of the new row filter.
    */
-  public QueryBuilder criteria(String fieldName) {
-    return new QueryBuilder(this, fieldName);
+  public QueryBuilder criteria(String field) {
+    return new QueryBuilder(this, field);
   }
 
   /**
    * Begins construction of a new row filter for this Query.
    * 
-   * @param fieldName
+   * @param field
    *          the name of the field on which to filter.
    * @return A partial representation of the new row filter.
    */
-  public QueryBuilder field(String fieldName) {
-    return new QueryBuilder(this, fieldName);
+  public QueryBuilder field(String field) {
+    return new QueryBuilder(this, field);
   }
 
   public Query near(String text, int meters) {
