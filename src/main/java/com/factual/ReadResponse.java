@@ -1,18 +1,15 @@
 package com.factual;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 
 
@@ -37,7 +34,7 @@ public class ReadResponse extends Response {
     try{
       JSONObject rootJsonObj = new JSONObject(json);
       Response.withMeta(this, rootJsonObj);
-      data = data(rootJsonObj.getJSONObject("response").getJSONArray("data"));
+      data = JsonUtil.data(rootJsonObj.getJSONObject("response").getJSONArray("data"));
     } catch (JSONException e) {
       throw new RuntimeException(e);
     }
@@ -93,24 +90,5 @@ public class ReadResponse extends Response {
   }
 
   //TODO: Bradley: "mapToStrings, mapToDoubles, etc."
-
-  private static List<Map<String, Object>> data(JSONArray arr) throws JSONException {
-    List<Map<String, Object>> data = Lists.newArrayList();
-    for(int i=0; i<arr.length(); i++) {
-      data.add(row(arr.getJSONObject(i)));
-    }
-    return data;
-  }
-
-  private static Map<String, Object> row(JSONObject jo) throws JSONException {
-    Map<String, Object> row = Maps.newHashMap();
-    Iterator<?> iter = jo.keys();
-    while(iter.hasNext()) {
-      String key = iter.next().toString();
-      Object value = jo.get(key);
-      row.put(key, value);
-    }
-    return row;
-  }
 
 }

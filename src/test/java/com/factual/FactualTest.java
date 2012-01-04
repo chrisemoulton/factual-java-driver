@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.base.Joiner;
@@ -31,11 +31,25 @@ public class FactualTest {
   private static Factual factual;
 
 
-  @BeforeClass
-  public static void connect() {
+  @Before
+  public void setup() {
     String key = read("key.txt");
     String secret = read("secret.txt");
     factual = new Factual(key, secret);
+  }
+
+  @Test
+  public void testSchema() {
+    SchemaResponse schema = factual.schema("restaurants-us");
+    assertEquals("US Restaurants", schema.getTitle());
+    assertTrue(schema.isGeoEnabled());
+    assertTrue(schema.isSearchEnabled());
+
+    assertFalse(schema.getColumnSchemas().isEmpty());
+
+    ColumnSchema nameSchema = schema.getColumnSchema("name");
+    assertEquals("name", nameSchema.name);
+    assertEquals("string", nameSchema.datatype);
   }
 
   /**
@@ -303,9 +317,7 @@ public class FactualTest {
   public void testApiException() {
     Factual badness = new Factual("badkey", "badsecret");
     try{
-      ReadResponse resp = badness.fetch("places", new Query().field("region").equal("CA"));
-      //System.out.println(resp.getStatus());
-      //System.out.println(resp.mapStrings("region"));
+      badness.fetch("places", new Query().field("region").equal("CA"));
       fail("Expected to catch a FactualApiException");
     } catch (FactualApiException e) {
       assertEquals(401, e.getResponse().statusCode);
@@ -360,8 +372,16 @@ public class FactualTest {
    */
   public static String read(String name) {
     try {
-      return FileUtils.readFileToString(new File("src/test/resources/" + name)).trim();
+      File file = new File("src/test/resources/" + name);
+      if(file.exists()) {
+        return FileUtils.readFileToString(file).trim();
+      } else {
+        fail("You must provide " + file);
+        System.err.println("You must provide " + file);
+        throw new IllegalStateException("Could not find " + file);
+      }
     } catch (IOException e) {
+      e.printStackTrace();
       throw new RuntimeException(e);
     }
   }

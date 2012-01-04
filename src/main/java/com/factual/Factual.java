@@ -26,7 +26,7 @@ import com.google.common.io.Closeables;
  * @author aaron
  */
 public class Factual {
-  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.0.1";
+  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.0.2";
   private String factHome = "http://api.v3.factual.com/";
   private final String key;
   private final OAuthHmacSigner signer;
@@ -145,6 +145,14 @@ public class Factual {
    */
   public ReadResponse fetch(String tableName, ResolveQuery query) {
     return new ReadResponse(request(urlForResolve(tableName, query)));
+  }
+
+  public SchemaResponse schema(String tableName) {
+    return new SchemaResponse(request(urlForSchema(tableName)));
+  }
+
+  private String urlForSchema(String tableName) {
+    return factHome + "t/" + tableName + "/schema";
   }
 
   private String urlForCrosswalk(String tableName, CrosswalkQuery query) {
