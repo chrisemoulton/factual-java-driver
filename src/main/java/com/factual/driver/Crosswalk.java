@@ -1,4 +1,4 @@
-package com.factual;
+package com.factual.driver;
 
 /**
  * Represents a Crosswalk record from Factual.

@@ -1,4 +1,4 @@
-package com.factual;
+package com.factual.driver;
 
 import java.util.Collection;
 import java.util.List;
@@ -19,7 +19,7 @@ import com.google.common.collect.Lists;
  *
  * @author aaron
  */
-public class ReadResponse extends Response {
+public class ReadResponse extends Response implements Tabular {
   private final String json;
   private List<Map<String, Object>> data = Lists.newArrayList();
 
@@ -65,6 +65,7 @@ public class ReadResponse extends Response {
    * 
    * @return the main data returned by Factual.
    */
+  @Override
   public List<Map<String, Object>> getData() {
     return data;
   }

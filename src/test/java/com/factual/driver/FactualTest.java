@@ -1,4 +1,4 @@
-package com.factual;
+package com.factual.driver;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -15,6 +15,18 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.factual.driver.Circle;
+import com.factual.driver.ColumnSchema;
+import com.factual.driver.Crosswalk;
+import com.factual.driver.CrosswalkQuery;
+import com.factual.driver.CrosswalkResponse;
+import com.factual.driver.Factual;
+import com.factual.driver.FactualApiException;
+import com.factual.driver.Query;
+import com.factual.driver.ReadResponse;
+import com.factual.driver.ResolveQuery;
+import com.factual.driver.Response;
+import com.factual.driver.SchemaResponse;
 import com.google.common.base.Joiner;
 
 

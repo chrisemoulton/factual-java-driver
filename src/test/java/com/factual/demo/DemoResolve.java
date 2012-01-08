@@ -1,12 +1,12 @@
 package com.factual.demo;
 
-import static com.factual.FactualTest.read;
+import static com.factual.driver.FactualTest.read;
 
 import java.util.Map;
 
-import com.factual.Factual;
-import com.factual.ReadResponse;
-import com.factual.ResolveQuery;
+import com.factual.driver.Factual;
+import com.factual.driver.ReadResponse;
+import com.factual.driver.ResolveQuery;
 
 
 public class DemoResolve {

@@ -4,7 +4,7 @@
 
   <groupId>com.factual</groupId>
   <artifactId>factual-java-driver</artifactId>
-  <version>1.0.2</version>
+  <version>1.1.0</version>
   <packaging>jar</packaging>
 
   <name>factual-java-driver</name>
@@ -82,7 +82,7 @@
 
   <build>
     <plugins>
-      <plugin>
+      <!--plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-gpg-plugin</artifactId>
         <executions>
@@ -94,7 +94,7 @@
             </goals>
           </execution>
         </executions>
-      </plugin>    
+      </plugin-->    
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>2.3.2</version>
@@ -136,12 +136,12 @@
     </plugins>
   </build>
   
-  <distributionManagement>
+  <!--distributionManagement>
     <repository>
       <id>sonatype-nexus-staging</id>
       <name>Sonatype Staging</name>
       <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
     </repository>
-  </distributionManagement>
+  </distributionManagement-->
 
 </project>

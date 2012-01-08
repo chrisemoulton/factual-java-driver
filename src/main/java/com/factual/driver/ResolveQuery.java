@@ -1,4 +1,4 @@
-package com.factual;
+package com.factual.driver;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;

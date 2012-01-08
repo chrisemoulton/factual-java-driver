@@ -3,7 +3,7 @@ package com.factual.data_science_toolkit;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.factual.FactualApiException;
+import com.factual.driver.FactualApiException;
 
 /**
  * Represents a coordinate that came from a DataScienceToolkit query.

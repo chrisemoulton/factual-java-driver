@@ -1,9 +1,9 @@
 package com.factual.demo;
 
-import static com.factual.FactualTest.read;
+import static com.factual.driver.FactualTest.read;
 
-import com.factual.Factual;
-import com.factual.Query;
+import com.factual.driver.Factual;
+import com.factual.driver.Query;
 
 
 public class DemoSort {

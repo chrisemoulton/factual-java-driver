@@ -1,4 +1,4 @@
-package com.factual;
+package com.factual.driver;
 
 import static org.junit.Assert.assertEquals;
 
@@ -6,6 +6,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
 import org.junit.Test;
+
+import com.factual.driver.Query;
 
 
 /**

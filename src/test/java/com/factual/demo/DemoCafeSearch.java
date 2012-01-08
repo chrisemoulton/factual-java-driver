@@ -1,13 +1,13 @@
 package com.factual.demo;
 
-import static com.factual.FactualTest.read;
+import static com.factual.driver.FactualTest.read;
 
 import java.util.Map;
 
-import com.factual.Circle;
-import com.factual.Factual;
-import com.factual.Query;
-import com.factual.ReadResponse;
+import com.factual.driver.Circle;
+import com.factual.driver.Factual;
+import com.factual.driver.Query;
+import com.factual.driver.ReadResponse;
 
 
 public class DemoCafeSearch {
@@ -29,7 +29,7 @@ public class DemoCafeSearch {
     ReadResponse resp = factual.fetch("places", q);
 
     // Print out each record
-    for(Map record : resp.getData()) {
+    for(Map<?, ?> record : resp.getData()) {
       System.out.println(record);
     }
 

@@ -1,9 +1,9 @@
 package com.factual.demo;
 
-import static com.factual.FactualTest.read;
+import static com.factual.driver.FactualTest.read;
 
-import com.factual.CrosswalkQuery;
-import com.factual.Factual;
+import com.factual.driver.CrosswalkQuery;
+import com.factual.driver.Factual;
 
 
 public class DemoCrosswalkBuenaVista {

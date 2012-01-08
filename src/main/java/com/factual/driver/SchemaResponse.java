@@ -1,4 +1,4 @@
-package com.factual;
+package com.factual.driver;
 
 import java.util.List;
 import java.util.Map;
@@ -15,13 +15,14 @@ import com.google.common.collect.Maps;
  *
  * @author aaron
  */
-public class SchemaResponse extends Response {
+public class SchemaResponse extends Response implements Tabular {
   private final String json;
   private final Map<String, ColumnSchema> columnSchemas;
   private final String title;
   private final boolean searchEnabled;
   private final boolean geoEnabled;
   private final String description;
+  private final List<Map<String, Object>> data;
 
 
   /**
@@ -36,9 +37,8 @@ public class SchemaResponse extends Response {
       Response.withMeta(this, rootJsonObj);
       JSONObject respObj = rootJsonObj.getJSONObject("response");
       JSONObject view = respObj.getJSONObject("view");
-
-      columnSchemas = makeColumnSchemas(JsonUtil.data(view.getJSONArray("fields")));
-
+      data = JsonUtil.data(view.getJSONArray("fields"));
+      columnSchemas = makeColumnSchemas(data);
       title = view.getString("title");
       description = view.getString("description");
       searchEnabled = view.getBoolean("search_enabled");
@@ -94,6 +94,11 @@ public class SchemaResponse extends Response {
 
   public ColumnSchema getColumnSchema(String columnName) {
     return columnSchemas.get(columnName);
+  }
+
+  @Override
+  public List<Map<String, Object>> getData() {
+    return data;
   }
 
 }

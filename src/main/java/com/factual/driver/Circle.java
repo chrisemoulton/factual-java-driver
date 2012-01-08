@@ -1,4 +1,4 @@
-package com.factual;
+package com.factual.driver;
 
 import com.factual.data_science_toolkit.Coord;
 
