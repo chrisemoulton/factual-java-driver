@@ -79,7 +79,9 @@ public class CrosswalkResponse extends Response {
     cw.setFactualId(jo.getString("factual_id"));
     cw.setNamespace(jo.getString("namespace"));
     cw.setNamespaceId(jo.getString("namespace_id"));
-    cw.setUrl(jo.getString("url"));
+    if(jo.has("url")) {
+      cw.setUrl(jo.getString("url"));
+    }
     return cw;
   }
 
