@@ -153,7 +153,9 @@ public class Query {
    * @param field
    *          the name of the field on which to filter.
    * @return A partial representation of the new row filter.
+   * @deprecated use {@link #field(String)}
    */
+  @Deprecated
   public QueryBuilder criteria(String field) {
     return new QueryBuilder(this, field);
   }
