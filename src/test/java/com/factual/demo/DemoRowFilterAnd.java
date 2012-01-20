@@ -16,8 +16,8 @@ public class DemoRowFilterAnd {
     // Build a query to find entities where the name begins with "Coffee" AND the telephone is blank:
     Query q = new Query();
     q.and(
-        q.criteria("name").beginsWith("Coffee"),
-        q.criteria("tel").blank()
+        q.field("name").beginsWith("Coffee"),
+        q.field("tel").blank()
     );
 
     System.out.println(

@@ -20,12 +20,12 @@ public class DemoRowFilterNestedOrAnd {
     Query q = new Query();
     q.or(
         q.or(
-            q.criteria("name").beginsWith("Starbucks"),
-            q.criteria("name").beginsWith("Coffee")
+            q.field("name").beginsWith("Starbucks"),
+            q.field("name").beginsWith("Coffee")
         ),
         q.and(
-            q.criteria("name").search("tea"),
-            q.criteria("tel").notBlank()
+            q.field("name").search("tea"),
+            q.field("tel").notBlank()
         )
     );
 

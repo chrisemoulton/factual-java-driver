@@ -7,8 +7,6 @@ import java.net.URLDecoder;
 
 import org.junit.Test;
 
-import com.factual.driver.Query;
-
 
 /**
  * Unit tests for Query.
@@ -60,8 +58,8 @@ public class QueryTest {
     .field("region").in("MA", "VT", "NH");
 
     q.or(
-        q.criteria("first_name").equal("Chun"),
-        q.criteria("last_name").equal("Kok")
+        q.field("first_name").equal("Chun"),
+        q.field("last_name").equal("Kok")
     );
 
     String queryStr = q.toUrlQuery();
@@ -76,12 +74,12 @@ public class QueryTest {
     Query q = new Query();
     q.or(
         q.or(
-            q.criteria("first_name").equal("Chun"),
-            q.criteria("last_name").equal("Kok")
+            q.field("first_name").equal("Chun"),
+            q.field("last_name").equal("Kok")
         ),
         q.and(
-            q.criteria("score").equal("38"),
-            q.criteria("city").equal("Los Angeles")
+            q.field("score").equal("38"),
+            q.field("city").equal("Los Angeles")
         )
     );
 

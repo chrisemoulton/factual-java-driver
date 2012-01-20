@@ -171,8 +171,8 @@ public class FactualTest {
     Query q = new Query();
     q.field("region").in("MA","VT","NH");
     q.or(
-        q.criteria("name").beginsWith("Coffee"),
-        q.criteria("name").beginsWith("Star")
+        q.field("name").beginsWith("Coffee"),
+        q.field("name").beginsWith("Star")
     );
 
     ReadResponse resp = factual.fetch("places", q);
