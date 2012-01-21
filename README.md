@@ -239,8 +239,8 @@ Queries support logical AND'ing your row filters. For example:
     // Build a query to find entities where the name begins with "Coffee" AND the telephone is blank:
     Query q = new Query();
     q.and(
-      q.criteria("name").beginsWith("Coffee"),
-      q.criteria("tel").blank()
+      q.field("name").beginsWith("Coffee"),
+      q.field("tel").blank()
     );
     
 Note that all row filters set at the top level of the Query are implicitly AND'ed together, so you could also do this:
@@ -256,8 +256,8 @@ Queries support logical OR'ing your row filters. For example:
     // Build a query to find entities where the name begins with "Coffee" OR the telephone is blank:
     Query q = new Query();
     q.or(
-        q.criteria("name").beginsWith("Coffee"),
-        q.criteria("tel").blank());
+        q.field("name").beginsWith("Coffee"),
+        q.field("tel").blank());
 	  
 ## Combined ANDs and ORs
 
@@ -270,12 +270,12 @@ You can nest AND and OR logic to whatever level of complexity you need. For exam
     Query q = new Query();
     q.or(
         q.or(
-            q.criteria("name").beginsWith("Starbucks"),
-            q.criteria("name").beginsWith("Coffee")
+            q.field("name").beginsWith("Starbucks"),
+            q.field("name").beginsWith("Coffee")
         ),
         q.and(
-            q.criteria("name").search("tea"),
-            q.criteria("tel").notBlank()
+            q.field("name").search("tea"),
+            q.field("tel").notBlank()
         )
     );
 
