@@ -281,7 +281,7 @@ You can nest AND and OR logic to whatever level of complexity you need. For exam
 
 # Crosswalk
 
-The driver fully support Factual's Crosswalk feature, which lets you "crosswalk" the web and relate entities between Factual's data and that of other web authorities.
+The driver fully supports Factual's Crosswalk feature, which lets you "crosswalk" the web and relate entities between Factual's data and that of other web authorities.
 
 (See [the Crosswalk Blog](http://blog.factual.com/crosswalk-api) for more background.)
 
@@ -347,7 +347,7 @@ NOTE: although these parameters are individually optional, at least one of the f
           
 # Resolve
 
-The driver fully support Factual's Resolve feature, which lets you start with incomplete data you may have for an entity, and get potential entity matches back from Factual.
+The driver fully supports Factual's Resolve feature, which lets you start with incomplete data you may have for an entity, and get potential entity matches back from Factual.
 
 Each result record will include a confidence score (<tt>"similarity"</tt>), and a flag indicating whether Factual decided the entity is the correct resolved match with a high degree of accuracy (<tt>"resolved"</tt>).
 
