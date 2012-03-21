@@ -39,9 +39,9 @@
       <version>r09</version>
     </dependency>
     <dependency>
-      <groupId>com.google.api.client</groupId>
+      <groupId>com.google.api-client</groupId>
       <artifactId>google-api-client</artifactId>
-      <version>1.4.1-beta</version>
+      <version>1.7.0-beta</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.jackson</groupId>

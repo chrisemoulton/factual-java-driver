@@ -190,13 +190,13 @@ public class Factual {
 
       HttpHeaders headers = new HttpHeaders();
       headers.set("X-Factual-Lib", DRIVER_HEADER_TAG);
-      request.headers = headers;
+      request.setHeaders(headers);
 
       // get the response
       br = new BufferedReader(new InputStreamReader(request.execute().getContent()));
       return br.readLine();
     } catch (HttpResponseException e) {
-      throw new FactualApiException(e).requestUrl(urlStr).requestMethod(requestMethod).response(e.response);
+      throw new FactualApiException(e).requestUrl(urlStr).requestMethod(requestMethod).response(e.getResponse());
     } catch (IOException e) {
       throw new FactualApiException(e).requestUrl(urlStr).requestMethod(requestMethod);
     } catch (GeneralSecurityException e) {
