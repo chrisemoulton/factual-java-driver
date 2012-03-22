@@ -2,7 +2,8 @@
 
  * Refactored into .driver package
  * Created a Tabular interface for responses that have tabulatable data
- * Fixed bug where lists ($in, etc.) were not formatted properly when sendin JSON to API
+ * Fixed bug where lists ($in, etc.) were not formatted properly when sending JSON to API
+ * Updated Google API Client Library dependency from 1.4.1-beta to 1.7.0-beta with relevant driver changes
 
 ## 1.0.2
 

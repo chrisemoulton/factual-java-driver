@@ -24,7 +24,7 @@ public class FieldFilter implements Filter {
    * For example:
    * <pre>
    * {"first": {"$eq":"Jack"}}
-   * {"first": {"$in":"a, b, c"}}
+   * {"first": {"$in":["a", "b", "c"]}}
    * </pre>
    */
   @Override

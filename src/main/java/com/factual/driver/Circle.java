@@ -19,7 +19,7 @@ public class Circle {
    * 
    * @param lat the latitude of the center of this Circle.
    * @param lon the longitude of the center of this Circle.
-   * @param metersRadius the radius, in meters, of this Circle.
+   * @param meters the radius, in meters, of this Circle.
    */
   public Circle(double lat, double lon, int meters) {
     this.lat = lat;

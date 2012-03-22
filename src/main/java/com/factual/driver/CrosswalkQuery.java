@@ -37,8 +37,8 @@ public class CrosswalkQuery {
    * Adds the specified <tt>limit</tt> to this Query. The amount of returned
    * Crosswalk records will not exceed this limit.
    * 
-   * @param factualId
-   *          a unique Factual ID.
+   * @param limit
+   *          The amount of returned Crosswalk records this Query will not exceed.
    * @return this CrosswalkQuery
    */
   public CrosswalkQuery limit(int limit) {

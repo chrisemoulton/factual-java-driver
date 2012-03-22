@@ -60,7 +60,7 @@ public abstract class Response {
   /**
    * Parses response metadata from <tt>rootJsonObj</tt> and adds it to <tt>response</tt>
    * 
-   * @param response the response object to which to add metadata.
+   * @param resp the response object to which to add metadata.
    * @param rootJsonObj the top-level JSON response Object built from a Factual response.
    */
   public static void withMeta(Response resp, JSONObject rootJsonObj) {

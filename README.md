@@ -11,13 +11,13 @@ The driver is in Maven Central, so you can just add this to your Maven <tt>pom.x
     <dependency>
       <groupId>com.factual</groupId>
       <artifactId>factual-java-driver</artifactId>
-      <version>1.0</version>
+      <version>1.1.0</version>
     </dependency>
     
 ## Non Maven users
 
 You can download the individual driver jar, and view the pom.xml file, here:
-[Driver download folder](http://repo1.maven.org/maven2/com/factual/factual-java-driver/1.0/)
+[Driver download folder](http://repo1.maven.org/maven2/com/factual/factual-java-driver/1.1.0/)
 
 The pom.xml tells you what dependencies you'll need to plug into your project to get the driver to work (see the <dependencies> section).
 

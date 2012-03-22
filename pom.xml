@@ -12,9 +12,18 @@
   <url>http://github.com/Factual/factual-java-driver</url>
 
   <scm>
-    <url>https://github.com/Factual/factual-java-driver/tree/master</url>
-    <connection>scm:git:git://github.com/Factual/factual-java-driver.git</connection>
+    <connection>scm:git:git@github.com:Factual/factual-java-driver.git</connection>
+    <developerConnection>scm:git:git@github.com:Factual/factual-java-driver.git</developerConnection>
+    <url>git@github.com:Factual/factual-java-driver.git</url>
+    <!--url>https://github.com/Factual/factual-java-driver/tree/master</url>
+    <connection>scm:git:git://github.com/Factual/factual-java-driver.git</connection-->
   </scm>
+
+  <!--parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>
+  </parent-->
 
   <licenses>
     <license>
@@ -31,7 +40,7 @@
       <email>aaron@factual.com</email>
     </developer>
   </developers>
-  
+
   <dependencies>
     <dependency>
       <groupId>com.google.guava</groupId>
@@ -82,6 +91,26 @@
 
   <build>
     <plugins>
+      <plugin>
+	<groupId>org.apache.maven.plugins</groupId>
+	<artifactId>maven-javadoc-plugin</artifactId>
+	<executions>
+	  <execution>
+	    <id>attach-javadocs</id>
+	    <goals>
+              <goal>jar</goal>
+	    </goals>
+	  </execution>
+	</executions>
+      </plugin>
+      <plugin>
+       <groupId>org.apache.maven.plugins</groupId>
+       <artifactId>maven-release-plugin</artifactId>
+       <version>2.1</version>
+       <configuration>
+         <pushChanges>false</pushChanges>
+       </configuration>
+     </plugin>
       <!--plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-gpg-plugin</artifactId>
@@ -94,7 +123,7 @@
             </goals>
           </execution>
         </executions>
-      </plugin-->    
+      </plugin-->
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>2.3.2</version>
@@ -131,11 +160,11 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>2.8</version>
-      </plugin>      
-      
+      </plugin>
+
     </plugins>
   </build>
-  
+
   <!--distributionManagement>
     <repository>
       <id>sonatype-nexus-staging</id>
