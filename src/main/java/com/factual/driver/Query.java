@@ -2,13 +2,11 @@ package com.factual.driver;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.List;
+import java.util.Map;
 
 import com.factual.data_science_toolkit.Coord;
 import com.factual.data_science_toolkit.DataScienceToolkit;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 
 /**
  * Represents a top level Factual query. Knows how to represent the query as URL
@@ -17,25 +15,26 @@ import com.google.common.collect.Lists;
  * 
  * @author aaron
  */
-public class Query {
-  private String fullTextSearch;
-  private String[] selectFields;
-  private long limit;
-  private long offset;
+public class Query implements Filterable {
+
   private boolean includeRowCount;
-  private Circle circle;
 
   /**
-   * Holds all row filters for this Query. Implicit top-level AND.
-   */
-  private final List<Filter> rowFilters = Lists.newArrayList();
-
-  /**
-   * Holds all results sorts for this Query. Example contents:
+   * Key for sorts on this Query.
+   *      Value holds all results sorts for this Query. Example contents:
    * <tt>"$distance:desc","name:asc","locality:asc"</tt>
    */
-  private final List<String> sorts = Lists.newArrayList();
+  private static final String SORT = "sort";
 
+  /**
+   * Key for selects on this Query
+   */
+  private static final String SELECT = "select";
+
+  /**
+   * Holds all parameters for this Query.
+   */
+  protected final Parameters queryParams = new Parameters();
 
   /**
    * Sets a full text search query. Factual will use this value to perform a
@@ -47,7 +46,7 @@ public class Query {
    * @return this Query
    */
   public Query search(String term) {
-    this.fullTextSearch = term;
+    addParam("q", term);
     return this;
   }
 
@@ -57,7 +56,7 @@ public class Query {
    * @return this Query
    */
   public Query limit(long limit) {
-    this.limit = limit;
+    addParam("limit", (limit > 0 ? limit : null));
     return this;
   }
 
@@ -70,7 +69,9 @@ public class Query {
    * @return this Query
    */
   public Query only(String... fields) {
-    this.selectFields = fields;
+	for (String field : fields) {
+		queryParams.addCommaSeparatedParam(SELECT, field);
+	}
     return this;
   }
 
@@ -78,7 +79,7 @@ public class Query {
    * @return array of select fields set by only(), null if none.
    */
   public String[] getSelectFields() {
-    return selectFields;
+	return queryParams.getCommaSeparatedParam(SELECT);
   }
 
   /**
@@ -89,7 +90,7 @@ public class Query {
    * @return this Query
    */
   public Query sortAsc(String field) {
-    sorts.add(field + ":asc");
+	queryParams.addCommaSeparatedParam(SORT, field + ":asc");
     return this;
   }
 
@@ -101,7 +102,7 @@ public class Query {
    * @return this Query
    */
   public Query sortDesc(String field) {
-    sorts.add(field + ":desc");
+	queryParams.addCommaSeparatedParam(SORT, field + ":desc");
     return this;
   }
 
@@ -114,7 +115,7 @@ public class Query {
    * @return this Query
    */
   public Query offset(long offset) {
-    this.offset = offset;
+    addParam("offset", (offset > 0 ? offset : null));
     return this;
   }
 
@@ -188,7 +189,7 @@ public class Query {
    * @return this Query.
    */
   public Query within(Circle circle) {
-    this.circle = circle;
+	queryParams.setParam("geo", circle);
     return this;
   }
 
@@ -196,23 +197,42 @@ public class Query {
    * Used to nest AND'ed predicates.
    */
   public Query and(Query... queries) {
-    return popFilters("$and", queries);
+    queryParams.popFilters("$and", queries);
+    return this;
   }
 
   /**
    * Used to nest OR'ed predicates.
    */
   public Query or(Query... queries) {
-    return popFilters("$or", queries);
+    queryParams.popFilters("$or", queries);
+    return this;
   }
 
   /**
    * Adds <tt>filter</tt> to this Query.
    */
   public void add(Filter filter) {
-    rowFilters.add(filter);
+	queryParams.add(filter);
   }
 
+  /**
+   * Adds a key-value pair to this Query.
+   * 
+   * @param key
+   * @param value
+   * @return this Query
+   */
+  public Query addJsonParam(String key, Object value) {
+	queryParams.setJsonParam(key, value);
+    return this;
+  }
+
+  public Query addParam(String key, Object value) {
+	queryParams.setParam(key, value);
+    return this;
+  }
+    
   /**
    * Builds and returns the query string to represent this Query when talking to
    * Factual's API. Provides proper URL encoding and escaping.
@@ -230,18 +250,19 @@ public class Query {
    * @return the query string to represent this Query when talking to Factual's
    *         API.
    */
-  protected String toUrlQuery() {
-    return Joiner.on("&").skipNulls().join(
-        urlPair("select", fieldsJsonOrNull()),
-        urlPair("q", fullTextSearch),
-        urlPair("sort", sortsJsonOrNull()),
-        (limit > 0 ? urlPair("limit", limit) : null),
-        (offset > 0 ? urlPair("offset", offset) : null),
-        (includeRowCount ? urlPair("include_count", true) : null),
-        urlPair("filters", rowFiltersJsonOrNull()),
-        urlPair("geo", geoBoundsJsonOrNull()));
+  public String toUrlQuery() {
+	Parameters additional = null;
+	if (includeRowCount) {
+		additional = new Parameters();
+		additional.setParam("include_count",true);
+	}
+	return queryParams.toUrlQuery(additional, true);
   }
 
+  protected Map<Object, Object> toJsonData() {
+	return queryParams.toJsonObject();
+  }
+	
   @Override
   public String toString() {
     try {
@@ -251,71 +272,9 @@ public class Query {
     }
   }
 
-  private String urlPair(String name, Object val) {
-    if(val != null) {
-      try {
-        return name + "=" + (val instanceof String ? URLEncoder.encode(val.toString(), "UTF-8") : val);
-      } catch (UnsupportedEncodingException e) {
-        throw new RuntimeException(e);
-      }
-    } else {
-      return null;
-    }
-  }
-
-  private String fieldsJsonOrNull() {
-    if(selectFields != null) {
-      return Joiner.on(",").join(selectFields);
-    } else {
-      return null;
-    }
-  }
-
-  private String sortsJsonOrNull() {
-    if(!sorts.isEmpty()) {
-      return Joiner.on(",").join(sorts);
-    } else {
-      return null;
-    }
-  }
-
-  private String geoBoundsJsonOrNull() {
-    if(circle != null) {
-      return circle.toJsonStr();
-    } else {
-      return null;
-    }
-  }
-
-  private String rowFiltersJsonOrNull() {
-    if(rowFilters.isEmpty()) {
-      return null;
-    } else if(rowFilters.size() == 1) {
-      return rowFilters.get(0).toJsonStr();
-    } else {
-      return new FilterGroup(rowFilters).toJsonStr();
-    }
-  }
-
-  /**
-   * Pops the newest Filter from each of <tt>queries</tt>,
-   * grouping each popped Filter into one new FilterGroup.
-   * Adds that new FilterGroup as the newest Filter in this
-   * Query.
-   * <p>
-   * The FilterGroup's logic will be determined by <tt>op</tt>.
-   */
-  private Query popFilters(String op, Query... queries) {
-    FilterGroup group = new FilterGroup().op(op);
-    for(Query q : queries) {
-      group.add(pop(q.rowFilters));
-    }
-    add(group);
-    return this;
-  }
-
-  private Filter pop(List<Filter> list) {
-    return list.remove(list.size()-1);
+  @Override
+  public List<Filter> getFilterList() {
+	return queryParams.getFilterList();
   }
 
 }

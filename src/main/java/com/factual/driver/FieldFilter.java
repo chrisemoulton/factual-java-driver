@@ -1,10 +1,6 @@
 package com.factual.driver;
 
-import java.io.IOException;
-
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
+import java.util.HashMap;
 
 public class FieldFilter implements Filter {
   private final String fieldName;
@@ -29,19 +25,26 @@ public class FieldFilter implements Filter {
    */
   @Override
   public String toJsonStr() {
-    return "{\"" + fieldName + "\":{\"" + op + "\":" + toJsonStr(arg) + "}}";
+    return JsonUtil.toJsonStr(toJsonObject());
   }
 
-  private String toJsonStr(Object obj) {
-    try {
-      return new ObjectMapper().writeValueAsString(obj);
-    } catch (JsonGenerationException e) {
-      throw new RuntimeException(e);
-    } catch (JsonMappingException e) {
-      throw new RuntimeException(e);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+  /**
+   * View this FieldFilter as an object representation that can be serialized as json
+   * 
+   * @return an object representation of this field filter that can be serialized as json
+   */
+  @SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+  @Override
+  public Object toJsonObject() {
+	  return new HashMap() {
+	    	{
+	    		put(fieldName, new HashMap() {
+	    			{
+	    				put(op, arg);
+	    			}
+	    		});
+	    	}
+	  };
   }
 
 }

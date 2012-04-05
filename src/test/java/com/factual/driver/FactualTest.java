@@ -8,6 +8,8 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +32,9 @@ import com.google.common.base.Joiner;
 public class FactualTest {
   private static Factual factual;
 
+  final double latitude = 34.06018;
+  final double longitude = -118.41835;
+  final int meters = 5000;
 
   @Before
   public void setup() {
@@ -51,7 +56,7 @@ public class FactualTest {
     assertEquals("name", nameSchema.name);
     assertEquals("string", nameSchema.datatype);
   }
-
+  
   /**
    * Find rows in the global places database in the United States
    */
@@ -62,6 +67,19 @@ public class FactualTest {
 
     assertOk(resp);
     assertAll(resp, "country", "US");
+    Query raw = new Query()
+    .addJsonParam("filters", new HashMap() {  
+		{  
+			put("country", new HashMap(){
+				{
+					put("$eq", "US");	    
+				}
+			});
+	    }  
+	});
+    ReadResponse respRaw = factual.fetch("places", raw);
+    
+    assertEquals(resp.getJson(), respRaw.getJson());
   }
 
   /**
@@ -76,6 +94,20 @@ public class FactualTest {
 
     assertOk(resp);
     assertStartsWith(resp, "name", "Star");
+
+    Query raw = new Query()
+    .addJsonParam("filters", new HashMap() {  
+		{  
+			put("name", new HashMap(){
+				{
+					put("$bw", "Star");	    
+				}
+			});
+	    }  
+	})
+	.addParam("include_count", true);
+    ReadResponse respRaw = factual.fetch("places", raw);
+    assertEquals(resp.getJson(), respRaw.getJson());
   }
 
   /**
@@ -88,6 +120,12 @@ public class FactualTest {
     .search("Fried Chicken, Los Angeles"));
 
     assertOk(resp);
+    
+    Query raw = new Query()
+    .addParam("q", "Fried Chicken, Los Angeles");
+    ReadResponse respRaw = factual.fetch("places", raw);
+    assertEquals(resp.getJson(), respRaw.getJson());
+
   }
 
   /**
@@ -103,6 +141,14 @@ public class FactualTest {
 
     assertOk(resp);
     assertEquals(5, resp.getData().size());
+
+    Query raw = new Query()
+    .addParam("q", "Fried Chicken, Los Angeles")
+    .addParam("offset", 20)
+    .addParam("limit", 5);
+    ReadResponse respRaw = factual.fetch("places", raw);
+    assertEquals(resp.getJson(), respRaw.getJson());
+
   }
 
   /**
@@ -113,21 +159,56 @@ public class FactualTest {
   public void testCoreExample5() {
     ReadResponse resp = factual.fetch("places", new Query()
     .field("name").equal("Stand")
-    .within(new Circle(34.06018, -118.41835, 5000)));
-
+    .within(new Circle(latitude, longitude, meters)));
     assertNotEmpty(resp);
     assertOk(resp);
+
+    Query raw = new Query()
+    .addJsonParam("geo", new HashMap() {  
+		{  
+			put("$circle", new HashMap(){
+				{
+					put("$center", new String[]{Double.toString(latitude), Double.toString(longitude)});	    
+					put("$meters", meters);
+				}
+			});
+	    }  
+	})
+	.addJsonParam("filters", new HashMap() {  
+		{  
+			put("name", new HashMap(){
+				{
+					put("$eq", "Stand");	    
+				}
+			});
+	    }  
+	});
+    ReadResponse respRaw = factual.fetch("places", raw);
+    assertEquals(resp.getJson(), respRaw.getJson());
   }
 
   @Test
   public void testSort_byDistance() {
+
     ReadResponse resp = factual.fetch("places", new Query()
-    .within(new Circle(34.06018, -118.41835, 5000))
+    .within(new Circle(latitude, longitude, meters))
     .sortAsc("$distance"));
 
     assertNotEmpty(resp);
     assertOk(resp);
     assertAscendingDoubles(resp, "$distance");
+    
+    Query raw = new Query()
+    .addJsonParam("geo", new HashMap() {{  
+		put("$circle", new HashMap(){{
+			put("$center", new String[]{Double.toString(latitude), Double.toString(longitude)});	    
+			put("$meters", meters);
+		}});
+	}})
+	.addParam("sort", "$distance:asc");
+    ReadResponse respRaw = factual.fetch("places", raw);
+    assertEquals(resp.getJson(), respRaw.getJson());
+        
   }
 
   /**
@@ -142,6 +223,24 @@ public class FactualTest {
     assertOk(resp);
     assertStartsWith(resp, "name", "McDonald");
     assertStartsWith(resp, "category", "Food & Beverage");
+
+    Query raw = new Query()
+    .addJsonParam("filters", 
+    	new HashMap() {{  
+			put("$and", new Map[] {
+				new HashMap() {{
+					put("name", new HashMap() {{
+						put("$bw", "McDonald's");
+					}});	
+					put("category", new HashMap() {{
+						put("$bw", "Food & Beverage");
+					}});
+				}}});
+    	}});
+
+    ReadResponse respRaw = factual.fetch("places", raw);
+    assertEquals(resp.getJson(), respRaw.getJson());
+
   }
 
   @Test
@@ -152,6 +251,20 @@ public class FactualTest {
     assertOk(resp);
     assertNotEmpty(resp);
     assertIn(resp, "region", "CA", "NM", "FL");
+    
+    Query raw = new Query()
+    .addJsonParam("filters", new HashMap() {  
+		{  
+			put("region", new HashMap(){
+				{
+					put("$in", new String[]{"CA", "NM", "FL"});	    
+				}
+			});
+	    }  
+	});
+    ReadResponse respRaw = factual.fetch("places", raw);
+    assertEquals(resp.getJson(), respRaw.getJson());
+    
   }
 
   /**
@@ -323,7 +436,232 @@ public class FactualTest {
       assertTrue(e.getRequestUrl().startsWith("http://api.v3.factual.com/t/places"));
     }
   }
+  
+  @Test
+  @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+  public void testSelect() {
+  	Query select = new Query().field("country").equal("US").only("address", "country");
+    assertEquals("[address, country]", Arrays.toString(select.getSelectFields()));
 
+    ReadResponse resp = factual.fetch("places", select);
+    assertOk(resp);
+    assertAll(resp, "country", "US");
+    Query raw = new Query()
+    .addJsonParam("filters", new HashMap() {  
+		{  
+			put("country", new HashMap(){
+				{
+					put("$eq", "US");	    
+				}
+			});
+	    }  
+	})
+	.addParam("select", "address,country");
+    ReadResponse respRaw = factual.fetch("places", raw);
+    
+    assertEquals(resp.getJson(), respRaw.getJson());	  
+  }
+  
+  @Test
+  @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+  public void testCustomRead() {
+    CustomQuery q = new CustomQuery()
+    .addJsonParam("filters", new HashMap() {  
+		{  
+			put("region", new HashMap(){
+				{
+					put("$in", new String[]{"CA", "NM", "FL"});	    
+				}
+			});
+	    }  
+	});
+    String respString = factual.fetch("t/places", q);
+    assertTrue(respString != null && respString.length() > 0);
+  }
+  
+  @Test
+  @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+  public void testCustomReadCombo() {
+    CustomQuery q = new CustomQuery()
+    .addJsonParam("filters", new HashMap() {  
+		{  
+			put("region", new HashMap(){
+				{
+					put("$in", new String[]{"CA", "NM", "FL"});	    
+				}
+			});
+	    }  
+	});
+    String respString = factual.fetch("t/places", q);
+    assertTrue(respString != null && respString.length() > 0);
+  }
+
+  /**
+   * And should not be used for geo queries.  
+   * However, neither should it throw an exception. 
+   */
+  @Test
+  public void testInvalidAnd() {
+    Query q = new Query();
+    q.and(
+    	q.field("category").beginsWith("Food"),
+        q.within(new Circle(latitude, longitude, meters))
+    );
+
+    ReadResponse resp = factual.fetch("places", q);
+    assertOk(resp);
+  }
+  
+  @Test
+  public void testFacet() {
+	Facet facet = new Facet()
+	.search("Starbucks")
+	.select("region", "locality")
+	.facetLimit(20)
+	.minCount(100)
+	.includeRowCount();
+
+	FacetResponse resp = factual.fetch("places", facet);
+	//printFacetResponse(resp);
+	//System.out.println(resp.getJson());
+    assertOk(resp);
+    assertTrue(resp.getData().size() > 0);
+  }
+  
+  @Test
+  public void testFacetFilter() {
+	Facet facet = new Facet()
+    .field("region").in("MA","VT","NH");
+    facet.and(facet.or(	facet.field("name").beginsWith("Coffee"),
+    		   			facet.field("name").beginsWith("Star")),
+    		  facet.field("locality").beginsWith("w"))
+    .select("locality");
+	FacetResponse resp = factual.fetch("places", facet);
+    assertOk(resp);
+    assertTrue(resp.getData().size() > 0);
+  }
+  
+  @Test
+  public void testFacetGeo() {
+	Facet facet = new Facet().within(new Circle(latitude, longitude, meters)).select("category");
+	FacetResponse resp = factual.fetch("places", facet);
+    assertOk(resp);
+    assertTrue(resp.getData().size() > 0);
+  }
+  
+  @Test
+  public void testSuggestAdd() {
+	Suggest write = new Suggest()
+    .setValue("longitude", 100);
+	SuggestResponse resp = factual.suggest("global", write, new Metadata("Brandon Yoshimoto").debug());
+	//printSuggestResponse(resp);
+	//System.out.println(resp.getJson());
+    assertOk(resp);
+    assertTrue(resp.isNewEntity());
+  }
+  
+  @Test
+  public void testSuggestEdit() {
+	Suggest write = new Suggest()
+    .setValue("longitude", 100);
+	SuggestResponse resp = factual.suggest("global", "0545b03f-9413-44ed-8882-3a9a461848da",write, new Metadata("Brandon Yoshimoto").debug());
+    assertOk(resp);
+    assertFalse(resp.isNewEntity());
+  }
+
+  @Test
+  public void testSuggestDelete() {
+	Suggest write = new Suggest()
+    .makeBlank("longitude");
+	SuggestResponse resp = factual.suggest("global", "0545b03f-9413-44ed-8882-3a9a461848da",write, new Metadata("Brandon Yoshimoto").debug());
+    assertOk(resp);
+    assertFalse(resp.isNewEntity());
+  }
+
+  @Test
+  public void testSuggestError() {
+	Suggest write = new Suggest()
+    .makeBlank("longitude");
+	SuggestResponse resp = factual.suggest("global", "randomwrongid", write, new Metadata("Brandon Yoshimoto").debug());
+	printSuggestResponse(resp);
+	System.out.println(resp.getJson());
+  }
+  
+  @Test
+  public void testReport() {
+	Report report = Report.spam();
+	ReportResponse resp = factual.report("global", "0545b03f-9413-44ed-8882-3a9a461848da", report, new Metadata("Brandon Yoshimoto").debug());
+	System.out.println(resp.getJson());
+  }
+
+  @Test
+  public void testDiff() {
+	Diff diff = new Diff().before(1318890505254L);
+	DiffResponse resp = factual.fetch("places", diff);
+	System.out.println(resp.getJson());
+  }
+  
+  @Test
+  public void testMulti() {
+	  factual.setFactHome("http://api.bm01.factual.com/");
+	  Query q = new Query().limit(1);
+	  factual.queueFetch("places", q.field("country").equal("US"));
+	  factual.queueFetch("places", 
+		new Query().limit(1)); 
+	  /*
+	  factual.queueFetch("places", new Facet()
+		.search("Starbucks")
+		.select("region", "locality")
+		.facetLimit(20)
+		.minCount(100)
+		.includeRowCount());
+		*/
+	  /*
+	  factual.queueFetch("places", new CrosswalkQuery()
+      .factualId("97598010-433f-4946-8fd5-4a6dd1639d77"));
+	  factual.queueFetch("places", new ResolveQuery()
+      .add("name", "McDonalds")
+      .add("address", "10451 Santa Monica Blvd")
+      .add("region", "CA")
+      .add("postcode", "90025"));
+      */
+	  /*
+	    .field("name").equal("Stand")
+	    .within(new Circle(latitude, longitude, meters)));
+	    */
+	  MultiResponse multi = factual.sendRequests();
+	  
+	  for (Response resp : multi.getData()) {
+		  System.out.println(resp);
+	  }
+	  
+	  factual.setFactHome("http://api.v3.factual.com/");
+  }
+
+  private void printFacetResponse(FacetResponse resp) {
+	Map<String, Map<String, Object>> data = resp.getData();
+	for (String field : data.keySet()) {
+		Map<String, Object> map = data.get(field);
+		for (String facetValue : map.keySet()) {
+			System.out.println(field+" : "+facetValue + " : "+map.get(facetValue));
+		}
+	}
+	printResponse(resp);
+  }
+  
+  private void printSuggestResponse(SuggestResponse resp) {
+	  System.out.println("factual id: "+resp.getFactualId());
+	  System.out.println("is new entity: "+resp.isNewEntity());
+	  printResponse(resp);
+  }
+  
+  private void printResponse(Response resp) {
+	System.out.println("version: "+resp.getVersion());
+	System.out.println("included row count: "+resp.getIncludedRowCount());
+	System.out.println("total row count: "+resp.getTotalRowCount());
+	System.out.println("status: "+resp.getStatus());
+  }
+  
   private void assertFactualId(List<Crosswalk> crosswalks, String id) {
     for(Crosswalk cw : crosswalks) {
       assertEquals(id, cw.getFactualId());

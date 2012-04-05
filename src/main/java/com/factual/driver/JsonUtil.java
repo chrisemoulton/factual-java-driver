@@ -1,9 +1,13 @@
 package com.factual.driver;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,7 +28,21 @@ public class JsonUtil {
     }
     return data;
   }
-
+  
+  /**
+   * Takes a JSONObject of records, where each record is a dictionary, and
+   * returns the translated Map of Maps.
+   */
+  public static Map<String, Map<String, Object>> data(JSONObject jo) throws JSONException {
+    Map<String, Map<String, Object>> data = Maps.newHashMap();
+    Iterator<?> iter = jo.keys();
+    while (iter.hasNext()) {
+    	String key = iter.next().toString();
+    	data.put(key, row(jo.getJSONObject(key)));
+    }
+    return data;
+  }
+  
   private static Map<String, Object> row(JSONObject jo) throws JSONException {
     Map<String, Object> row = Maps.newHashMap();
     Iterator<?> iter = jo.keys();
@@ -35,5 +53,17 @@ public class JsonUtil {
     }
     return row;
   }
-
+  
+  protected static String toJsonStr(Object obj) {
+	try {
+	  return new ObjectMapper().writeValueAsString(obj);
+	} catch (JsonGenerationException e) {
+	  throw new RuntimeException(e);
+	} catch (JsonMappingException e) {
+	  throw new RuntimeException(e);
+	} catch (IOException e) {
+	  throw new RuntimeException(e);
+	}
+  }
+  
 }

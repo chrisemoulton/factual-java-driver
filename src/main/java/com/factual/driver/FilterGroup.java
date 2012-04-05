@@ -1,8 +1,8 @@
 package com.factual.driver;
 
+import java.util.HashMap;
 import java.util.List;
 
-import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 
@@ -62,15 +62,25 @@ public class FilterGroup implements Filter {
    */
   @Override
   public String toJsonStr() {
-    return "{\"" + op + "\":[" + logicJsonStr() + "]}";
+    return JsonUtil.toJsonStr(toJsonObject());
   }
 
-  private String logicJsonStr() {
-    List<String> logics = Lists.newArrayList();
+  private List<Object> logicJsonData() {
+    List<Object> logics = Lists.newArrayList();
     for(Filter f : filters) {
-      logics.add(f.toJsonStr());
+      logics.add(f.toJsonObject());
     }
-    return Joiner.on(",").join(logics);
+    return logics;
   }
 
+  @SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+  @Override
+  public Object toJsonObject() {
+	  return new HashMap() {
+	    	{
+	    		put(op, logicJsonData());
+	    	}
+	  };
+  }
+  
 }

@@ -3,9 +3,13 @@ package com.factual.driver;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 
 import com.google.api.client.auth.oauth.OAuthHmacSigner;
 import com.google.api.client.auth.oauth.OAuthParameters;
@@ -15,7 +19,10 @@ import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.client.http.HttpResponseException;
 import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.UrlEncodedContent;
 import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.io.Closeables;
 
 /**
@@ -30,7 +37,8 @@ public class Factual {
   private String factHome = "http://api.v3.factual.com/";
   private final String key;
   private final OAuthHmacSigner signer;
-
+  
+  private Queue<FullQuery> fetchQueue = Lists.newLinkedList();
 
   /**
    * Constructor. Represents your authenticated access to Factual.
@@ -68,8 +76,194 @@ public class Factual {
    * @return the response of running <tt>query</tt> against Factual.
    */
   public ReadResponse fetch(String tableName, Query query) {
-    return new ReadResponse(request(urlForFetch(tableName, query)));
+    return fetchCustom(urlForFetch(tableName), query);
   }
+  
+  /**
+   * Runs a <tt>facet</tt> read against the specified Factual table.
+   * 
+   * 
+   * @param tableName
+   * 		  the name of the table you wish to query for facets (e.g., "places")
+   * @param facet
+   * 		  the facet query to run against <tt>table</tt>
+   * @return the response of running <tt>facet</tt> against Factual.
+   */
+  public FacetResponse fetch(String tableName, Facet facet) {
+	return fetchCustom(urlForFetch(tableName)+"/facets", facet);
+  }
+
+  /**
+   * Runs a <tt>suggest</tt> input against the specified Factual table.
+   * 
+   * @param tableName
+   * 		  the name of the table you wish to suggest updates for (e.g., "places")
+   * @param factualId
+   * 		  the factual id on which the suggest is run
+   * @param suggest
+   * 		  the suggest parameters to run against <tt>table</tt>
+   * @param metadata
+   * 		  the metadata to send with information on this request
+   * 	  	 
+   * @return the response of running <tt>suggest</tt> against Factual.
+   */
+  public SuggestResponse suggest(String tableName, String factualId, Suggest suggest, Metadata metadata) {
+	return suggestCustom("t/"+tableName+"/"+factualId+"/input", suggest, metadata);
+  }
+
+  /**
+   * Runs a <tt>suggest</tt> to add a row against the specified Factual table.
+   * 
+   * @param tableName
+   * 		  the name of the table you wish to suggest the add for (e.g., "places")
+   * @param suggest
+   * 		  the suggest parameters to run against <tt>table</tt>
+   * @param metadata
+   * 		  the metadata to send with information on this request
+   * 	  	 
+   * @return the response of running <tt>suggest</tt> against Factual.
+   */
+  public SuggestResponse suggest(String tableName, Suggest suggest, Metadata metadata) {
+	return suggestCustom("t/"+tableName+"/input", suggest, metadata);
+  }
+  
+  /**
+   * Runs a <tt>report</tt> input against the specified Factual table.
+   * 
+   * @param tableName
+   * 		  the name of the table you wish to report updates for (e.g., "places")
+   * @param factualId
+   * 		  the factual id on which the report is run
+   * @param report
+   * 		  the report parameters to run against <tt>table</tt>
+   * @param metadata
+   * 		  the metadata to send with information on this request
+   * 	  	 
+   * @return the response of running <tt>report</tt> against Factual.
+   */
+  public ReportResponse report(String tableName, String factualId, Report report, Metadata metadata) {
+	return reportCustom("t/"+tableName+"/"+factualId+"/flag", report, metadata);
+  }
+  
+  /**
+   * Runs a custom query against the path specified
+   * @param path the path to run the request against
+   * @param query the custom raw read query
+   * @return the response of running <tt>query</tt> against Factual.
+   */
+  public String fetch(String path, CustomQuery query) {
+	return request(toUrl(factHome + path, query.toUrlQuery()));
+  }
+  
+  private ReadResponse fetchCustom(String root, Query query) {
+	return new ReadResponse(request(toUrl(factHome + root, query.toUrlQuery())));
+  }
+  
+  private FacetResponse fetchCustom(String root, Facet facet) {
+	return new FacetResponse(request(toUrl(factHome + root, facet.toUrlQuery())));
+  }
+  
+  private CrosswalkResponse fetchCustom(String root, CrosswalkQuery query) {
+	return new CrosswalkResponse(request(toUrl(factHome + root, query.toUrlQuery())));
+  } 
+  
+  private ReadResponse fetchCustom(String root, ResolveQuery query) {
+	return new ReadResponse(request(toUrl(factHome + root, query.toUrlQuery())));
+  }
+  
+  private SuggestResponse suggestCustom(String root, Suggest input, Metadata metadata) {
+	Map<String, Object> params = Maps.newHashMap();
+	params.putAll(metadata.toMap());
+	params.putAll(input.toMap());
+	return new SuggestResponse(requestPost(factHome + root, params));
+  }
+
+  private ReportResponse reportCustom(String root, Report report, Metadata metadata) {
+	Map<String, Object> params = Maps.newHashMap();
+	params.putAll(metadata.toMap());
+	params.putAll(report.toMap());
+	return new ReportResponse(requestPost(factHome + root, params));
+  }
+  
+  private String toUrl(String root, String parameters) {
+	return root + "?" + parameters;
+  }
+
+  public DiffResponse fetch(String tableName, Diff diff) {
+	return fetchCustom(urlForFetch(tableName)+"/diffs", diff);
+  }
+
+  public DiffResponse fetchCustom(String root, Diff diff) {
+	return new DiffResponse(request(toUrl(factHome + root, diff.toUrlQuery())));
+  }
+
+  private class FullQuery {
+	  protected Object query;
+	  protected String table;
+	  public FullQuery(String table, Object query) {
+		  this.table = table;
+		  this.query = query;
+	  }
+  }
+  
+  public void queueFetch(String table, Query query) {
+	fetchQueue.add(new FullQuery(table, query));
+  }
+  
+  public void queueFetch(String table, CrosswalkQuery query) {
+	fetchQueue.add(new FullQuery(table, query));
+  }
+  
+  public void queueFetch(String table, ResolveQuery query) {
+	fetchQueue.add(new FullQuery(table, query));
+  }
+  
+  public void queueFetch(String table, Facet query) {
+	fetchQueue.add(new FullQuery(table, query));
+  }
+  
+  public MultiResponse sendRequests() {
+	Map<String, String> multi = Maps.newHashMap();
+	int i = 0;
+	Map<String, Object> requestMapping = Maps.newHashMap();
+	while (!fetchQueue.isEmpty()) {
+		FullQuery fullQuery = fetchQueue.poll();
+		String url = null;
+		Object query = fullQuery.query;
+		String table = fullQuery.table;
+	    if (query instanceof Query) {
+			url = toUrl("/"+urlForFetch(table), ((Query)query).toUrlQuery());
+	    } else if (query instanceof CrosswalkQuery) {
+			url = toUrl("/"+urlForCrosswalk(table), ((CrosswalkQuery)query).toUrlQuery());
+	    } else if (query instanceof ResolveQuery) {
+			url = toUrl("/"+urlForResolve(table), ((ResolveQuery)query).toUrlQuery());
+	    } else if (query instanceof Facet) {
+			url = toUrl("/"+urlForFetch(table), ((Facet)query).toUrlQuery());
+	    }
+		if (url != null) {
+			String multiKey = "q"+i;
+			multi.put(multiKey, url);
+			requestMapping.put(multiKey, query);
+			i++;
+		}
+	}
+	String json = JsonUtil.toJsonStr(multi);
+	String url = "";
+	try {
+		String encoded = URLEncoder.encode(json, "UTF-8");
+		url = toUrl(factHome + "multi", "queries=" + encoded+"&"+"KEY="+key);
+		//System.out.println("encoded: "+url);
+		//String decoded = URLDecoder.decode(url, "UTF-8");
+		//System.out.println("decoded: "+decoded);
+	} catch (UnsupportedEncodingException e) {
+		e.printStackTrace();
+	}
+	String jsonResponse = request(url, false);
+	MultiResponse resp = new MultiResponse(requestMapping);
+	resp.setJson(jsonResponse);
+	return resp;
+  }
+
 
   /**
    * Convenience method to return Crosswalks for the specific query.
@@ -89,7 +283,7 @@ public class Factual {
    * @return Factual's response to the Crosswalk query.
    */
   public CrosswalkResponse fetch(String tableName, CrosswalkQuery query) {
-    return new CrosswalkResponse(request(urlForCrosswalk(tableName, query)));
+    return fetchCustom(urlForCrosswalk(tableName), query);
   }
 
   /**
@@ -144,33 +338,47 @@ public class Factual {
    * @return the response from Factual for the Resolve request.
    */
   public ReadResponse fetch(String tableName, ResolveQuery query) {
-    return new ReadResponse(request(urlForResolve(tableName, query)));
+    return fetchCustom(urlForResolve(tableName), query);
   }
 
   public SchemaResponse schema(String tableName) {
-    return new SchemaResponse(request(urlForSchema(tableName)));
+    return new SchemaResponse(request(factHome+urlForSchema(tableName)));
   }
 
   private String urlForSchema(String tableName) {
-    return factHome + "t/" + tableName + "/schema";
+    return "t/" + tableName + "/schema";
   }
 
-  private String urlForCrosswalk(String tableName, CrosswalkQuery query) {
-    return factHome + tableName + "/crosswalk?" + query.toUrlQuery();
+  private String urlForCrosswalk(String tableName) {
+    return tableName + "/crosswalk";
   }
 
-  private String urlForResolve(String tableName, ResolveQuery query) {
-    return factHome + tableName + "/resolve?" + query.toUrlQuery();
+  private String urlForResolve(String tableName) {
+    return tableName + "/resolve";
   }
 
-  private String urlForFetch(String tableName, Query query) {
-    return factHome + "t/" + tableName + "?" + query.toUrlQuery();
+  private String urlForFetch(String tableName) {
+    return "t/" + tableName;
   }
-
+  
   private String request(String urlStr) {
-    GenericUrl url = new GenericUrl(urlStr);
-    String requestMethod = "GET";
+	  return request(urlStr, true);
+  }
+  
+  private String request(String urlStr, boolean useOAuth) {
+	  return request(urlStr, "GET", null, useOAuth);
+  }
 
+  private String requestPost(String urlStr, Map<String, Object> postData) {
+	  return requestPost(urlStr, postData, true);
+  }
+
+  private String requestPost(String urlStr, Map<String, Object> postData, boolean useOAuth) {
+	  return request(urlStr, "POST", postData, useOAuth);
+  }
+  
+  private String request(String urlStr, String requestMethod, Map<String, Object> postData, boolean useOAuth) {
+    GenericUrl url = new GenericUrl(urlStr);
     // Configure OAuth request params
     OAuthParameters params = new OAuthParameters();
     params.consumerKey = key;
@@ -185,13 +393,30 @@ public class Factual {
 
       // make the request
       HttpTransport transport = new NetHttpTransport();
-      HttpRequestFactory f = transport.createRequestFactory(params);
-      HttpRequest request = f.buildGetRequest(url);
-
+      HttpRequestFactory f = null;
+      if (useOAuth) {
+    	  f = transport.createRequestFactory(params);
+      } else {
+    	  f = transport.createRequestFactory();
+      }
+      HttpRequest request = null;
+      if ("POST".equals(requestMethod))
+    	  request = f.buildPostRequest(url, new UrlEncodedContent(postData));
+      else
+    	  request = f.buildGetRequest(url);
       HttpHeaders headers = new HttpHeaders();
       headers.set("X-Factual-Lib", DRIVER_HEADER_TAG);
       request.setHeaders(headers);
-
+      
+      /*
+      System.out.println(request.getMethod());
+      System.out.println(request.getUrl().build());
+      for (Map.Entry<String, Object> e : request.getHeaders().entrySet()) {
+    	  System.out.println(e.getKey() + ": " +e.getValue());
+      }
+      System.out.println("Content: "+UrlEncodedContent.getContent(request).getData());
+      */
+      
       // get the response
       br = new BufferedReader(new InputStreamReader(request.execute().getContent()));
       return br.readLine();
