@@ -1,3 +1,7 @@
+## 1.2.0
+
+ * Adds support for facet, suggest, and report features.
+
 ## 1.1.0
 
  * Refactored into .driver package

@@ -514,9 +514,8 @@ public class FactualTest {
   
   @Test
   public void testFacet() {
-	Facet facet = new Facet()
+	Facet facet = new Facet("region", "locality")
 	.search("Starbucks")
-	.select("region", "locality")
 	.facetLimit(20)
 	.minCount(100)
 	.includeRowCount();
@@ -551,6 +550,8 @@ public class FactualTest {
   
   @Test
   public void testSuggestAdd() {
+	factual.setFactHome("http://23.21.18.255:10002/");
+
 	Suggest write = new Suggest()
     .setValue("longitude", 100);
 	SuggestResponse resp = factual.suggest("global", write, new Metadata("Brandon Yoshimoto").debug());
@@ -558,6 +559,9 @@ public class FactualTest {
 	//System.out.println(resp.getJson());
     assertOk(resp);
     assertTrue(resp.isNewEntity());
+
+    factual.setFactHome("http://api.v3.factual.com/");
+
   }
   
   @Test
@@ -596,8 +600,8 @@ public class FactualTest {
 
   @Test
   public void testDiff() {
-	Diff diff = new Diff().before(1318890505254L);
-	DiffResponse resp = factual.fetch("places", diff);
+	Diffs diff = new Diffs(1318890505254L);
+	DiffsResponse resp = factual.fetch("places", diff);
 	System.out.println(resp.getJson());
   }
   

@@ -1,16 +1,22 @@
 package com.factual.driver;
 
+import java.util.List;
 import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class DiffResponse extends Response {
+/**
+ * Represents a Factual Diffs response
+ * @author brandon
+ *
+ */
+public class DiffsResponse extends Response {
 
 	private String json = null;
-	private Map<String, Map<String, Object>> data = null;
+	private List<Map<String, Object>> data = null;
 	
-	public DiffResponse(String json) {
+	public DiffsResponse(String json) {
 		this.json = json;
 		try {
 			JSONObject rootJsonObj = new JSONObject(json);
@@ -22,10 +28,14 @@ public class DiffResponse extends Response {
 	}
 
 	private void parseResponse(JSONObject jo) throws JSONException {
-	    data = JsonUtil.data(jo.getJSONObject("data"));
+	    data = JsonUtil.data(jo.getJSONArray("data"));
 	}
 	
-	public Map<String, Map<String, Object>> getData() {
+	/**
+	 * Get diffs response as a list of diffs, where each diff is represented as a map 
+	 * @return list of diffs returned from this query.
+	 */
+	public List<Map<String, Object>> getData() {
 		return data;
 	}
 

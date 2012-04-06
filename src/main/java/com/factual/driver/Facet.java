@@ -16,7 +16,12 @@ public class Facet implements Filterable {
 
 	private boolean includeRowCount;
 
-	public Facet() {
+	/**
+	 * Constructor.
+	 * @param fields fields to select for facet counts
+	 */
+	public Facet(String... fields) {
+		select(fields);
 	}
 
 	/**

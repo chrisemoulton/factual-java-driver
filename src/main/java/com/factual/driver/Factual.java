@@ -33,7 +33,7 @@ import com.google.common.io.Closeables;
  * @author aaron
  */
 public class Factual {
-  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.1.0";
+  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.2.0";
   private String factHome = "http://api.v3.factual.com/";
   private final String key;
   private final OAuthHmacSigner signer;
@@ -175,26 +175,26 @@ public class Factual {
 	Map<String, Object> params = Maps.newHashMap();
 	params.putAll(metadata.toMap());
 	params.putAll(input.toMap());
-	return new SuggestResponse(requestPost(factHome + root, params));
+	return new SuggestResponse(requestPost(factHome + root + "?" + input.toUrlQuery() + "&" + metadata.toUrlQuery()));
   }
 
   private ReportResponse reportCustom(String root, Report report, Metadata metadata) {
 	Map<String, Object> params = Maps.newHashMap();
 	params.putAll(metadata.toMap());
 	params.putAll(report.toMap());
-	return new ReportResponse(requestPost(factHome + root, params));
+	return new ReportResponse(requestPost(factHome + root));
   }
   
   private String toUrl(String root, String parameters) {
 	return root + "?" + parameters;
   }
 
-  public DiffResponse fetch(String tableName, Diff diff) {
+  public DiffsResponse fetch(String tableName, Diffs diff) {
 	return fetchCustom(urlForFetch(tableName)+"/diffs", diff);
   }
 
-  public DiffResponse fetchCustom(String root, Diff diff) {
-	return new DiffResponse(request(toUrl(factHome + root, diff.toUrlQuery())));
+  public DiffsResponse fetchCustom(String root, Diffs diff) {
+	return new DiffsResponse(request(toUrl(factHome + root, diff.toUrlQuery())));
   }
 
   private class FullQuery {
@@ -369,8 +369,8 @@ public class Factual {
 	  return request(urlStr, "GET", null, useOAuth);
   }
 
-  private String requestPost(String urlStr, Map<String, Object> postData) {
-	  return requestPost(urlStr, postData, true);
+  private String requestPost(String urlStr) {
+	  return requestPost(urlStr, null, true);
   }
 
   private String requestPost(String urlStr, Map<String, Object> postData, boolean useOAuth) {
@@ -401,21 +401,23 @@ public class Factual {
       }
       HttpRequest request = null;
       if ("POST".equals(requestMethod))
-    	  request = f.buildPostRequest(url, new UrlEncodedContent(postData));
+    	  if (postData == null)
+        	  request = f.buildPostRequest(url, null);
+    	  else
+    		  request = f.buildPostRequest(url, new UrlEncodedContent(postData));
       else
     	  request = f.buildGetRequest(url);
       HttpHeaders headers = new HttpHeaders();
       headers.set("X-Factual-Lib", DRIVER_HEADER_TAG);
       request.setHeaders(headers);
       
-      /*
+
       System.out.println(request.getMethod());
       System.out.println(request.getUrl().build());
       for (Map.Entry<String, Object> e : request.getHeaders().entrySet()) {
     	  System.out.println(e.getKey() + ": " +e.getValue());
       }
       System.out.println("Content: "+UrlEncodedContent.getContent(request).getData());
-      */
       
       // get the response
       br = new BufferedReader(new InputStreamReader(request.execute().getContent()));

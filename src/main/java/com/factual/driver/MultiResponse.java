@@ -9,6 +9,12 @@ import org.json.JSONObject;
 
 import com.google.common.collect.Lists;
 
+/**
+ * Represents a Factual Multi response.
+ * 
+ * @author brandon
+ *
+ */
 public class MultiResponse extends Response {
 	private String json = null;
 	private List<Response> data = Lists.newArrayList();

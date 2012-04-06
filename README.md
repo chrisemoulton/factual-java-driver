@@ -11,13 +11,13 @@ The driver is in Maven Central, so you can just add this to your Maven <tt>pom.x
     <dependency>
       <groupId>com.factual</groupId>
       <artifactId>factual-java-driver</artifactId>
-      <version>1.1.0</version>
+      <version>1.2.0</version>
     </dependency>
     
 ## Non Maven users
 
 You can download the individual driver jar, and view the pom.xml file, here:
-[Driver download folder](http://repo1.maven.org/maven2/com/factual/factual-java-driver/1.1.0/)
+[Driver download folder](http://repo1.maven.org/maven2/com/factual/factual-java-driver/1.2.0/)
 
 The pom.xml tells you what dependencies you'll need to plug into your project to get the driver to work (see the <dependencies> section).
 
@@ -372,7 +372,224 @@ The <tt>resolve</tt> method gives you the one full match if there is one, or nul
     .add("name", "Buena Vista")
     .add("latitude", 34.06)
     .add("longitude", -118.40));
-      
+
+# Facet
+
+The driver fully supports Factual's Facet feature, which lets you return row counts for Factual tables, grouped by facets of data.  For example, you may want to query all businesses within 1 mile of a location and for a count of those businesses by category.
+Not all fields are configured to return facet counts.  To determine what fields you can return facets for, use the schema call.  The faceted attribute of the schema will let you know.
+
+## Simple Facet Example
+
+The <tt>fetch</tt> method gives the facet counts:
+
+    // Get facet counts for the specified fields
+    FacetResponse resp = factual.fetch(new Facet("region", "locality")
+	.search("Starbucks")
+	.facetLimit(20)
+	.minCount(100));
+
+## All Top Level Facet Parameters
+
+<table>
+  <tr>
+    <th>Parameter</th>
+    <th>Description</th>
+    <th>Example</th>
+  </tr>
+  <tr>
+    <td>select</td>
+    <td>The fields for which facets should be generated. The response will not be ordered identically to this list, nor will it reflect any nested relationships between fields.</td>
+    <td><tt>f.select("region", "locality");</tt><p><tt>new Facet("region", "locality");</tt></td>
+  </tr>
+  <tr>
+    <td>min count</td>
+    <td>For each facet count, the minimum count it must show in order to be returned in the response. Must be zero or greater. The default is 1.</td>
+    <td><tt>f.minCount(2)</tt></td>
+  </tr>
+  <tr>
+    <td>limit</td>
+    <td>The maximum number of unique facets that can be returned for a single field. Range is 1-250. The default is 25.</td>
+    <td><tt>f.facetLimit(10)</tt></td>
+  </tr>
+  <tr>
+    <td>filters</td>
+    <td>Restrict the data returned to conform to specific conditions.</td>
+    <td><tt>f.field("name").beginsWith("Starbucks")</tt></td>
+  </tr>
+  <tr>
+    <td>include count</td>
+    <td>Include a count of the total number of rows in the dataset that conform to the request based on included filters. Requesting the row count will increase the time required to return a response. The default behavior is to NOT include a row count. When the row count is requested, the Response object will contain a valid total row count via <tt>.getTotalRowCount()</tt>.</td>
+    <td><tt>f.includeRowCount()</tt></td>
+  </tr>
+  <tr>
+    <td>geo</td>
+    <td>Restrict data to be returned to be within a geographical range based.</td>
+    <td>(See the section on Geo Filters)</td>
+  </tr>
+  <tr>
+    <td>search</td>
+    <td>Full text search query string.</td>
+    <td>
+      Find "sushi":<br><tt>q.search("sushi")</tt><p>
+      Find "sushi" or "sashimi":<br><tt>q.search("sushi, sashimi")</tt><p>
+      Find "sushi" and "santa" and "monica":<br><tt>q.search("sushi santa monica")</tt>
+    </td>
+  </tr>
+</table>  
+
+# Report
+
+The driver fully supports Factual's Report feature, which lets enables flagging problematic rows in Factual tables. Use this method if you are requesting for an entity to be deleted or merged into a duplicate record.
+
+## Simple Report Example
+
+The <tt>report</tt> method reports a problematic row:
+
+    // Flag a row as problematic
+	Report report = Report.spam();
+	ReportResponse resp = factual.report("global", "0545b03f-9413-44ed-8882-3a9a461848da", report, new Metadata("my_username").debug());
+
+## All Top Level Flag Parameters
+
+<table>
+  <tr>
+    <th>Parameter</th>
+    <th>Description</th>
+    <th>Example</th>
+  </tr>
+  <tr>
+    <td>problem</td>
+    <td>One of: duplicate, inaccurate, inappropriate, nonexistent, spam, or other.</td>
+    <td><tt>Report r = Report.duplicate()</tt><p><tt>Report r = new Report(Report.Type.DUPLICATE)</tt></td>
+  </tr>
+  <tr>
+    <td>user</td>
+    <td>An arbitrary token representing the user contributing the data.</td>
+    <td><tt>Metadata metadata = new Metadata("my_username")</tt></td>
+  </tr>
+  <tr>
+    <td>comment</td>
+    <td>Any english text comment that may help explain your corrections.</td>
+    <td><tt>metadata.comment("my comment")</tt></td>
+  </tr>
+  <tr>
+    <td>debug</td>
+    <td>Specify that you are only making a test query and that you don't want any actual data to be written - just to let you know if your query is valid.</td>
+    <td><tt>metadata.debug()</tt></td>
+  </tr>
+  <tr>
+    <td>reference</td>
+    <td>A reference to a URL, title, person, etc. that is the source of this data.</td>
+    <td><tt>metadata.reference("http://...")</tt></td>
+  </tr>
+</table>  
+
+# Suggest
+
+The driver fully supports Factual's Suggest feature, which enables you to contribute edits to existing rows and/or contribute new rows of data in Factual tables. For information on deleting records, see report.
+
+## Simple Suggest Examples
+
+The <tt>suggest</tt> method is a contribution to edit an existing row or add a new row:
+
+	// Suggest adding a new row
+	Suggest write = new Suggest()
+    .setValue("longitude", 100);
+	SuggestResponse resp = factual.suggest("global", write, new Metadata("my_username").debug());
+	
+    // Suggest a field update
+	Suggest write = new Suggest()
+    .setValue("longitude", 100);
+	SuggestResponse resp = factual.suggest("global", "0545b03f-9413-44ed-8882-3a9a461848da",write, new Metadata("my_username").debug());
+
+	// Suggest a field become blank
+	Suggest write = new Suggest()
+    .makeBlank("longitude");
+	SuggestResponse resp = factual.suggest("global", "0545b03f-9413-44ed-8882-3a9a461848da",write, new Metadata("my_username").debug());
+
+## All Top Level Suggest Parameters
+
+<table>
+  <tr>
+    <th>Parameter</th>
+    <th>Description</th>
+    <th>Example</th>
+  </tr>
+  <tr>
+    <td>values</td>
+    <td>A JSON hash field names and values to be added to a Factual table</td>
+    <td><tt>s.setValue("longitude", "100")</tt><p><tt>s.makeBlank("longitude")</tt></td>
+  </tr>
+  <tr>
+    <td>user</td>
+    <td>An arbitrary token representing the user contributing the data.</td>
+    <td><tt>new Metadata("my_username")</tt></td>
+  </tr>
+  <tr>
+    <td>comment</td>
+    <td>Any english text comment that may help explain your corrections.</td>
+    <td><tt>metadata.comment("my comment")</tt></td>
+  </tr>
+  <tr>
+    <td>debug</td>
+    <td>Specify that you are only making a test query and that you don't want any actual data to be written - just to let you know if your query is valid.</td>
+    <td><tt>metadata.debug()</tt></td>
+  </tr>
+  <tr>
+    <td>reference</td>
+    <td>A reference to a URL, title, person, etc. that is the source of this data.</td>
+    <td><tt>metadata.reference("http://...")</tt></td>
+  </tr>
+</table>  
+
+# Diffs
+
+The driver fully supports Factual's Diffs feature, which enables Factual data update downloads.
+
+## Simple Diffs Example
+
+The <tt>fetch</tt> method gives the diff data:
+
+	// Fetch a diffs response
+	Diffs diffs = new Diffs(1318890505254L);
+	DiffsResponse resp = factual.fetch("places", diffs);
+
+## All Top Level Facet Parameters
+
+<table>
+  <tr>
+    <th>Parameter</th>
+    <th>Description</th>
+    <th>Example</th>
+  </tr>
+  <tr>
+    <td>before</td>
+    <td>The start time for a diff</td>
+    <td><tt>d.before(long timestamp)</tt></td>
+  </tr>
+  <tr>
+    <td>after</td>
+    <td>The end time for a diff</td>
+    <td><tt>d.after(long timestamp)</tt></td>
+  </tr>
+</table>  
+
+
+# Multi
+
+The driver fully supports Factual's Multi feature, which enables making multiple requests on the same connection.
+
+## Simple Multi Example
+
+The <tt>sendRequest</tt> method requests all reads queued since the last <tt>sendRequest</tt>:
+
+	// Fetch a multi response
+	factual.queueFetch("places", new Query().field("country").equal("US"));
+	factual.queueFetch("places", new Query().limit(1)); 
+	MultiResponse multi = factual.sendRequests();
+
+Queue responses using <tt>queueFetch</tt>, and send all queued reads using <tt>sendRequests</tt>.	
+
 # Exception Handling
 
 If Factual's API indicates an error, a <tt>FactualApiException</tt> unchecked Exception will be thrown. It will contain details about the request you sent and the error that Factual returned.
@@ -387,7 +604,8 @@ Here is an example of catching a <tt>FactualApiException</tt> and inspecting it:
       System.out.println("Error Status Code: " + e.getResponse().statusCode);
       System.out.println("Error Response Message: " + e.getResponse().statusMessage);
     }
-
+    
+    
 # More Examples
 
 For more code examples:

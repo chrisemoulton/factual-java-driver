@@ -8,30 +8,59 @@ import java.util.Map;
  * @author brandon
  */
 public class Report {
+	/**
+	 * Constructor.  Create a request to report information on a Factual row.
+	 * 
+	 * @param type the type of report that this represents
+	 */
 	public Report(Type type) {
 		queryParams.setParam("problem", type.toApiString());
 	}
 
+	/**
+	 * Create a report for a duplicate row.
+	 * @return new Report instance.
+	 */
 	public static Report duplicate() {
 		return new Report(Type.DUPLICATE);
 	}
 
+	/**
+	 * Create a report for an inaccurate row.
+	 * @return new Report instance.
+	 */
 	public static Report inaccurate() {
 		return new Report(Type.INACCURATE);
 	}
 
+	/**
+	 * Create a report for an inappropriate row.
+	 * @return new Report instance.
+	 */
 	public static Report inappropriate() {
 		return new Report(Type.INAPPROPRIATE);
 	}
 
+	/**
+	 * Create a report for a non-existent row.
+	 * @return new Report instance.
+	 */
 	public static Report nonexistent() {
 		return new Report(Type.NONEXISTENT);
 	}
 
+	/**
+	 * Create a report that a row is spam.
+	 * @return new Report instance.
+	 */
 	public static Report spam() {
 		return new Report(Type.SPAM);
 	}
 
+	/**
+	 * Create a report for this row.
+	 * @return new Report instance
+	 */
 	public static Report other() {
 		return new Report(Type.OTHER);
 	}
