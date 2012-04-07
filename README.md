@@ -373,6 +373,48 @@ The <tt>resolve</tt> method gives you the one full match if there is one, or nul
     .add("latitude", 34.06)
     .add("longitude", -118.40));
 
+# Raw Read
+
+You can perform any read queries documented in the Factual API using the custom raw read query. Add parameters to your request using <tt>addParam</tt> or <tt>addJsonParam</tt> and a request will be made using your OAuth token.  The driver will URL-encode the parameter values.
+
+## Example Raw Read Queries
+
+Fetch only the name and category fields, including the row count in the response.  <tt>addParam</tt> adds a parameter key and value pair, where the value is serialized using <tt>value.toString()</tt>.
+    
+    CustomQuery q = new CustomQuery()
+    .addParam("select", "name,category")
+    .addParam("include_count", true);
+    String respString = factual.fetch("t/places", q);
+    
+Fetch 10 items from the places table in California, New Mexico, or Florida.  <tt>addJsonParam</tt> adds a parameter key and value pair, where the value is an object that can be serialized to json.  The object can contain maps, collections, and types with string representations.
+
+    CustomQuery q = new CustomQuery()
+    .addJsonParam("filters", new HashMap() {  
+		{  
+			put("region", new HashMap(){
+				{
+					put("$in", new String[]{"CA", "NM", "FL"});	    
+				}
+			});
+	    }  
+	})
+	.addParam("limit", 10);
+    String respString = factual.fetch("t/places", q);
+
+Fetch only the name and address fields from 
+
+# Debug Mode
+
+To see a full trace of debug information for a request and response, set debug mode to true.  There are two ways to do so.  Use the <tt>Factual</tt> constructor:
+
+	Factual factual = new Factual(key, secret, true);
+
+or modify and existing instance:
+	
+	factual.debug(true);
+	
+Debug information will be printed to the standard out, with request and response information, including headers.
+
 # Facet
 
 The driver fully supports Factual's Facet feature, which lets you return row counts for Factual tables, grouped by facets of data.  For example, you may want to query all businesses within 1 mile of a location and for a count of those businesses by category.
@@ -430,9 +472,9 @@ The <tt>fetch</tt> method gives the facet counts:
     <td>search</td>
     <td>Full text search query string.</td>
     <td>
-      Find "sushi":<br><tt>q.search("sushi")</tt><p>
-      Find "sushi" or "sashimi":<br><tt>q.search("sushi, sashimi")</tt><p>
-      Find "sushi" and "santa" and "monica":<br><tt>q.search("sushi santa monica")</tt>
+      Find "sushi":<br><tt>f.search("sushi")</tt><p>
+      Find "sushi" or "sashimi":<br><tt>f.search("sushi, sashimi")</tt><p>
+      Find "sushi" and "santa" and "monica":<br><tt>f.search("sushi santa monica")</tt>
     </td>
   </tr>
 </table>  
@@ -443,7 +485,7 @@ The driver fully supports Factual's Report feature, which lets enables flagging 
 
 ## Simple Report Example
 
-The <tt>report</tt> method reports a problematic row:
+The <tt>report</tt> method flags a problematic row:
 
     // Flag a row as problematic
 	Report report = Report.spam();
@@ -518,7 +560,7 @@ The <tt>suggest</tt> method is a contribution to edit an existing row or add a n
   <tr>
     <td>values</td>
     <td>A JSON hash field names and values to be added to a Factual table</td>
-    <td><tt>s.setValue("longitude", "100")</tt><p><tt>s.makeBlank("longitude")</tt></td>
+    <td>Update a value:<p><tt>s.setValue("longitude", 100)</tt><p>Make a value blank:<p><tt>s.makeBlank("longitude")</tt></td>
   </tr>
   <tr>
     <td>user</td>

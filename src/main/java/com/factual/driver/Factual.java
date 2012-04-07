@@ -4,12 +4,15 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
+import java.util.logging.StreamHandler;
 
 import com.google.api.client.auth.oauth.OAuthHmacSigner;
 import com.google.api.client.auth.oauth.OAuthParameters;
@@ -37,8 +40,11 @@ public class Factual {
   private String factHome = "http://api.v3.factual.com/";
   private final String key;
   private final OAuthHmacSigner signer;
+  private boolean debug = false;
+  private StreamHandler debugHandler = null;
   
   private Queue<FullQuery> fetchQueue = Lists.newLinkedList();
+  
 
   /**
    * Constructor. Represents your authenticated access to Factual.
@@ -47,10 +53,23 @@ public class Factual {
    * @param secret your oauth secret.
    */
   public Factual(String key, String secret) {
-    this.key = key;
-    this.signer = new OAuthHmacSigner();
-    this.signer.clientSharedSecret = secret;
+	this(key, secret, false);
   }
+  
+  /**
+   * Constructor. Represents your authenticated access to Factual.
+   * 
+   * @param key your oauth key.
+   * @param secret your oauth secret.
+   * @param debug whether or not this is in debug mode
+   */
+  public Factual(String key, String secret, boolean debug) {
+	this.key = key;
+	this.signer = new OAuthHmacSigner();
+	this.signer.clientSharedSecret = secret;
+	debug(debug);
+  }
+  
 
   /**
    * Change the base URL at which to contact Factual's API. This
@@ -411,16 +430,16 @@ public class Factual {
       headers.set("X-Factual-Lib", DRIVER_HEADER_TAG);
       request.setHeaders(headers);
       
-
-      System.out.println(request.getMethod());
-      System.out.println(request.getUrl().build());
-      for (Map.Entry<String, Object> e : request.getHeaders().entrySet()) {
-    	  System.out.println(e.getKey() + ": " +e.getValue());
-      }
-      System.out.println("Content: "+UrlEncodedContent.getContent(request).getData());
+      if (debug) {
+          Logger logger = Logger.getLogger(HttpTransport.class.getName());
+          logger.removeHandler(debugHandler);
+          logger.setLevel(Level.ALL);
+          logger.addHandler(debugHandler);
+	  }
       
       // get the response
       br = new BufferedReader(new InputStreamReader(request.execute().getContent()));
+      
       return br.readLine();
     } catch (HttpResponseException e) {
       throw new FactualApiException(e).requestUrl(urlStr).requestMethod(requestMethod).response(e.getResponse());
@@ -431,6 +450,18 @@ public class Factual {
     } finally {
       Closeables.closeQuietly(br);
     }
+  }
+  
+  /**
+   * Set the driver in or out of debug mode.
+   * @param debug whether or not this is in debug mode
+   */
+  public void debug(boolean debug) {
+	  this.debug = debug;
+	  if (debug && debugHandler == null) {
+          debugHandler = new StreamHandler(System.out, new SimpleFormatter());
+          debugHandler.setLevel(Level.ALL);
+	  }
   }
 
 }

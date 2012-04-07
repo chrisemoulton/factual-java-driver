@@ -464,7 +464,7 @@ public class FactualTest {
   
   @Test
   @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
-  public void testCustomRead() {
+  public void testCustomRead1() {
     CustomQuery q = new CustomQuery()
     .addJsonParam("filters", new HashMap() {  
 		{  
@@ -481,17 +481,10 @@ public class FactualTest {
   
   @Test
   @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
-  public void testCustomReadCombo() {
+  public void testCustomRead2() {
     CustomQuery q = new CustomQuery()
-    .addJsonParam("filters", new HashMap() {  
-		{  
-			put("region", new HashMap(){
-				{
-					put("$in", new String[]{"CA", "NM", "FL"});	    
-				}
-			});
-	    }  
-	});
+    .addParam("select", "name,category")
+    .addParam("include_count", true);
     String respString = factual.fetch("t/places", q);
     assertTrue(respString != null && respString.length() > 0);
   }
@@ -586,9 +579,13 @@ public class FactualTest {
   public void testSuggestError() {
 	Suggest write = new Suggest()
     .makeBlank("longitude");
-	SuggestResponse resp = factual.suggest("global", "randomwrongid", write, new Metadata("Brandon Yoshimoto").debug());
-	printSuggestResponse(resp);
-	System.out.println(resp.getJson());
+	FactualApiException exception = null;
+	try {
+		SuggestResponse resp = factual.suggest("global", "randomwrongid", write, new Metadata("Brandon Yoshimoto").debug());
+	} catch (FactualApiException e) {
+		exception = e;
+	}
+	assertTrue(exception != null);
   }
   
   @Test
@@ -642,6 +639,20 @@ public class FactualTest {
 	  factual.setFactHome("http://api.v3.factual.com/");
   }
 
+  
+  /**
+   * Test debug mode
+   */
+  @Test
+  public void testDebug() {
+	factual.debug(true);
+    ReadResponse resp = factual.fetch("places",
+        new Query().field("country").equal("US"));
+    factual.debug(false);
+    assertOk(resp);
+    assertAll(resp, "country", "US");
+  }
+  
   private void printFacetResponse(FacetResponse resp) {
 	Map<String, Map<String, Object>> data = resp.getData();
 	for (String field : data.keySet()) {
