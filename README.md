@@ -375,18 +375,25 @@ The <tt>resolve</tt> method gives you the one full match if there is one, or nul
 
 # Raw Read
 
-You can perform any read queries documented in the Factual API using the custom raw read query. Add parameters to your request using <tt>addParam</tt> or <tt>addJsonParam</tt> and a request will be made using your OAuth token.  The driver will URL-encode the parameter values.
+You can perform any read queries documented in the Factual API using the custom raw read query. Add parameters to your request using <tt>addParam</tt> or <tt>addJsonParam</tt> and a request will be made using your OAuth token.  The driver will URL-encode the parameter values.  
+
+<ul>
+<li><tt>addParam</tt> adds a parameter key and value pair, where the value is serialized using <tt>value.toString()</tt>.
+</li>
+<li><tt>addJsonParam</tt> adds a parameter key and value pair, where the value is an object that can be serialized to json.  The object can contain maps, collections, primitive types, etc.
+</li>
+</ul>
 
 ## Example Raw Read Queries
 
-Fetch only the name and category fields, including the row count in the response.  <tt>addParam</tt> adds a parameter key and value pair, where the value is serialized using <tt>value.toString()</tt>.
+Fetch only the name and category fields, including the row count in the response: 
     
     CustomQuery q = new CustomQuery()
     .addParam("select", "name,category")
     .addParam("include_count", true);
     String respString = factual.fetch("t/places", q);
     
-Fetch 10 items from the places table in California, New Mexico, or Florida.  <tt>addJsonParam</tt> adds a parameter key and value pair, where the value is an object that can be serialized to json.  The object can contain maps, collections, and types with string representations.
+Fetch 10 items from the places table in California, New Mexico, or Florida:
 
     CustomQuery q = new CustomQuery()
     .addJsonParam("filters", new HashMap() {  
@@ -401,19 +408,19 @@ Fetch 10 items from the places table in California, New Mexico, or Florida.  <tt
 	.addParam("limit", 10);
     String respString = factual.fetch("t/places", q);
 
-Fetch only the name and address fields from 
 
 # Debug Mode
 
-To see a full trace of debug information for a request and response, set debug mode to true.  There are two ways to do so.  Use the <tt>Factual</tt> constructor:
+To see a full trace of debug information for a request and response, set debug mode to true.  There are two ways to do so:<p>
+Use the <tt>Factual</tt> constructor:
 
 	Factual factual = new Factual(key, secret, true);
 
-or modify and existing instance:
+or modify an existing instance:
 	
 	factual.debug(true);
 	
-Debug information will be printed to the standard out, with request and response information, including headers.
+Debug information will be printed to standard out, with request and response information, including headers.
 
 # Facet
 
@@ -465,7 +472,7 @@ The <tt>fetch</tt> method gives the facet counts:
   </tr>
   <tr>
     <td>geo</td>
-    <td>Restrict data to be returned to be within a geographical range based.</td>
+    <td>Restrict data to be returned to be within a geographical range.</td>
     <td>(See the section on Geo Filters)</td>
   </tr>
   <tr>
@@ -479,17 +486,17 @@ The <tt>fetch</tt> method gives the facet counts:
   </tr>
 </table>  
 
-# Report
+# Flag
 
-The driver fully supports Factual's Report feature, which lets enables flagging problematic rows in Factual tables. Use this method if you are requesting for an entity to be deleted or merged into a duplicate record.
+The driver fully supports Factual's Flag feature, which lets enables flagging problematic rows in Factual tables. Use this method if you are requesting for an entity to be deleted or merged into a duplicate record.
 
-## Simple Report Example
+## Simple Flag Example
 
-The <tt>report</tt> method flags a problematic row:
+The <tt>flag</tt> method flags a problematic row:
 
     // Flag a row as problematic
-	Report report = Report.spam();
-	ReportResponse resp = factual.report("global", "0545b03f-9413-44ed-8882-3a9a461848da", report, new Metadata("my_username").debug());
+	Flag flag = Flag.spam();
+	FlagResponse resp = factual.flag("global", "0545b03f-9413-44ed-8882-3a9a461848da", flag, new Metadata("my_username").debug());
 
 ## All Top Level Flag Parameters
 
@@ -502,7 +509,7 @@ The <tt>report</tt> method flags a problematic row:
   <tr>
     <td>problem</td>
     <td>One of: duplicate, inaccurate, inappropriate, nonexistent, spam, or other.</td>
-    <td><tt>Report r = Report.duplicate()</tt><p><tt>Report r = new Report(Report.Type.DUPLICATE)</tt></td>
+    <td><tt>Flag f = Flag.duplicate()</tt><p><tt>Flag f = new Flag(Report.Type.DUPLICATE)</tt></td>
   </tr>
   <tr>
     <td>user</td>
@@ -528,26 +535,26 @@ The <tt>report</tt> method flags a problematic row:
 
 # Suggest
 
-The driver fully supports Factual's Suggest feature, which enables you to contribute edits to existing rows and/or contribute new rows of data in Factual tables. For information on deleting records, see report.
+The driver fully supports Factual's Suggest feature, which enables you to contribute edits to existing rows and/or contribute new rows of data in Factual tables. For information on deleting records, see Flag.
 
 ## Simple Suggest Examples
 
 The <tt>suggest</tt> method is a contribution to edit an existing row or add a new row:
 
 	// Suggest adding a new row
-	Suggest write = new Suggest()
+	Suggest suggest = new Suggest()
     .setValue("longitude", 100);
-	SuggestResponse resp = factual.suggest("global", write, new Metadata("my_username").debug());
+	SuggestResponse resp = factual.suggest("global", suggest, new Metadata("my_username").debug());
 	
     // Suggest a field update
-	Suggest write = new Suggest()
+	Suggest suggest = new Suggest()
     .setValue("longitude", 100);
-	SuggestResponse resp = factual.suggest("global", "0545b03f-9413-44ed-8882-3a9a461848da",write, new Metadata("my_username").debug());
+	SuggestResponse resp = factual.suggest("global", "0545b03f-9413-44ed-8882-3a9a461848da",suggest, new Metadata("my_username").debug());
 
 	// Suggest a field become blank
-	Suggest write = new Suggest()
+	Suggest suggest = new Suggest()
     .makeBlank("longitude");
-	SuggestResponse resp = factual.suggest("global", "0545b03f-9413-44ed-8882-3a9a461848da",write, new Metadata("my_username").debug());
+	SuggestResponse resp = factual.suggest("global", "0545b03f-9413-44ed-8882-3a9a461848da",suggest, new Metadata("my_username").debug());
 
 ## All Top Level Suggest Parameters
 
@@ -559,7 +566,7 @@ The <tt>suggest</tt> method is a contribution to edit an existing row or add a n
   </tr>
   <tr>
     <td>values</td>
-    <td>A JSON hash field names and values to be added to a Factual table</td>
+    <td>A JSON hash field of names and values to be added to a Factual table</td>
     <td>Update a value:<p><tt>s.setValue("longitude", 100)</tt><p>Make a value blank:<p><tt>s.makeBlank("longitude")</tt></td>
   </tr>
   <tr>
@@ -586,7 +593,7 @@ The <tt>suggest</tt> method is a contribution to edit an existing row or add a n
 
 # Diffs
 
-The driver fully supports Factual's Diffs feature, which enables Factual data update downloads.
+The driver fully supports Factual's experimental Diffs feature, which enables Factual data update downloads.
 
 ## Simple Diffs Example
 
@@ -606,12 +613,12 @@ The <tt>fetch</tt> method gives the diff data:
   </tr>
   <tr>
     <td>before</td>
-    <td>The start time for a diff</td>
+    <td>The start time for a diff request</td>
     <td><tt>d.before(long timestamp)</tt></td>
   </tr>
   <tr>
     <td>after</td>
-    <td>The end time for a diff</td>
+    <td>The end time for a diff request</td>
     <td><tt>d.after(long timestamp)</tt></td>
   </tr>
 </table>  
@@ -619,18 +626,16 @@ The <tt>fetch</tt> method gives the diff data:
 
 # Multi
 
-The driver fully supports Factual's Multi feature, which enables making multiple requests on the same connection.
+The driver fully supports Factual's experimental Multi feature, which enables making multiple requests on the same connection.
+Queue responses using <tt>queueFetch</tt>, and send all queued reads using <tt>sendRequests</tt>.  The <tt>sendRequest</tt> method requests all reads queued since the last <tt>sendRequest</tt>
 
 ## Simple Multi Example
 
-The <tt>sendRequest</tt> method requests all reads queued since the last <tt>sendRequest</tt>:
 
 	// Fetch a multi response
 	factual.queueFetch("places", new Query().field("country").equal("US"));
 	factual.queueFetch("places", new Query().limit(1)); 
-	MultiResponse multi = factual.sendRequests();
-
-Queue responses using <tt>queueFetch</tt>, and send all queued reads using <tt>sendRequests</tt>.	
+	MultiResponse multi = factual.sendRequests();	
 
 # Exception Handling
 

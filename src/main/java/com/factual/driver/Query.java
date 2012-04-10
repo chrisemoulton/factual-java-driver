@@ -157,8 +157,8 @@ public class Query implements Filterable {
    * @deprecated use {@link #field(String)}
    */
   @Deprecated
-  public QueryBuilder criteria(String field) {
-    return new QueryBuilder(this, field);
+  public QueryBuilder<Query> criteria(String field) {
+    return new QueryBuilder<Query>(this, field);
   }
 
   /**
@@ -168,8 +168,8 @@ public class Query implements Filterable {
    *          the name of the field on which to filter.
    * @return A partial representation of the new row filter.
    */
-  public QueryBuilder field(String field) {
-    return new QueryBuilder(this, field);
+  public QueryBuilder<Query> field(String field) {
+    return new QueryBuilder<Query>(this, field);
   }
 
   public Query near(String text, int meters) {
@@ -212,6 +212,7 @@ public class Query implements Filterable {
   /**
    * Adds <tt>filter</tt> to this Query.
    */
+  @Override
   public void add(Filter filter) {
 	queryParams.add(filter);
   }

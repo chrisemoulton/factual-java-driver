@@ -147,21 +147,21 @@ public class Factual {
   }
   
   /**
-   * Runs a <tt>report</tt> input against the specified Factual table.
+   * Runs a <tt>flag</tt> input against the specified Factual table.
    * 
    * @param tableName
-   * 		  the name of the table you wish to report updates for (e.g., "places")
+   * 		  the name of the table you wish to flag updates for (e.g., "places")
    * @param factualId
-   * 		  the factual id on which the report is run
-   * @param report
-   * 		  the report parameters to run against <tt>table</tt>
+   * 		  the factual id on which the flag is run
+   * @param flag
+   * 		  the flag parameters to run against <tt>table</tt>
    * @param metadata
    * 		  the metadata to send with information on this request
    * 	  	 
-   * @return the response of running <tt>report</tt> against Factual.
+   * @return the response of running <tt>flag</tt> against Factual.
    */
-  public ReportResponse report(String tableName, String factualId, Report report, Metadata metadata) {
-	return reportCustom("t/"+tableName+"/"+factualId+"/flag", report, metadata);
+  public FlagResponse flag(String tableName, String factualId, Flag flag, Metadata metadata) {
+	return flagCustom("t/"+tableName+"/"+factualId+"/flag", flag, metadata);
   }
   
   /**
@@ -194,14 +194,14 @@ public class Factual {
 	Map<String, Object> params = Maps.newHashMap();
 	params.putAll(metadata.toMap());
 	params.putAll(input.toMap());
-	return new SuggestResponse(requestPost(factHome + root + "?" + input.toUrlQuery() + "&" + metadata.toUrlQuery()));
+	return new SuggestResponse(requestPost(factHome + root, params));
   }
 
-  private ReportResponse reportCustom(String root, Report report, Metadata metadata) {
+  private FlagResponse flagCustom(String root, Flag flag, Metadata metadata) {
 	Map<String, Object> params = Maps.newHashMap();
 	params.putAll(metadata.toMap());
-	params.putAll(report.toMap());
-	return new ReportResponse(requestPost(factHome + root));
+	params.putAll(flag.toMap());
+	return new FlagResponse(requestPost(factHome + root, params));
   }
   
   private String toUrl(String root, String parameters) {
@@ -388,8 +388,8 @@ public class Factual {
 	  return request(urlStr, "GET", null, useOAuth);
   }
 
-  private String requestPost(String urlStr) {
-	  return requestPost(urlStr, null, true);
+  private String requestPost(String urlStr, Map<String, Object> postData) {
+	  return requestPost(urlStr, postData, true);
   }
 
   private String requestPost(String urlStr, Map<String, Object> postData, boolean useOAuth) {
@@ -429,7 +429,7 @@ public class Factual {
       HttpHeaders headers = new HttpHeaders();
       headers.set("X-Factual-Lib", DRIVER_HEADER_TAG);
       request.setHeaders(headers);
-      
+
       if (debug) {
           Logger logger = Logger.getLogger(HttpTransport.class.getName());
           logger.removeHandler(debugHandler);

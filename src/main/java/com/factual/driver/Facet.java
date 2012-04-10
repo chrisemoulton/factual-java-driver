@@ -102,8 +102,8 @@ public class Facet implements Filterable {
 	 *            the name of the field on which to filter.
 	 * @return A partial representation of the new row filter.
 	 */
-	public FacetBuilder field(String field) {
-		return new FacetBuilder(this, field);
+	public QueryBuilder<Facet> field(String field) {
+		return new QueryBuilder<Facet>(this, field);
 	}
 
 	public Facet near(String text, int meters) {
@@ -148,6 +148,7 @@ public class Facet implements Filterable {
 	/**
 	 * Adds <tt>filter</tt> to this Facet.
 	 */
+	@Override
 	public void add(Filter filter) {
 		queryParams.add(filter);
 	}

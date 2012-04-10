@@ -543,8 +543,6 @@ public class FactualTest {
   
   @Test
   public void testSuggestAdd() {
-	factual.setFactHome("http://23.21.18.255:10002/");
-
 	Suggest write = new Suggest()
     .setValue("longitude", 100);
 	SuggestResponse resp = factual.suggest("global", write, new Metadata("Brandon Yoshimoto").debug());
@@ -552,9 +550,6 @@ public class FactualTest {
 	//System.out.println(resp.getJson());
     assertOk(resp);
     assertTrue(resp.isNewEntity());
-
-    factual.setFactHome("http://api.v3.factual.com/");
-
   }
   
   @Test
@@ -589,9 +584,9 @@ public class FactualTest {
   }
   
   @Test
-  public void testReport() {
-	Report report = Report.spam();
-	ReportResponse resp = factual.report("global", "0545b03f-9413-44ed-8882-3a9a461848da", report, new Metadata("Brandon Yoshimoto").debug());
+  public void testFlag() {
+	Flag flag = Flag.spam();
+	FlagResponse resp = factual.flag("global", "0545b03f-9413-44ed-8882-3a9a461848da", flag, new Metadata("Brandon Yoshimoto").debug());
 	System.out.println(resp.getJson());
   }
 

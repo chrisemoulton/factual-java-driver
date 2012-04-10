@@ -4,11 +4,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Represents the response from running a Report request against Factual.
+ * Represents the response from running a Flag request against Factual.
  * 
  * @author brandon
  */
-public class ReportResponse extends Response {
+public class FlagResponse extends Response {
 	private String json = null;
 
 	/**
@@ -16,7 +16,7 @@ public class ReportResponse extends Response {
 	 * 
 	 * @param json the JSON response String returned by Factual.
 	 */
-	public ReportResponse(String json) {
+	public FlagResponse(String json) {
 		this.json = json;
 		try {
 			JSONObject rootJsonObj = new JSONObject(json);

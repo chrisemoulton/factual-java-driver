@@ -12,4 +12,7 @@ public interface Filterable {
 	 * @return a list of filters
 	 */
 	List<Filter> getFilterList();
+	
+
+	void add(Filter filter);
 }
