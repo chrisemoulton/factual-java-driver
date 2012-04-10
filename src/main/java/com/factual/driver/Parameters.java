@@ -17,12 +17,12 @@ import com.google.common.collect.Maps;
  * @author brandon
  *
  */
-public class Parameters implements Convertible {
+public class Parameters {
 
 	/**
 	 * Holds key-value parameter pairs
 	 */
-	private Map<Object, Convertible> params = Maps.newHashMap();
+	private Map<Object, Object> params = Maps.newHashMap();
 
 	/**
 	 * Filters parameter field.
@@ -32,7 +32,7 @@ public class Parameters implements Convertible {
 	public Parameters() {
 	}
 	
-	public Parameters(Map<Object, Convertible> params) {
+	public Parameters(Map<Object, Object> params) {
 		this.params = params;
 	}
 	
@@ -85,23 +85,12 @@ public class Parameters implements Convertible {
 	 */
 	protected List<Object> toQueryParams(Parameters additionalParams, boolean urlEncode) {
 		List<Object> paramList = Lists.newArrayList();
-		for (Entry<Object, Convertible> entry : params.entrySet()) {
+		for (Entry<Object, Object> entry : params.entrySet()) {
 			paramList.add(urlPair(entry.getKey(), String.valueOf(entry.getValue()), urlEncode));
 		}
 		if (additionalParams != null)
 			paramList.addAll(additionalParams.toQueryParams(null, urlEncode));
 		return paramList;
-	}
-	
-	/**
-	 * Get a representation of the of the parameters that can be serialized to json.
-	 */
-	public Map<Object, Object> toJsonObject() {
-		Map<Object, Object> jsonData = Maps.newHashMap();
-		for (Object key : params.keySet()) {
-			jsonData.put(key, params.get(key).toJsonObject());
-		}
-		return jsonData;
 	}
 
 	/**
@@ -168,7 +157,7 @@ public class Parameters implements Convertible {
 		getFilterList().add(filter);
 	}
 
-	private String urlPair(Object name, Object val, boolean urlEncode) {
+	protected static String urlPair(Object name, Object val, boolean urlEncode) {
 		if (val != null) {
 			try {
 				return name
@@ -186,7 +175,7 @@ public class Parameters implements Convertible {
 	/**
 	 * Holds a filter list parameter value representation. Implicit top-level AND.
 	 */
-	private static class FilterList extends ArrayList<Filter> implements Convertible {
+	private static class FilterList extends ArrayList<Filter> {
 		public FilterList() {
 		}
 
@@ -201,7 +190,6 @@ public class Parameters implements Convertible {
 			}
 		}
 
-		@Override
 		public Object toJsonObject() {
 			if (isEmpty()) {
 				return null;
@@ -216,8 +204,7 @@ public class Parameters implements Convertible {
 	/**
 	 * Holds a comma-separated parameter value representation
 	 */
-	private static class CommaSeparatedData extends HashSet<Object> implements
-			Convertible {
+	private static class CommaSeparatedData extends HashSet<Object> {
 		public CommaSeparatedData() {
 		}
 
@@ -226,7 +213,6 @@ public class Parameters implements Convertible {
 			return Joiner.on(",").skipNulls().join(this);
 		}
 
-		@Override
 		public Object toJsonObject() {
 			return toString();
 		}
@@ -236,7 +222,7 @@ public class Parameters implements Convertible {
 	 * Holds a parameter value representation which is serializable to json
 	 * @param <T>
 	 */
-	private static class JsonData<T> implements Convertible {
+	private static class JsonData<T> {
 		private T value = null;
 
 		public JsonData(T value) {
@@ -252,7 +238,6 @@ public class Parameters implements Convertible {
 			return JsonUtil.toJsonStr(value);
 		}
 
-		@Override
 		public Object toJsonObject() {
 			return value;
 		}
@@ -261,7 +246,7 @@ public class Parameters implements Convertible {
 	/**
 	 * Holds a parameter value which directly uses data.toString(), performing no transformation.
 	 */
-	private static class SimpleData implements Convertible {
+	private static class SimpleData {
 		private Object data = null;
 
 		public SimpleData(Object data) {
@@ -273,7 +258,6 @@ public class Parameters implements Convertible {
 			return String.valueOf(data);
 		}
 
-		@Override
 		public Object toJsonObject() {
 			return toString();
 		}

@@ -10,7 +10,7 @@ import com.factual.data_science_toolkit.Coord;
  *
  * @author aaron
  */
-public class Circle implements Convertible {
+public class Circle {
   private final double lat;
   private final double lon;
   private final int meters;
@@ -54,8 +54,7 @@ public class Circle implements Convertible {
    * @return an object representation of this circle that can be serialized as json
    */
   @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
-  @Override
-  public Object toJsonObject() {
+  private Object toJsonObject() {
 	  return new HashMap() {
 		{
 			put("$circle", new HashMap() {

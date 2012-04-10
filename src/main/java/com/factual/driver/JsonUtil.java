@@ -54,7 +54,33 @@ public class JsonUtil {
     return row;
   }
   
-  protected static String toJsonStr(Object obj) {
+  /**
+   * Serialize a Java object to json.  
+   * Use Maps and Lists to specify object and array structures respectively.
+   * 
+   * For example, the following value as input:
+   * <pre>
+   * {@code
+   * new HashMap() {{
+   * put("$and", new Map[] {
+   * 	new HashMap() {{
+   * 		put("name", new HashMap() {{
+   *  			put("$bw", "McDonald's");
+   *  		}});	
+   *  		put("category", new HashMap() {{
+   *  			put("$bw", "Food & Beverage");
+   *  		}});
+   * 	}}});
+   * }};
+   * }
+   * </pre>
+   * Will be serialized to json as:
+   * {"$and":[{"name":{"$bw":"McDonald's"},"category":{"$bw":"Food & Beverage"}}
+   * 
+   * @param obj the object to be serialized as json
+   * @return the json string representing the passed in object 
+   */
+  public static String toJsonStr(Object obj) {
 	try {
 	  return new ObjectMapper().writeValueAsString(obj);
 	} catch (JsonGenerationException e) {

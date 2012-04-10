@@ -36,16 +36,6 @@ public class Suggest {
 		return queryParams.toUrlQuery(true);
 	}
 
-	public Suggest addJsonParam(String key, Object value) {
-		queryParams.setJsonParam(key, value);
-		return this;
-	}
-
-	public Suggest addParam(String key, Object value) {
-		queryParams.setParam(key, value);
-		return this;
-	}
-	
 	/**
 	 * Set the value for a single field in this suggest request.  
 	 * Added to a JSON hash of field names and values to be added to a Factual table.

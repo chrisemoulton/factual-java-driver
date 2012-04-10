@@ -12,10 +12,10 @@ public class Metadata {
 
 	/**
 	 * Constructor.  Create metadata to associate with suggest and flag requests
-	 * @param username the name of the user associated with this request
 	 */
-	public Metadata(String username) {
-		queryParams.setParam("user", username);
+	public Metadata() {
+		// Temporary
+		debug();
 	}
 	
 	private Metadata(Parameters queryParams) {
@@ -23,10 +23,21 @@ public class Metadata {
 	}
 
 	/**
+	 * Set a user name for the person contributing the data 
+	 * @param username
+	 * @return new Metadata, with a username set
+	 */
+	public Metadata user(String username) {
+		Parameters params = queryParams.copy();
+		params.setParam("user", username);
+		return new Metadata(params);
+	}
+	
+	/**
 	 * The request will only be a test query and no actual data will be written
 	 * @return new Metadata, marked as a debug request
 	 */
-	public Metadata debug() {
+	private Metadata debug() {
 		return debug(true);
 	}
 	
@@ -36,7 +47,7 @@ public class Metadata {
 	 * @param debug true if you want this to be a test query where no actual date is written
 	 * @return new Metadata, marked with whether or not this is a debug request
 	 */
-	public Metadata debug(boolean debug) {
+	private Metadata debug(boolean debug) {
 		Parameters params = queryParams.copy();
 		params.setParam("debug", debug);
 		return new Metadata(params);

@@ -9,6 +9,7 @@ import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
@@ -24,6 +25,7 @@ import com.google.api.client.http.HttpResponseException;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.UrlEncodedContent;
 import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Closeables;
@@ -160,18 +162,23 @@ public class Factual {
    * 	  	 
    * @return the response of running <tt>flag</tt> against Factual.
    */
-  public FlagResponse flag(String tableName, String factualId, Flag flag, Metadata metadata) {
+  public FlagResponse flag(String tableName, String factualId, FlagType flag, Metadata metadata) {
 	return flagCustom("t/"+tableName+"/"+factualId+"/flag", flag, metadata);
   }
   
   /**
-   * Runs a custom query against the path specified
+   * Runs a "GET" request against the path specified using the parameters specified and your Oauth token.
    * @param path the path to run the request against
-   * @param query the custom raw read query
+   * @param params the parameters to send with the request, URL-encoded
    * @return the response of running <tt>query</tt> against Factual.
    */
-  public String fetch(String path, CustomQuery query) {
-	return request(toUrl(factHome + path, query.toUrlQuery()));
+  public String get(String path, Map<String, Object> params) {
+	List<Object> paramList = Lists.newArrayList();
+	for (Entry<String, Object> entry : params.entrySet()) {
+		paramList.add(Parameters.urlPair(entry.getKey(), String.valueOf(entry.getValue()), true));
+	}
+	String paramString = Joiner.on("&").skipNulls().join(paramList);
+	return request(toUrl(factHome + path, paramString));
   }
   
   private ReadResponse fetchCustom(String root, Query query) {
@@ -197,10 +204,10 @@ public class Factual {
 	return new SuggestResponse(requestPost(factHome + root, params));
   }
 
-  private FlagResponse flagCustom(String root, Flag flag, Metadata metadata) {
+  private FlagResponse flagCustom(String root, FlagType flag, Metadata metadata) {
 	Map<String, Object> params = Maps.newHashMap();
 	params.putAll(metadata.toMap());
-	params.putAll(flag.toMap());
+	params.put("problem", flag.toApiString());
 	return new FlagResponse(requestPost(factHome + root, params));
   }
   
@@ -212,7 +219,7 @@ public class Factual {
 	return fetchCustom(urlForFetch(tableName)+"/diffs", diff);
   }
 
-  public DiffsResponse fetchCustom(String root, Diffs diff) {
+  private DiffsResponse fetchCustom(String root, Diffs diff) {
 	return new DiffsResponse(request(toUrl(factHome + root, diff.toUrlQuery())));
   }
 
@@ -225,22 +232,54 @@ public class Factual {
 	  }
   }
   
+  /**
+   * Queue a read request for inclusion in the next multi request.
+   * @param table
+   *          the name of the table you wish to query (e.g., "places")
+   * @param query
+   *          the read query to run against <tt>table</tt>.
+   */
   public void queueFetch(String table, Query query) {
 	fetchQueue.add(new FullQuery(table, query));
   }
-  
+
+  /**
+   * Queue a crosswalk request for inclusion in the next multi request.
+   * @param table
+   *          the name of the table you wish to use crosswalk against (e.g., "places")
+   * @param query
+   *          the crosswalk query to run against <tt>table</tt>.
+   */
   public void queueFetch(String table, CrosswalkQuery query) {
 	fetchQueue.add(new FullQuery(table, query));
   }
-  
+
+  /**
+   * Queue a resolve request for inclusion in the next multi request.
+   * @param table
+   *          the name of the table you wish to use resolve against (e.g., "places")
+   * @param query
+   *          the resolve query to run against <tt>table</tt>.
+   */
   public void queueFetch(String table, ResolveQuery query) {
 	fetchQueue.add(new FullQuery(table, query));
   }
   
+  /**
+   * Queue a facet request for inclusion in the next multi request.
+   * @param table
+   *          the name of the table you wish to use a facet request against (e.g., "places")
+   * @param query
+   *          the facet query to run against <tt>table</tt>.
+   */
   public void queueFetch(String table, Facet query) {
 	fetchQueue.add(new FullQuery(table, query));
   }
   
+  /**
+   * Use this to send all queued reads as a multi request
+   * @return response for a multi request
+   */
   public MultiResponse sendRequests() {
 	Map<String, String> multi = Maps.newHashMap();
 	int i = 0;

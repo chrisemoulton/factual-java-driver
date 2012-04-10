@@ -38,12 +38,13 @@ public class Facet implements Filterable {
 		return queryParams.toUrlQuery(additional, true);
 	}
 
-	public Facet addJsonParam(String key, Object value) {
-		queryParams.setJsonParam(key, value);
-		return this;
-	}
-
-	public Facet addParam(String key, Object value) {
+	/**
+	 * Set a parameter and value pair for specifying url parameters, specifically those not yet available as convenience methods.
+	 * @param key the field name of the parameter to add
+	 * @param value the field value that will be serialized using value.toString()
+	 * @return this Facet
+	 */
+	private Facet addParam(String key, Object value) {
 		queryParams.setParam(key, value);
 		return this;
 	}

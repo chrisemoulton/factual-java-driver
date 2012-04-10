@@ -3,7 +3,6 @@ package com.factual.driver;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.List;
-import java.util.Map;
 
 import com.factual.data_science_toolkit.Coord;
 import com.factual.data_science_toolkit.DataScienceToolkit;
@@ -218,18 +217,12 @@ public class Query implements Filterable {
   }
 
   /**
-   * Adds a key-value pair to this Query.
-   * 
-   * @param key
-   * @param value
+   * Set a parameter and value pair for specifying url parameters, specifically those not yet available as convenience methods.
+   * @param key the field name of the parameter to add
+   * @param value the field value that will be serialized using value.toString()
    * @return this Query
-   */
-  public Query addJsonParam(String key, Object value) {
-	queryParams.setJsonParam(key, value);
-    return this;
-  }
-
-  public Query addParam(String key, Object value) {
+   */  
+  private Query addParam(String key, Object value) {
 	queryParams.setParam(key, value);
     return this;
   }
@@ -258,10 +251,6 @@ public class Query implements Filterable {
 		additional.setParam("include_count",true);
 	}
 	return queryParams.toUrlQuery(additional, true);
-  }
-
-  protected Map<Object, Object> toJsonData() {
-	return queryParams.toJsonObject();
   }
 	
   @Override

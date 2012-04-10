@@ -18,16 +18,6 @@ public class ResolveQuery {
 		return this;
 	}
 	
-	public ResolveQuery addJsonParam(String key, Object value) {
-		queryParams.setJsonParam(key, value);
-	    return this;
-	}
-
-	public ResolveQuery addParam(String key, Object value) {
-		queryParams.setParam(key, value);
-	    return this;
-	}
-	
 	protected String toUrlQuery() {
 		return queryParams.toUrlQuery(true);
 	}

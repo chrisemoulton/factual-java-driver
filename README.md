@@ -375,38 +375,31 @@ The <tt>resolve</tt> method gives you the one full match if there is one, or nul
 
 # Raw Read
 
-You can perform any read queries documented in the Factual API using the custom raw read query. Add parameters to your request using <tt>addParam</tt> or <tt>addJsonParam</tt> and a request will be made using your OAuth token.  The driver will URL-encode the parameter values.  
+You can perform any read queries documented in the Factual API using the <tt>factual.get(…)</tt> API. Add parameters to your request by building a map of field and value pairs, and a GET request will be made using your OAuth token.  The driver will URL-encode the parameter values.
 
-<ul>
-<li><tt>addParam</tt> adds a parameter key and value pair, where the value is serialized using <tt>value.toString()</tt>.
-</li>
-<li><tt>addJsonParam</tt> adds a parameter key and value pair, where the value is an object that can be serialized to json.  The object can contain maps, collections, primitive types, etc.
-</li>
-</ul>
+<p>As a convenience, use <tt>JsonUtil.toJsonStr(object)</tt> to serialize Java objects to json format before adding a parameter.  The object can contain maps, collections, primitive types, etc.
 
 ## Example Raw Read Queries
 
 Fetch only the name and category fields, including the row count in the response: 
     
-    CustomQuery q = new CustomQuery()
-    .addParam("select", "name,category")
-    .addParam("include_count", true);
-    String respString = factual.fetch("t/places", q);
+    Map<String, Object> params = new HashMap<String, Object>()
+    params.put("select", "name,category")
+    params.put("include_count", true);
+    String respString = factual.get("t/places", params);
     
 Fetch 10 items from the places table in California, New Mexico, or Florida:
 
-    CustomQuery q = new CustomQuery()
-    .addJsonParam("filters", new HashMap() {  
-		{  
-			put("region", new HashMap(){
-				{
-					put("$in", new String[]{"CA", "NM", "FL"});	    
-				}
-			});
-	    }  
-	})
-	.addParam("limit", 10);
-    String respString = factual.fetch("t/places", q);
+    Map<String, Object> params = new HashMap<String, Object>()
+    params.put("filters", JsonUtil.toJsonStr(
+    		new HashMap() {{  
+				put("region", new HashMap() {{
+					put("$in", new String[]{"CA", "NM", "FL"});				}});
+			}}
+		)
+	);
+	params.put("limit", 10);
+    String respString = factual.fetch("t/places", params);
 
 
 # Debug Mode
@@ -494,9 +487,8 @@ The driver fully supports Factual's Flag feature, which lets enables flagging pr
 
 The <tt>flag</tt> method flags a problematic row:
 
-    // Flag a row as problematic
-	Flag flag = Flag.spam();
-	FlagResponse resp = factual.flag("global", "0545b03f-9413-44ed-8882-3a9a461848da", flag, new Metadata("my_username").debug());
+    // Flag a row as spam
+	FlagResponse resp = factual.flag("global", "0545b03f-9413-44ed-8882-3a9a461848da", FlagType.SPAM, new Metadata().user("my_username"));
 
 ## All Top Level Flag Parameters
 
@@ -509,22 +501,17 @@ The <tt>flag</tt> method flags a problematic row:
   <tr>
     <td>problem</td>
     <td>One of: duplicate, inaccurate, inappropriate, nonexistent, spam, or other.</td>
-    <td><tt>Flag f = Flag.duplicate()</tt><p><tt>Flag f = new Flag(Report.Type.DUPLICATE)</tt></td>
+    <td><tt>factual.flag(table, factualId, FlagType.SPAM, metadata)</tt></td>
   </tr>
   <tr>
     <td>user</td>
     <td>An arbitrary token representing the user contributing the data.</td>
-    <td><tt>Metadata metadata = new Metadata("my_username")</tt></td>
+    <td><tt>Metadata metadata = new Metadata().user("my_username")</tt></td>
   </tr>
   <tr>
     <td>comment</td>
     <td>Any english text comment that may help explain your corrections.</td>
     <td><tt>metadata.comment("my comment")</tt></td>
-  </tr>
-  <tr>
-    <td>debug</td>
-    <td>Specify that you are only making a test query and that you don't want any actual data to be written - just to let you know if your query is valid.</td>
-    <td><tt>metadata.debug()</tt></td>
   </tr>
   <tr>
     <td>reference</td>
@@ -541,20 +528,23 @@ The driver fully supports Factual's Suggest feature, which enables you to contri
 
 The <tt>suggest</tt> method is a contribution to edit an existing row or add a new row:
 
+	// Field-value mapping for an entity.
+	Map<String, Object> values = …;
+	Metadata metadata = new Metadata().user("my_username");
+
 	// Suggest adding a new row
-	Suggest suggest = new Suggest()
-    .setValue("longitude", 100);
-	SuggestResponse resp = factual.suggest("global", suggest, new Metadata("my_username").debug());
+	Suggest suggest = new Suggest(values)
+	SuggestResponse resp = factual.suggest("global", suggest, metadata);
 	
     // Suggest a field update
-	Suggest suggest = new Suggest()
+	Suggest suggest = new Suggest(values)
     .setValue("longitude", 100);
-	SuggestResponse resp = factual.suggest("global", "0545b03f-9413-44ed-8882-3a9a461848da",suggest, new Metadata("my_username").debug());
+	SuggestResponse resp = factual.suggest("global", "0545b03f-9413-44ed-8882-3a9a461848da",suggest, metadata);
 
 	// Suggest a field become blank
-	Suggest suggest = new Suggest()
+	Suggest suggest = new Suggest(values)
     .makeBlank("longitude");
-	SuggestResponse resp = factual.suggest("global", "0545b03f-9413-44ed-8882-3a9a461848da",suggest, new Metadata("my_username").debug());
+	SuggestResponse resp = factual.suggest("global", "0545b03f-9413-44ed-8882-3a9a461848da",suggest, metadata);
 
 ## All Top Level Suggest Parameters
 
@@ -572,17 +562,12 @@ The <tt>suggest</tt> method is a contribution to edit an existing row or add a n
   <tr>
     <td>user</td>
     <td>An arbitrary token representing the user contributing the data.</td>
-    <td><tt>new Metadata("my_username")</tt></td>
+    <td><tt>new Metadata().user("my_username")</tt></td>
   </tr>
   <tr>
     <td>comment</td>
     <td>Any english text comment that may help explain your corrections.</td>
     <td><tt>metadata.comment("my comment")</tt></td>
-  </tr>
-  <tr>
-    <td>debug</td>
-    <td>Specify that you are only making a test query and that you don't want any actual data to be written - just to let you know if your query is valid.</td>
-    <td><tt>metadata.debug()</tt></td>
   </tr>
   <tr>
     <td>reference</td>

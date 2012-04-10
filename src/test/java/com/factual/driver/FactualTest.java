@@ -18,6 +18,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Maps;
 
 
 /**
@@ -61,25 +62,24 @@ public class FactualTest {
    * Find rows in the global places database in the United States
    */
   @Test
+  @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
   public void testCoreExample1() {
     ReadResponse resp = factual.fetch("places",
         new Query().field("country").equal("US"));
 
     assertOk(resp);
     assertAll(resp, "country", "US");
-    Query raw = new Query()
-    .addJsonParam("filters", new HashMap() {  
-		{  
-			put("country", new HashMap(){
-				{
-					put("$eq", "US");	    
-				}
-			});
-	    }  
-	});
-    ReadResponse respRaw = factual.fetch("places", raw);
     
-    assertEquals(resp.getJson(), respRaw.getJson());
+    Map<String, Object> params = Maps.newHashMap();
+    params.put("filters", JsonUtil.toJsonStr(
+		new HashMap() {{  
+			put("country", new HashMap() {{
+				put("$eq", "US");	    
+			}});
+		}})
+    );
+    String respRaw = factual.get("t/places", params);
+    assertEquals(resp.getJson(), respRaw);
   }
 
   /**
@@ -87,6 +87,7 @@ public class FactualTest {
    * return both the data and a total count of the matched rows.
    */
   @Test
+  @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
   public void testCoreExample2() {
     ReadResponse resp = factual.fetch("places", new Query()
     .field("name").beginsWith("Star")
@@ -95,19 +96,17 @@ public class FactualTest {
     assertOk(resp);
     assertStartsWith(resp, "name", "Star");
 
-    Query raw = new Query()
-    .addJsonParam("filters", new HashMap() {  
-		{  
-			put("name", new HashMap(){
-				{
+    Map<String, Object> params = Maps.newHashMap();
+    params.put("filters", JsonUtil.toJsonStr(
+		new HashMap() {{  
+			put("name", new HashMap() {{
 					put("$bw", "Star");	    
-				}
-			});
-	    }  
-	})
-	.addParam("include_count", true);
-    ReadResponse respRaw = factual.fetch("places", raw);
-    assertEquals(resp.getJson(), respRaw.getJson());
+			}});
+	    }})
+    );
+	params.put("include_count", true);
+    String respRaw = factual.get("t/places", params);
+    assertEquals(resp.getJson(), respRaw);
   }
 
   /**
@@ -120,11 +119,11 @@ public class FactualTest {
     .search("Fried Chicken, Los Angeles"));
 
     assertOk(resp);
-    
-    Query raw = new Query()
-    .addParam("q", "Fried Chicken, Los Angeles");
-    ReadResponse respRaw = factual.fetch("places", raw);
-    assertEquals(resp.getJson(), respRaw.getJson());
+
+    Map<String, Object> params = Maps.newHashMap();
+    params.put("q", "Fried Chicken, Los Angeles");
+    String respRaw = factual.get("t/places", params);
+    assertEquals(resp.getJson(), respRaw);
 
   }
 
@@ -142,13 +141,13 @@ public class FactualTest {
     assertOk(resp);
     assertEquals(5, resp.getData().size());
 
-    Query raw = new Query()
-    .addParam("q", "Fried Chicken, Los Angeles")
-    .addParam("offset", 20)
-    .addParam("limit", 5);
-    ReadResponse respRaw = factual.fetch("places", raw);
-    assertEquals(resp.getJson(), respRaw.getJson());
-
+    Map<String, Object> params = Maps.newHashMap();
+    params.put("q", "Fried Chicken, Los Angeles");
+    params.put("offset", 20);
+    params.put("limit", 5);
+    String respRaw = factual.get("t/places", params);
+    assertEquals(resp.getJson(), respRaw);
+    
   }
 
   /**
@@ -156,6 +155,7 @@ public class FactualTest {
    * within 5000 meters of the specified lat/lng
    */
   @Test
+  @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
   public void testCoreExample5() {
     ReadResponse resp = factual.fetch("places", new Query()
     .field("name").equal("Stand")
@@ -163,31 +163,31 @@ public class FactualTest {
     assertNotEmpty(resp);
     assertOk(resp);
 
-    Query raw = new Query()
-    .addJsonParam("geo", new HashMap() {  
-		{  
-			put("$circle", new HashMap(){
-				{
+    Map<String, Object> params = Maps.newHashMap();
+    params.put("geo", JsonUtil.toJsonStr(
+    	new HashMap() {{  
+			put("$circle", new HashMap() {{
 					put("$center", new String[]{Double.toString(latitude), Double.toString(longitude)});	    
 					put("$meters", meters);
-				}
-			});
-	    }  
-	})
-	.addJsonParam("filters", new HashMap() {  
-		{  
-			put("name", new HashMap(){
-				{
-					put("$eq", "Stand");	    
-				}
-			});
-	    }  
-	});
-    ReadResponse respRaw = factual.fetch("places", raw);
-    assertEquals(resp.getJson(), respRaw.getJson());
+			}});
+	    }})
+    );
+    params.put("filters", JsonUtil.toJsonStr(
+		new HashMap() {{  
+			put("name", new HashMap(){{
+				put("$eq", "Stand");	    
+			}});
+	    }}
+	 )
+   );
+
+    String respRaw = factual.get("t/places", params);
+    assertEquals(resp.getJson(), respRaw);
+
   }
 
   @Test
+  @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
   public void testSort_byDistance() {
 
     ReadResponse resp = factual.fetch("places", new Query()
@@ -198,16 +198,19 @@ public class FactualTest {
     assertOk(resp);
     assertAscendingDoubles(resp, "$distance");
     
-    Query raw = new Query()
-    .addJsonParam("geo", new HashMap() {{  
-		put("$circle", new HashMap(){{
-			put("$center", new String[]{Double.toString(latitude), Double.toString(longitude)});	    
-			put("$meters", meters);
-		}});
-	}})
-	.addParam("sort", "$distance:asc");
-    ReadResponse respRaw = factual.fetch("places", raw);
-    assertEquals(resp.getJson(), respRaw.getJson());
+    Map<String, Object> params = Maps.newHashMap();
+    params.put("geo", JsonUtil.toJsonStr(
+		new HashMap() {{  
+			put("$circle", new HashMap(){{
+				put("$center", new String[]{Double.toString(latitude), Double.toString(longitude)});	    
+				put("$meters", meters);
+			}});
+		}})
+    );
+	params.put("sort", "$distance:asc");
+
+	String respRaw = factual.get("t/places", params);
+    assertEquals(resp.getJson(), respRaw);
         
   }
 
@@ -215,6 +218,7 @@ public class FactualTest {
    * {"$and":[{"name":{"$bw":"McDonald's"},"category":{"$bw":"Food & Beverage"}}]}
    */
   @Test
+  @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
   public void testRowFilters_2beginsWith() {
     ReadResponse resp = factual.fetch("places", new Query()
     .field("name").beginsWith("McDonald's")
@@ -224,9 +228,9 @@ public class FactualTest {
     assertStartsWith(resp, "name", "McDonald");
     assertStartsWith(resp, "category", "Food & Beverage");
 
-    Query raw = new Query()
-    .addJsonParam("filters", 
-    	new HashMap() {{  
+    Map<String, Object> params = Maps.newHashMap();
+    params.put("filters", JsonUtil.toJsonStr(
+		new HashMap() {{  
 			put("$and", new Map[] {
 				new HashMap() {{
 					put("name", new HashMap() {{
@@ -236,14 +240,16 @@ public class FactualTest {
 						put("$bw", "Food & Beverage");
 					}});
 				}}});
-    	}});
+    	}})
+    );
 
-    ReadResponse respRaw = factual.fetch("places", raw);
-    assertEquals(resp.getJson(), respRaw.getJson());
+	String respRaw = factual.get("t/places", params);
+    assertEquals(resp.getJson(), respRaw);
 
   }
 
   @Test
+  @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
   public void testIn() {
     Query q = new Query().field("region").in("CA", "NM", "FL");
     ReadResponse resp = factual.fetch("places", q);
@@ -252,18 +258,17 @@ public class FactualTest {
     assertNotEmpty(resp);
     assertIn(resp, "region", "CA", "NM", "FL");
     
-    Query raw = new Query()
-    .addJsonParam("filters", new HashMap() {  
-		{  
-			put("region", new HashMap(){
-				{
-					put("$in", new String[]{"CA", "NM", "FL"});	    
-				}
-			});
-	    }  
-	});
-    ReadResponse respRaw = factual.fetch("places", raw);
-    assertEquals(resp.getJson(), respRaw.getJson());
+    Map<String, Object> params = Maps.newHashMap();
+    params.put("filters", JsonUtil.toJsonStr(
+		new HashMap() {{  
+			put("region", new HashMap(){{
+				put("$in", new String[]{"CA", "NM", "FL"});	    
+			}});
+	    }})
+    );
+
+	String respRaw = factual.get("t/places", params);
+    assertEquals(resp.getJson(), respRaw);    
     
   }
 
@@ -446,46 +451,46 @@ public class FactualTest {
     ReadResponse resp = factual.fetch("places", select);
     assertOk(resp);
     assertAll(resp, "country", "US");
-    Query raw = new Query()
-    .addJsonParam("filters", new HashMap() {  
-		{  
-			put("country", new HashMap(){
-				{
-					put("$eq", "US");	    
-				}
-			});
-	    }  
-	})
-	.addParam("select", "address,country");
-    ReadResponse respRaw = factual.fetch("places", raw);
     
-    assertEquals(resp.getJson(), respRaw.getJson());	  
+    Map<String, Object> params = Maps.newHashMap();
+    params.put("filters", JsonUtil.toJsonStr(
+		new HashMap() {{  
+			put("country", new HashMap(){{
+				put("$eq", "US");	    
+			}});
+	    }})
+    );
+	params.put("select", "address,country");
+	String respRaw = factual.get("t/places", params);
+    assertEquals(resp.getJson(), respRaw);      
+
   }
   
   @Test
   @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
   public void testCustomRead1() {
-    CustomQuery q = new CustomQuery()
-    .addJsonParam("filters", new HashMap() {  
-		{  
-			put("region", new HashMap(){
-				{
-					put("$in", new String[]{"CA", "NM", "FL"});	    
-				}
-			});
-	    }  
-	});
-    String respString = factual.fetch("t/places", q);
+	  
+    Map<String, Object> params = Maps.newHashMap();
+    params.put("filters", JsonUtil.toJsonStr(
+		new HashMap() {{  
+			put("region", new HashMap(){{
+				put("$in", new String[]{"CA", "NM", "FL"});	    
+			}});
+	    }})
+    );
+	params.put("select", "address,country");
+	String respString = factual.get("t/places", params);	  
+	  
     assertTrue(respString != null && respString.length() > 0);
   }
   
   @Test
-  @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
   public void testCustomRead2() {
-    CustomQuery q = new CustomQuery()
-    .addParam("select", "name,category")
-    .addParam("include_count", true);
-    String respString = factual.fetch("t/places", q);
+    Map<String, Object> params = Maps.newHashMap();
+    params.put("select", "name,category");
+    params.put("include_count", true);
+    
+    String respString = factual.get("t/places", params);
     assertTrue(respString != null && respString.length() > 0);
   }
 
@@ -545,7 +550,7 @@ public class FactualTest {
   public void testSuggestAdd() {
 	Suggest write = new Suggest()
     .setValue("longitude", 100);
-	SuggestResponse resp = factual.suggest("global", write, new Metadata("Brandon Yoshimoto").debug());
+	SuggestResponse resp = factual.suggest("global", write, new Metadata().user("testuser"));
 	//printSuggestResponse(resp);
 	//System.out.println(resp.getJson());
     assertOk(resp);
@@ -556,7 +561,7 @@ public class FactualTest {
   public void testSuggestEdit() {
 	Suggest write = new Suggest()
     .setValue("longitude", 100);
-	SuggestResponse resp = factual.suggest("global", "0545b03f-9413-44ed-8882-3a9a461848da",write, new Metadata("Brandon Yoshimoto").debug());
+	SuggestResponse resp = factual.suggest("global", "0545b03f-9413-44ed-8882-3a9a461848da",write, new Metadata().user("testuser"));
     assertOk(resp);
     assertFalse(resp.isNewEntity());
   }
@@ -565,7 +570,7 @@ public class FactualTest {
   public void testSuggestDelete() {
 	Suggest write = new Suggest()
     .makeBlank("longitude");
-	SuggestResponse resp = factual.suggest("global", "0545b03f-9413-44ed-8882-3a9a461848da",write, new Metadata("Brandon Yoshimoto").debug());
+	SuggestResponse resp = factual.suggest("global", "0545b03f-9413-44ed-8882-3a9a461848da",write, new Metadata().user("testuser"));
     assertOk(resp);
     assertFalse(resp.isNewEntity());
   }
@@ -576,7 +581,7 @@ public class FactualTest {
     .makeBlank("longitude");
 	FactualApiException exception = null;
 	try {
-		SuggestResponse resp = factual.suggest("global", "randomwrongid", write, new Metadata("Brandon Yoshimoto").debug());
+		SuggestResponse resp = factual.suggest("global", "randomwrongid", write, new Metadata().user("testuser"));
 	} catch (FactualApiException e) {
 		exception = e;
 	}
@@ -585,8 +590,7 @@ public class FactualTest {
   
   @Test
   public void testFlag() {
-	Flag flag = Flag.spam();
-	FlagResponse resp = factual.flag("global", "0545b03f-9413-44ed-8882-3a9a461848da", flag, new Metadata("Brandon Yoshimoto").debug());
+	FlagResponse resp = factual.flag("global", "0545b03f-9413-44ed-8882-3a9a461848da", FlagType.SPAM, new Metadata().user("testuser"));
 	System.out.println(resp.getJson());
   }
 
