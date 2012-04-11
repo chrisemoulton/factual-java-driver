@@ -375,9 +375,11 @@ The <tt>resolve</tt> method gives you the one full match if there is one, or nul
 
 # Raw Read
 
-You can perform any read queries documented in the Factual API using the <tt>factual.get(…)</tt> API. Add parameters to your request by building a map of field and value pairs, and a GET request will be made using your OAuth token.  The driver will URL-encode the parameter values.
+Factual may occasionally release a new API which is not immediately supported by the Java driver.  To test queries against these APIs, we recommend using the raw read API.  The recommendation is to only construct a raw read query if the feature is not yet supported using other convenience methods.
 
-<p>As a convenience, use <tt>JsonUtil.toJsonStr(object)</tt> to serialize Java objects to json format before adding a parameter.  The object can contain maps, collections, primitive types, etc.
+<p>You can perform any GET request using the <tt>factual.get(…)</tt> method. Add parameters to your request by building a map of field and value pairs, and the request will be made using your OAuth token.  The driver will URL-encode the parameter values.
+
+<p>For convenience, use <tt>JsonUtil.toJsonStr(object)</tt> to serialize Java objects to the json format before adding a parameter.  The object can contain maps, collections, primitive types, etc., making it easier to guarantee a valid json string.
 
 ## Example Raw Read Queries
 
@@ -400,18 +402,22 @@ Fetch 10 items from the places table in California, New Mexico, or Florida:
 	);
 	params.put("limit", 10);
     String respString = factual.fetch("t/places", params);
+    
+Note that the above examples demonstrate the ability to construct read queries using the raw read feature.  However, in practice, the recommendation is to always use the convenience classes for features which are supported.  In the above cases, a Query object should be used.
 
 
 # Debug Mode
 
 To see a full trace of debug information for a request and response, set debug mode to true.  There are two ways to do so:<p>
-Use the <tt>Factual</tt> constructor:
+Use the <tt>Factual</tt> constructor to enable debug on a new instance:
 
 	Factual factual = new Factual(key, secret, true);
 
-or modify an existing instance:
+or modify an existing instance to toggle debug mode on and off for individual requests:
 	
 	factual.debug(true);
+	factual.fetch(…);
+	factual.debug(false);
 	
 Debug information will be printed to standard out, with request and response information, including headers.
 
@@ -481,14 +487,14 @@ The <tt>fetch</tt> method gives the facet counts:
 
 # Flag
 
-The driver fully supports Factual's Flag feature, which lets enables flagging problematic rows in Factual tables. Use this method if you are requesting for an entity to be deleted or merged into a duplicate record.
+The driver fully supports Factual's Flag feature, which enables flagging problematic rows in Factual tables. Use this feature if you are requesting for an entity to be deleted or merged into a duplicate record.
 
 ## Simple Flag Example
 
 The <tt>flag</tt> method flags a problematic row:
 
-    // Flag a row as spam
-	FlagResponse resp = factual.flag("global", "0545b03f-9413-44ed-8882-3a9a461848da", FlagType.SPAM, new Metadata().user("my_username"));
+    // Flag a row as inaccurate
+	FlagResponse resp = factual.flagInaccurate("global", "0545b03f-9413-44ed-8882-3a9a461848da", new Metadata().user("my_username"));
 
 ## All Top Level Flag Parameters
 
@@ -501,7 +507,12 @@ The <tt>flag</tt> method flags a problematic row:
   <tr>
     <td>problem</td>
     <td>One of: duplicate, inaccurate, inappropriate, nonexistent, spam, or other.</td>
-    <td><tt>factual.flag(table, factualId, FlagType.SPAM, metadata)</tt></td>
+    <td><tt>factual.flagDuplicate(table, factualId, metadata)</tt>
+	    <p><tt>factual.flagInaccurate(table, factualId, metadata)</tt>	    <p><tt>factual.flagInappropriate(table, factualId, metadata)</tt>
+	    <p><tt>factual.flagNonExistent(table, factualId, metadata)</tt>
+	    <p><tt>factual.flagSpam(table, factualId, metadata)</tt>
+	    <p><tt>factual.flagOther(table, factualId, metadata)</tt>
+	    </td>
   </tr>
   <tr>
     <td>user</td>

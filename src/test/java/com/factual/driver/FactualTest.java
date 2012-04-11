@@ -589,11 +589,41 @@ public class FactualTest {
   }
   
   @Test
-  public void testFlag() {
-	FlagResponse resp = factual.flag("global", "0545b03f-9413-44ed-8882-3a9a461848da", FlagType.SPAM, new Metadata().user("testuser"));
+  public void testFlagDuplicate() {
+	FlagResponse resp = factual.flagDuplicate("global", "0545b03f-9413-44ed-8882-3a9a461848da", new Metadata().user("testuser"));
+	System.out.println(resp.getJson());
+  }
+  
+  @Test
+  public void testFlagInaccurate() {
+	FlagResponse resp = factual.flagInaccurate("global", "0545b03f-9413-44ed-8882-3a9a461848da", new Metadata().user("testuser"));
 	System.out.println(resp.getJson());
   }
 
+  @Test
+  public void testFlagInappropriate() {
+	FlagResponse resp = factual.flagInappropriate("global", "0545b03f-9413-44ed-8882-3a9a461848da", new Metadata().user("testuser"));
+	System.out.println(resp.getJson());
+  }  
+
+  @Test
+  public void testFlagNonExistent() {
+	FlagResponse resp = factual.flagNonExistent("global", "0545b03f-9413-44ed-8882-3a9a461848da", new Metadata().user("testuser"));
+	System.out.println(resp.getJson());
+  }  
+  
+  @Test
+  public void testFlagSpam() {
+	FlagResponse resp = factual.flagSpam("global", "0545b03f-9413-44ed-8882-3a9a461848da", new Metadata().user("testuser"));
+	System.out.println(resp.getJson());
+  }  
+
+  @Test
+  public void testFlagOther() {
+	FlagResponse resp = factual.flagOther("global", "0545b03f-9413-44ed-8882-3a9a461848da", new Metadata().user("testuser"));
+	System.out.println(resp.getJson());
+  }  
+  
   @Test
   public void testDiff() {
 	Diffs diff = new Diffs(1318890505254L);

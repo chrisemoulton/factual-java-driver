@@ -79,8 +79,8 @@ public class Metadata {
 		return queryParams.toUrlQuery(true);
 	}
 
-	public Map<String, Object> toMap() {
-		return queryParams.toMap();
+	protected Map<String, String> toParamMap() {
+		return queryParams.toParamMap();
 	}
 	
 }

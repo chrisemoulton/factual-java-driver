@@ -149,22 +149,100 @@ public class Factual {
   }
   
   /**
-   * Runs a <tt>flag</tt> input against the specified Factual table.
+   * Flags a row as a duplicate in the specified Factual table.
    * 
    * @param tableName
-   * 		  the name of the table you wish to flag updates for (e.g., "places")
+   * 		  the name of the table you wish to flag a duplicate for (e.g., "places")
    * @param factualId
-   * 		  the factual id on which the flag is run
-   * @param flag
-   * 		  the flag parameters to run against <tt>table</tt>
+   * 		  the factual id that is the duplicate
    * @param metadata
    * 		  the metadata to send with information on this request
    * 	  	 
-   * @return the response of running <tt>flag</tt> against Factual.
+   * @return the response from flagging a duplicate row.
    */
-  public FlagResponse flag(String tableName, String factualId, FlagType flag, Metadata metadata) {
-	return flagCustom("t/"+tableName+"/"+factualId+"/flag", flag, metadata);
+  public FlagResponse flagDuplicate(String tableName, String factualId, Metadata metadata) {
+	return flagCustom(urlForFlag(tableName, factualId), "duplicate", metadata);
   }
+
+  /**
+   * Flags a row as inaccurate in the specified Factual table.
+   * 
+   * @param tableName
+   * 		  the name of the table you wish to flag an inaccurate row for (e.g., "places")
+   * @param factualId
+   * 		  the factual id that is inaccurate
+   * @param metadata
+   * 		  the metadata to send with information on this request
+   * 	  	 
+   * @return the response from flagging an inaccurate row.
+   */
+  public FlagResponse flagInaccurate(String tableName, String factualId, Metadata metadata) {
+	return flagCustom(urlForFlag(tableName, factualId), "inaccurate", metadata);
+  }  
+  
+  /**
+   * Flags a row as inappropriate in the specified Factual table.
+   * 
+   * @param tableName
+   * 		  the name of the table you wish to flag an inappropriate row for (e.g., "places")
+   * @param factualId
+   * 		  the factual id that is inappropriate
+   * @param metadata
+   * 		  the metadata to send with information on this request
+   * 	  	 
+   * @return the response from flagging an inappropriate row.
+   */
+  public FlagResponse flagInappropriate(String tableName, String factualId, Metadata metadata) {
+	return flagCustom(urlForFlag(tableName, factualId), "inappropriate", metadata);
+  }
+
+  /**
+   * Flags a row as non-existent in the specified Factual table.
+   * 
+   * @param tableName
+   * 		  the name of the table you wish to flag a non-existent row for (e.g., "places")
+   * @param factualId
+   * 		  the factual id that is non-existent
+   * @param metadata
+   * 		  the metadata to send with information on this request
+   * 	  	 
+   * @return the response from flagging a non-existent row.
+   */
+  public FlagResponse flagNonExistent(String tableName, String factualId, Metadata metadata) {
+	return flagCustom(urlForFlag(tableName, factualId), "nonexistent", metadata);
+  }  
+
+  /**
+   * Flags a row as spam in the specified Factual table.
+   * 
+   * @param tableName
+   * 		  the name of the table you wish to flag a row as spam (e.g., "places")
+   * @param factualId
+   * 		  the factual id that is spam
+   * @param metadata
+   * 		  the metadata to send with information on this request
+   * 	  	 
+   * @return the response from flagging a row as spam.
+   */
+  public FlagResponse flagSpam(String tableName, String factualId, Metadata metadata) {
+	return flagCustom(urlForFlag(tableName, factualId), "spam", metadata);
+  }   
+  
+  /**
+   * Flags a row as problematic in the specified Factual table.
+   * 
+   * @param tableName
+   * 		  the name of the table for which you wish to flag as problematic (e.g., "places")
+   * @param factualId
+   * 		  the factual id that has a problem other than duplicate, inaccurate, inappropriate, non-existent, or spam.
+   * @param metadata
+   * 		  the metadata to send with information on this request
+   * 	  	 
+   * @return the response from flagging a row as problematic.
+   */
+  public FlagResponse flagOther(String tableName, String factualId, Metadata metadata) {
+	return flagCustom(urlForFlag(tableName, factualId), "other", metadata);
+  }  
   
   /**
    * Runs a "GET" request against the path specified using the parameters specified and your Oauth token.
@@ -198,16 +276,16 @@ public class Factual {
   }
   
   private SuggestResponse suggestCustom(String root, Suggest input, Metadata metadata) {
-	Map<String, Object> params = Maps.newHashMap();
-	params.putAll(metadata.toMap());
-	params.putAll(input.toMap());
+	Map<String, String> params = Maps.newHashMap();
+	params.putAll(metadata.toParamMap());
+	params.putAll(input.toParamMap());
 	return new SuggestResponse(requestPost(factHome + root, params));
   }
 
-  private FlagResponse flagCustom(String root, FlagType flag, Metadata metadata) {
-	Map<String, Object> params = Maps.newHashMap();
-	params.putAll(metadata.toMap());
-	params.put("problem", flag.toApiString());
+  private FlagResponse flagCustom(String root, String flagType, Metadata metadata) {
+	Map<String, String> params = Maps.newHashMap();
+	params.putAll(metadata.toParamMap());
+	params.put("problem", flagType);
 	return new FlagResponse(requestPost(factHome + root, params));
   }
   
@@ -418,6 +496,10 @@ public class Factual {
   private String urlForFetch(String tableName) {
     return "t/" + tableName;
   }
+
+  private String urlForFlag(String tableName, String factualId) {
+	return "t/"+tableName+"/"+factualId+"/flag";
+  }
   
   private String request(String urlStr) {
 	  return request(urlStr, true);
@@ -427,15 +509,15 @@ public class Factual {
 	  return request(urlStr, "GET", null, useOAuth);
   }
 
-  private String requestPost(String urlStr, Map<String, Object> postData) {
+  private String requestPost(String urlStr, Map<String, String> postData) {
 	  return requestPost(urlStr, postData, true);
   }
 
-  private String requestPost(String urlStr, Map<String, Object> postData, boolean useOAuth) {
+  private String requestPost(String urlStr, Map<String, String> postData, boolean useOAuth) {
 	  return request(urlStr, "POST", postData, useOAuth);
   }
   
-  private String request(String urlStr, String requestMethod, Map<String, Object> postData, boolean useOAuth) {
+  private String request(String urlStr, String requestMethod, Map<String, String> postData, boolean useOAuth) {
     GenericUrl url = new GenericUrl(urlStr);
     // Configure OAuth request params
     OAuthParameters params = new OAuthParameters();

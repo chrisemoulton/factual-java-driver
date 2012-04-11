@@ -58,8 +58,8 @@ public class Suggest {
 		return this;
 	}
 
-	protected Map<String, Object> toMap() {
-		return queryParams.toMap();
+	protected Map<String, String> toParamMap() {
+		return queryParams.toParamMap();
 	}
 
 }

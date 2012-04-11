@@ -267,10 +267,10 @@ public class Parameters {
 		}
 	}
 
-	protected Map<String, Object> toMap() {
-		Map<String, Object> map = Maps.newHashMap();
+	protected Map<String, String> toParamMap() {
+		Map<String, String> map = Maps.newHashMap();
 		for (Object key : params.keySet()) {
-			map.put(String.valueOf(key), params.get(key).toString());
+			map.put(String.valueOf(key), String.valueOf(params.get(key).toString()));
 		}
 		return map;
 	}
