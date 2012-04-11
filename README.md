@@ -390,25 +390,26 @@ Fetch only the name and category fields, including the row count in the response
     params.put("include_count", true);
     String respString = factual.get("t/places", params);
     
-Fetch 10 items from the places table in California, New Mexico, or Florida:
+Fetch 10 items from the "t/places" table in California, New Mexico, or Florida:
 
     Map<String, Object> params = new HashMap<String, Object>()
     params.put("filters", JsonUtil.toJsonStr(
     		new HashMap() {{  
 				put("region", new HashMap() {{
-					put("$in", new String[]{"CA", "NM", "FL"});				}});
+					put("$in", new String[]{"CA", "NM", "FL"});
+				}});
 			}}
 		)
 	);
 	params.put("limit", 10);
     String respString = factual.fetch("t/places", params);
     
-Note that the above examples demonstrate the ability to construct read queries using the raw read feature.  However, in practice, the recommendation is to always use the convenience classes for features which are supported.  In the above cases, a Query object should be used.
+Note that the above examples demonstrate the ability to construct read queries using the raw read feature.  However, in practice, the recommendation is to always use the convenience classes for features which are supported.  In the above cases, a Query object should be used instead.
 
 
 # Debug Mode
 
-To see a full trace of debug information for a request and response, set debug mode to true.  There are two ways to do so:<p>
+To see a full trace of debug information for a request and response, turn debug mode on.  There are two ways to do so:<p>
 Use the <tt>Factual</tt> constructor to enable debug on a new instance:
 
 	Factual factual = new Factual(key, secret, true);
@@ -419,7 +420,7 @@ or modify an existing instance to toggle debug mode on and off for individual re
 	factual.fetch(…);
 	factual.debug(false);
 	
-Debug information will be printed to standard out, with request and response information, including headers.
+Debug information will be printed to standard out, with detailed request and response information, including headers.
 
 # Facet
 
