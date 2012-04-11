@@ -34,7 +34,7 @@ public class ReadResponse extends Response implements Tabular {
     try{
       JSONObject rootJsonObj = new JSONObject(json);
       Response.withMeta(this, rootJsonObj);
-      data = JsonUtil.data(rootJsonObj.getJSONObject("response").getJSONArray("data"));
+      data = JsonUtil.data(rootJsonObj.getJSONObject(Constants.RESPONSE).getJSONArray(Constants.QUERY_DATA));
     } catch (JSONException e) {
       throw new RuntimeException(e);
     }

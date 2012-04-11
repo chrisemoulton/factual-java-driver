@@ -59,7 +59,7 @@ public class MultiResponse extends Response {
 					resp = new CrosswalkResponse(responseJson);
 			   } else if (type instanceof ResolveQuery) {
 					resp = new ReadResponse(responseJson);
-			   } else if (type instanceof Facet) {
+			   } else if (type instanceof FacetQuery) {
 					resp = new FacetResponse(responseJson);
 			   }
 			   if (resp != null)

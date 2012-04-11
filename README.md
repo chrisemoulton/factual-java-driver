@@ -375,7 +375,7 @@ The <tt>resolve</tt> method gives you the one full match if there is one, or nul
 
 # Raw Read
 
-Factual may occasionally release a new API which is not immediately supported by the Java driver.  To test queries against these APIs, we recommend using the raw read API.  The recommendation is to only construct a raw read query if the feature is not yet supported using other convenience methods.
+Factual may occasionally release a new API which is not immediately supported by the Java driver.  To test queries against these APIs, we recommend using the raw read feature.  The recommendation is to only construct a raw read query if the feature is not yet supported using other convenience methods.
 
 <p>You can perform any GET request using the <tt>factual.get(…)</tt> method. Add parameters to your request by building a map of field and value pairs, and the request will be made using your OAuth token.  The driver will URL-encode the parameter values.
 
@@ -432,10 +432,10 @@ Not all fields are configured to return facet counts.  To determine what fields 
 The <tt>fetch</tt> method gives the facet counts:
 
     // Get facet counts for the specified fields
-    FacetResponse resp = factual.fetch(new Facet("region", "locality")
+    FacetResponse resp = factual.fetch(new FacetQuery("region", "locality")
 	.search("Starbucks")
-	.facetLimit(20)
-	.minCount(100));
+	.maxValuesPerFacet(20)
+	.minCountPerFacetValue(100));
 
 ## All Top Level Facet Parameters
 
@@ -448,17 +448,17 @@ The <tt>fetch</tt> method gives the facet counts:
   <tr>
     <td>select</td>
     <td>The fields for which facets should be generated. The response will not be ordered identically to this list, nor will it reflect any nested relationships between fields.</td>
-    <td><tt>f.select("region", "locality");</tt><p><tt>new Facet("region", "locality");</tt></td>
+    <td><tt>new Facet("region", "locality");</tt></td>
   </tr>
   <tr>
     <td>min count</td>
-    <td>For each facet count, the minimum count it must show in order to be returned in the response. Must be zero or greater. The default is 1.</td>
-    <td><tt>f.minCount(2)</tt></td>
+    <td>For each facet value count, the minimum count it must show in order to be returned in the response. Must be zero or greater. The default is 1.</td>
+    <td><tt>f.minCountPerFacetValue(2)</tt></td>
   </tr>
   <tr>
     <td>limit</td>
-    <td>The maximum number of unique facets that can be returned for a single field. Range is 1-250. The default is 25.</td>
-    <td><tt>f.facetLimit(10)</tt></td>
+    <td>The maximum number of unique facet values that can be returned for a single field. Range is 1-250. The default is 25.</td>
+    <td><tt>f.maxValuesPerFacet(10)</tt></td>
   </tr>
   <tr>
     <td>filters</td>
@@ -569,7 +569,7 @@ The <tt>suggest</tt> method is a contribution to edit an existing row or add a n
   <tr>
     <td>values</td>
     <td>A JSON hash field of names and values to be added to a Factual table</td>
-    <td>Update a value:<p><tt>s.setValue("longitude", 100)</tt><p>Make a value blank:<p><tt>s.makeBlank("longitude")</tt></td>
+    <td>Update a value:<p><tt>s.setValue("longitude", 100)</tt><p>Make a value blank:<p><tt>s.removeValue("longitude")</tt></td>
   </tr>
   <tr>
     <td>user</td>
@@ -597,7 +597,7 @@ The driver fully supports Factual's experimental Diffs feature, which enables Fa
 The <tt>fetch</tt> method gives the diff data:
 
 	// Fetch a diffs response
-	Diffs diffs = new Diffs(1318890505254L);
+	DiffsQuery diffs = new DiffsQuery(1318890505254L);
 	DiffsResponse resp = factual.fetch("places", diffs);
 
 ## All Top Level Facet Parameters

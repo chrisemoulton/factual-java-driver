@@ -12,20 +12,20 @@ import com.factual.data_science_toolkit.DataScienceToolkit;
  * 
  * @author brandon
  */
-public class Facet implements Filterable {
+public class FacetQuery implements Filterable {
 
 	private boolean includeRowCount;
 
 	/**
 	 * Constructor.
-	 * @param fields fields to select for facet counts
+	 * @param fields fields for which facets will be generated
 	 */
-	public Facet(String... fields) {
+	public FacetQuery(String... fields) {
 		select(fields);
 	}
 
 	/**
-	 * Holds all parameters for this Query.
+	 * Holds all parameters for this FacetQuery.
 	 */
 	private final Parameters queryParams = new Parameters();
 
@@ -33,7 +33,7 @@ public class Facet implements Filterable {
 		Parameters additional = null;
 		if (includeRowCount) {
 			additional = new Parameters();
-			additional.setParam("include_count",true);
+			additional.setParam(Constants.INCLUDE_COUNT,true);
 		}
 		return queryParams.toUrlQuery(additional, true);
 	}
@@ -42,42 +42,42 @@ public class Facet implements Filterable {
 	 * Set a parameter and value pair for specifying url parameters, specifically those not yet available as convenience methods.
 	 * @param key the field name of the parameter to add
 	 * @param value the field value that will be serialized using value.toString()
-	 * @return this Facet
+	 * @return this FacetQuery
 	 */
-	private Facet addParam(String key, Object value) {
+	private FacetQuery addParam(String key, Object value) {
 		queryParams.setParam(key, value);
 		return this;
 	}
 
 	/**
-	 * For each facet count, the minimum count it must show in order to be returned in the response. Must be zero or greater. The default is 1.
-	 * @param minCount for each facet count, the minimum count it must show in order to be returned in the response. Must be zero or greater. The default is 1.
+	 * For each facet value count, the minimum number of results it must have in order to be returned in the response. Must be zero or greater. The default is 1.
+	 * @param minCount for each facet value count, the minimum number of results it must have in order to be returned in the response. Must be zero or greater. The default is 1.
 	 * 
-	 * @return this Facet
+	 * @return this FacetQuery
 	 */
-	public Facet minCount(long minCount) {
-		addParam("min_count", minCount);
+	public FacetQuery minCountPerFacetValue(long minCount) {
+		addParam(Constants.FACET_MIN_COUNT_PER_FACET_VALUE, minCount);
 		return this;
 	}
 
 	/**
-	 * The maximum number of unique facets that can be returned for a single field. Range is 1-250. The default is 25.
-	 * @param facetLimit the maximum number of unique facets that can be returned for a single field. Range is 1-250. The default is 25.
-	 * @return this Facet
+	 * The maximum number of unique facet values that can be returned for a single field. Range is 1-250. The default is 25.
+	 * @param maxValuesPerFacet the maximum number of unique facet values that can be returned for a single field. Range is 1-250. The default is 25.
+	 * @return this FacetQuery
 	 */
-	public Facet facetLimit(long facetLimit) {
-		addParam("limit", facetLimit);
+	public FacetQuery maxValuesPerFacet(long maxValuesPerFacet) {
+		addParam(Constants.FACET_MAX_VALUES_PER_FACET, maxValuesPerFacet);
 		return this;
 	}
 
 	/**
 	 * The fields for which facets should be generated. The response will not be ordered identically to this list, nor will it reflect any nested relationships between fields.
 	 * @param fields the fields for which facets should be generated. The response will not be ordered identically to this list, nor will it reflect any nested relationships between fields.
-	 * @return this Facet
+	 * @return this FacetQuery
 	 */
-	public Facet select(String... fields) {
+	private FacetQuery select(String... fields) {
 		for (String field : fields) {
-			queryParams.addCommaSeparatedParam("select", field);
+			queryParams.addCommaSeparatedParam(Constants.FACET_SELECT, field);
 		}
 		return this;
 	}
@@ -89,25 +89,25 @@ public class Facet implements Filterable {
      * 
      * @param term
      *          the text for which to perform a full text search.
-     * @return this Facet
+     * @return this FacetQuery
      */
-	public Facet search(String term) {
-		addParam("q", term);
+	public FacetQuery search(String term) {
+		addParam(Constants.SEARCH, term);
 		return this;
 	}
 
 	/**
-	 * Begins construction of a new row filter for this Facet.
+	 * Begins construction of a new row filter for this FacetQuery.
 	 * 
 	 * @param field
 	 *            the name of the field on which to filter.
 	 * @return A partial representation of the new row filter.
 	 */
-	public QueryBuilder<Facet> field(String field) {
-		return new QueryBuilder<Facet>(this, field);
+	public QueryBuilder<FacetQuery> field(String field) {
+		return new QueryBuilder<FacetQuery>(this, field);
 	}
 
-	public Facet near(String text, int meters) {
+	public FacetQuery near(String text, int meters) {
 		Coord coord = new DataScienceToolkit().streetToCoord(text);
 		if (coord != null) {
 			return within(new Circle(coord, meters));
@@ -123,31 +123,31 @@ public class Facet implements Filterable {
 	 * 
 	 * @param circle
 	 *            The circle within which to bound the results.
-	 * @return this Facet.
+	 * @return this FacetQuery.
 	 */
-	public Facet within(Circle circle) {
-		queryParams.setParam("geo", circle);
+	public FacetQuery within(Circle circle) {
+		queryParams.setParam(Constants.FILTER_GEO, circle);
 		return this;
 	}
 
 	/**
 	 * Used to nest AND'ed predicates.
 	 */
-	public Facet and(Facet... queries) {
-		queryParams.popFilters("$and", queries);
+	public FacetQuery and(FacetQuery... queries) {
+		queryParams.popFilters(Constants.FILTER_AND, queries);
 		return this;
 	}
 
 	/**
 	 * Used to nest OR'ed predicates.
 	 */
-	public Facet or(Facet... queries) {
-		queryParams.popFilters("$or", queries);
+	public FacetQuery or(FacetQuery... queries) {
+		queryParams.popFilters(Constants.FILTER_OR, queries);
 		return this;
 	}
 
 	/**
-	 * Adds <tt>filter</tt> to this Facet.
+	 * Adds <tt>filter</tt> to this FacetQuery.
 	 */
 	@Override
 	public void add(Filter filter) {
@@ -160,9 +160,9 @@ public class Facet implements Filterable {
 	 * increase the time required to return a response. The default behavior is
 	 * to NOT include a row count.
 	 * 
-	 * @return this Facet, marked to return total row count when run.
+	 * @return this FacetQuery, marked to return total row count when run.
 	 */
-	public Facet includeRowCount() {
+	public FacetQuery includeRowCount() {
 		return includeRowCount(true);
 	}
 
@@ -176,9 +176,9 @@ public class Facet implements Filterable {
 	 *            true if you want the results to include a count of the total
 	 *            number of rows in the table that conform to the request based
 	 *            on included filters.
-	 * @return this Facet.
+	 * @return this FacetQuery.
 	 */
-	public Facet includeRowCount(boolean includeRowCount) {
+	public FacetQuery includeRowCount(boolean includeRowCount) {
 		this.includeRowCount = includeRowCount;
 		return this;
 	}

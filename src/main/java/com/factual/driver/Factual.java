@@ -110,7 +110,7 @@ public class Factual {
    * 		  the facet query to run against <tt>table</tt>
    * @return the response of running <tt>facet</tt> against Factual.
    */
-  public FacetResponse fetch(String tableName, Facet facet) {
+  public FacetResponse fetch(String tableName, FacetQuery facet) {
 	return fetchCustom(urlForFetch(tableName)+"/facets", facet);
   }
 
@@ -263,7 +263,7 @@ public class Factual {
 	return new ReadResponse(request(toUrl(factHome + root, query.toUrlQuery())));
   }
   
-  private FacetResponse fetchCustom(String root, Facet facet) {
+  private FacetResponse fetchCustom(String root, FacetQuery facet) {
 	return new FacetResponse(request(toUrl(factHome + root, facet.toUrlQuery())));
   }
   
@@ -293,11 +293,11 @@ public class Factual {
 	return root + "?" + parameters;
   }
 
-  public DiffsResponse fetch(String tableName, Diffs diff) {
+  public DiffsResponse fetch(String tableName, DiffsQuery diff) {
 	return fetchCustom(urlForFetch(tableName)+"/diffs", diff);
   }
 
-  private DiffsResponse fetchCustom(String root, Diffs diff) {
+  private DiffsResponse fetchCustom(String root, DiffsQuery diff) {
 	return new DiffsResponse(request(toUrl(factHome + root, diff.toUrlQuery())));
   }
 
@@ -350,7 +350,7 @@ public class Factual {
    * @param query
    *          the facet query to run against <tt>table</tt>.
    */
-  public void queueFetch(String table, Facet query) {
+  public void queueFetch(String table, FacetQuery query) {
 	fetchQueue.add(new FullQuery(table, query));
   }
   
@@ -373,8 +373,8 @@ public class Factual {
 			url = toUrl("/"+urlForCrosswalk(table), ((CrosswalkQuery)query).toUrlQuery());
 	    } else if (query instanceof ResolveQuery) {
 			url = toUrl("/"+urlForResolve(table), ((ResolveQuery)query).toUrlQuery());
-	    } else if (query instanceof Facet) {
-			url = toUrl("/"+urlForFetch(table), ((Facet)query).toUrlQuery());
+	    } else if (query instanceof FacetQuery) {
+			url = toUrl("/"+urlForFetch(table), ((FacetQuery)query).toUrlQuery());
 	    }
 		if (url != null) {
 			String multiKey = "q"+i;
@@ -388,9 +388,6 @@ public class Factual {
 	try {
 		String encoded = URLEncoder.encode(json, "UTF-8");
 		url = toUrl(factHome + "multi", "queries=" + encoded+"&"+"KEY="+key);
-		//System.out.println("encoded: "+url);
-		//String decoded = URLDecoder.decode(url, "UTF-8");
-		//System.out.println("decoded: "+decoded);
 	} catch (UnsupportedEncodingException e) {
 		e.printStackTrace();
 	}

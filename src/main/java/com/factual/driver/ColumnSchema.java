@@ -18,13 +18,13 @@ public class ColumnSchema {
    *          A column schema map object as provided by Factual.
    */
   public ColumnSchema(Map<String, Object> map) {
-    name = (String)map.get("name");
-    description = (String)map.get("description");
-    label = (String)map.get("label");
-    datatype = (String)map.get("datatype");
-    faceted = (Boolean)map.get("faceted");
-    sortable = (Boolean)map.get("sortable");
-    searchable = (Boolean)map.get("searchable");
+    name = (String)map.get(Constants.SCHEMA_COLUMN_NAME);
+    description = (String)map.get(Constants.SCHEMA_COLUMN_DESCRIPTION);
+    label = (String)map.get(Constants.SCHEMA_COLUMN_LABEL);
+    datatype = (String)map.get(Constants.SCHEMA_COLUMN_DATATYPE);
+    faceted = (Boolean)map.get(Constants.SCHEMA_COLUMN_FACETED);
+    sortable = (Boolean)map.get(Constants.SCHEMA_COLUMN_SORTABLE);
+    searchable = (Boolean)map.get(Constants.SCHEMA_COLUMN_SEARCHABLE);
   }
 
 }

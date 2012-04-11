@@ -11,21 +11,21 @@ import com.factual.data_science_toolkit.Coord;
  * @author aaron
  */
 public class Circle {
-  private final double lat;
-  private final double lon;
+  private final double centerLat;
+  private final double centerLong;
   private final int meters;
 
 
   /**
    * Constructs a geographic Circle representation.
    * 
-   * @param lat the latitude of the center of this Circle.
-   * @param lon the longitude of the center of this Circle.
+   * @param centerLat the latitude of the center of this Circle.
+   * @param centerLong the longitude of the center of this Circle.
    * @param meters the radius, in meters, of this Circle.
    */
-  public Circle(double lat, double lon, int meters) {
-    this.lat = lat;
-    this.lon = lon;
+  public Circle(double centerLat, double centerLong, int meters) {
+    this.centerLat = centerLat;
+    this.centerLong = centerLong;
     this.meters = meters;
   }
 
@@ -57,10 +57,10 @@ public class Circle {
   private Object toJsonObject() {
 	  return new HashMap() {
 		{
-			put("$circle", new HashMap() {
+			put(Constants.CIRCLE, new HashMap() {
 				{
-					put("$center", new String[]{String.valueOf(lat), String.valueOf(lon)});
-					put("$meters", meters);
+					put(Constants.CENTER, new double[]{centerLat, centerLong});
+					put(Constants.METERS, meters);
 				}
 			});
 		}

@@ -21,7 +21,8 @@ import com.google.common.io.Closeables;
  */
 public class DataScienceToolkit {
   private static final HttpRequestFactory REQ_FACTORY = new NetHttpTransport().createRequestFactory();
-  private final String home = "http://www.datasciencetoolkit.org/";
+  private static final String HOME = "http://www.datasciencetoolkit.org/";
+  private static final String STREET_2_COORDINATES = HOME+"street2coordinates/";
 
 
   /**
@@ -38,7 +39,7 @@ public class DataScienceToolkit {
    *         if no match.
    */
   public Coord streetToCoord(String text) {
-    GenericUrl url = new GenericUrl(home + "street2coordinates/");
+    GenericUrl url = new GenericUrl(STREET_2_COORDINATES);
     url.appendRawPath(text);
 
     BufferedReader br = null;

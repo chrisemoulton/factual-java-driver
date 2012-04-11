@@ -24,11 +24,6 @@ public class Parameters {
 	 */
 	private Map<Object, Object> params = Maps.newHashMap();
 
-	/**
-	 * Filters parameter field.
-	 */
-	private static final String FILTERS = "filters";
-
 	public Parameters() {
 	}
 	
@@ -120,7 +115,7 @@ public class Parameters {
     }
 	  
 	protected List<Filter> getFilterList() {
-	    Object filter = getParam(FILTERS);
+	    Object filter = getParam(Constants.FILTERS);
 	    if (filter instanceof SimpleData &&
 	    	((SimpleData) filter).getData() instanceof FilterList)
 	    	return (List<Filter>) ((SimpleData) filter).getData();
@@ -150,10 +145,10 @@ public class Parameters {
 	 * Adds <tt>filter</tt> to this Query.
 	 */
 	protected void add(Filter filter) {
-		if (!containsParam(FILTERS)
-				|| !(getParam(FILTERS) instanceof SimpleData)
-				|| !(((SimpleData) getParam(FILTERS)).getData() instanceof FilterList))
-			setParam(FILTERS, new FilterList());
+		if (!containsParam(Constants.FILTERS)
+				|| !(getParam(Constants.FILTERS) instanceof SimpleData)
+				|| !(((SimpleData) getParam(Constants.FILTERS)).getData() instanceof FilterList))
+			setParam(Constants.FILTERS, new FilterList());
 		getFilterList().add(filter);
 	}
 

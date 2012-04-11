@@ -21,7 +21,7 @@ public class CrosswalkQuery {
    * @return this CrosswalkQuery
    */
   public CrosswalkQuery factualId(String factualId) {
-    queryParams.setParam("factual_id", factualId);
+    queryParams.setParam(Constants.CROSSWALK_FACTUAL_ID, factualId);
     return this;
   }
 
@@ -34,7 +34,7 @@ public class CrosswalkQuery {
    * @return this CrosswalkQuery
    */
   public CrosswalkQuery limit(int limit) {
-	queryParams.setParam("limit", limit);
+	queryParams.setParam(Constants.CROSSWALK_LIMIT, limit);
     return this;
   }
 
@@ -46,7 +46,7 @@ public class CrosswalkQuery {
    * @return this CrosswalkQuery
    */
   public CrosswalkQuery namespace(String namespace) {
-    queryParams.setParam("namespace", namespace);
+    queryParams.setParam(Constants.CROSSWALK_NAMESPACE, namespace);
     return this;
   }
 
@@ -60,7 +60,7 @@ public class CrosswalkQuery {
    * @return this CrosswalkQuery
    */
   public CrosswalkQuery namespaceId(String namespaceId) {
-	queryParams.setParam("namespace_id", namespaceId);
+	queryParams.setParam(Constants.CROSSWALK_NAMESPACE_ID, namespaceId);
     return this;
   }
 
@@ -71,7 +71,7 @@ public class CrosswalkQuery {
    */
   public CrosswalkQuery only(String... namespaces) {
 	for (String namespace : namespaces)
-		queryParams.addCommaSeparatedParam("only", namespace);
+		queryParams.addCommaSeparatedParam(Constants.CROSSWALK_ONLY, namespace);
 	return this;
   }
 

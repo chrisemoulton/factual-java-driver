@@ -13,7 +13,7 @@ import com.google.common.collect.Lists;
  */
 public class FilterGroup implements Filter {
   private final List<Filter> filters;
-  private String op = "$and";
+  private String op = Constants.FILTER_AND;
 
 
   /**
@@ -45,7 +45,7 @@ public class FilterGroup implements Filter {
    * Sets this FilterGroup's logic to be OR.
    */
   public FilterGroup asOR() {
-    return op("$or");
+    return op(Constants.FILTER_OR);
   }
 
   public void add(Filter filter) {

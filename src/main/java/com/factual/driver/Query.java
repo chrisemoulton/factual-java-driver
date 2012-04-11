@@ -19,18 +19,6 @@ public class Query implements Filterable {
   private boolean includeRowCount;
 
   /**
-   * Key for sorts on this Query.
-   *      Value holds all results sorts for this Query. Example contents:
-   * <tt>"$distance:desc","name:asc","locality:asc"</tt>
-   */
-  private static final String SORT = "sort";
-
-  /**
-   * Key for selects on this Query
-   */
-  private static final String SELECT = "select";
-
-  /**
    * Holds all parameters for this Query.
    */
   protected final Parameters queryParams = new Parameters();
@@ -45,7 +33,7 @@ public class Query implements Filterable {
    * @return this Query
    */
   public Query search(String term) {
-    addParam("q", term);
+    addParam(Constants.SEARCH, term);
     return this;
   }
 
@@ -55,7 +43,7 @@ public class Query implements Filterable {
    * @return this Query
    */
   public Query limit(long limit) {
-    addParam("limit", (limit > 0 ? limit : null));
+    addParam(Constants.QUERY_LIMIT, (limit > 0 ? limit : null));
     return this;
   }
 
@@ -69,7 +57,7 @@ public class Query implements Filterable {
    */
   public Query only(String... fields) {
 	for (String field : fields) {
-		queryParams.addCommaSeparatedParam(SELECT, field);
+		queryParams.addCommaSeparatedParam(Constants.QUERY_SELECT, field);
 	}
     return this;
   }
@@ -78,7 +66,7 @@ public class Query implements Filterable {
    * @return array of select fields set by only(), null if none.
    */
   public String[] getSelectFields() {
-	return queryParams.getCommaSeparatedParam(SELECT);
+	return queryParams.getCommaSeparatedParam(Constants.QUERY_SELECT);
   }
 
   /**
@@ -89,7 +77,7 @@ public class Query implements Filterable {
    * @return this Query
    */
   public Query sortAsc(String field) {
-	queryParams.addCommaSeparatedParam(SORT, field + ":asc");
+	queryParams.addCommaSeparatedParam(Constants.QUERY_SORT, field + ":asc");
     return this;
   }
 
@@ -101,7 +89,7 @@ public class Query implements Filterable {
    * @return this Query
    */
   public Query sortDesc(String field) {
-	queryParams.addCommaSeparatedParam(SORT, field + ":desc");
+	queryParams.addCommaSeparatedParam(Constants.QUERY_SORT, field + ":desc");
     return this;
   }
 
@@ -114,7 +102,7 @@ public class Query implements Filterable {
    * @return this Query
    */
   public Query offset(long offset) {
-    addParam("offset", (offset > 0 ? offset : null));
+    addParam(Constants.QUERY_OFFSET, (offset > 0 ? offset : null));
     return this;
   }
 
@@ -188,7 +176,7 @@ public class Query implements Filterable {
    * @return this Query.
    */
   public Query within(Circle circle) {
-	queryParams.setParam("geo", circle);
+	queryParams.setParam(Constants.FILTER_GEO, circle);
     return this;
   }
 
@@ -196,7 +184,7 @@ public class Query implements Filterable {
    * Used to nest AND'ed predicates.
    */
   public Query and(Query... queries) {
-    queryParams.popFilters("$and", queries);
+    queryParams.popFilters(Constants.FILTER_AND, queries);
     return this;
   }
 
@@ -204,7 +192,7 @@ public class Query implements Filterable {
    * Used to nest OR'ed predicates.
    */
   public Query or(Query... queries) {
-    queryParams.popFilters("$or", queries);
+    queryParams.popFilters(Constants.FILTER_OR, queries);
     return this;
   }
 
@@ -248,7 +236,7 @@ public class Query implements Filterable {
 	Parameters additional = null;
 	if (includeRowCount) {
 		additional = new Parameters();
-		additional.setParam("include_count",true);
+		additional.setParam(Constants.INCLUDE_COUNT,true);
 	}
 	return queryParams.toUrlQuery(additional, true);
   }

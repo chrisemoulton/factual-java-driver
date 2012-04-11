@@ -512,10 +512,10 @@ public class FactualTest {
   
   @Test
   public void testFacet() {
-	Facet facet = new Facet("region", "locality")
+	FacetQuery facet = new FacetQuery("region", "locality")
 	.search("Starbucks")
-	.facetLimit(20)
-	.minCount(100)
+	.maxValuesPerFacet(20)
+	.minCountPerFacetValue(100)
 	.includeRowCount();
 
 	FacetResponse resp = factual.fetch("places", facet);
@@ -527,12 +527,11 @@ public class FactualTest {
   
   @Test
   public void testFacetFilter() {
-	Facet facet = new Facet()
+	FacetQuery facet = new FacetQuery("locality")
     .field("region").in("MA","VT","NH");
     facet.and(facet.or(	facet.field("name").beginsWith("Coffee"),
     		   			facet.field("name").beginsWith("Star")),
-    		  facet.field("locality").beginsWith("w"))
-    .select("locality");
+    		  facet.field("locality").beginsWith("w"));
 	FacetResponse resp = factual.fetch("places", facet);
     assertOk(resp);
     assertTrue(resp.getData().size() > 0);
@@ -540,7 +539,7 @@ public class FactualTest {
   
   @Test
   public void testFacetGeo() {
-	Facet facet = new Facet().within(new Circle(latitude, longitude, meters)).select("category");
+	FacetQuery facet = new FacetQuery("category").within(new Circle(latitude, longitude, meters));
 	FacetResponse resp = factual.fetch("places", facet);
     assertOk(resp);
     assertTrue(resp.getData().size() > 0);
@@ -551,8 +550,6 @@ public class FactualTest {
 	Suggest write = new Suggest()
     .setValue("longitude", 100);
 	SuggestResponse resp = factual.suggest("global", write, new Metadata().user("testuser"));
-	//printSuggestResponse(resp);
-	//System.out.println(resp.getJson());
     assertOk(resp);
     assertTrue(resp.isNewEntity());
   }
@@ -569,7 +566,7 @@ public class FactualTest {
   @Test
   public void testSuggestDelete() {
 	Suggest write = new Suggest()
-    .makeBlank("longitude");
+    .removeValue("longitude");
 	SuggestResponse resp = factual.suggest("global", "0545b03f-9413-44ed-8882-3a9a461848da",write, new Metadata().user("testuser"));
     assertOk(resp);
     assertFalse(resp.isNewEntity());
@@ -578,7 +575,7 @@ public class FactualTest {
   @Test
   public void testSuggestError() {
 	Suggest write = new Suggest()
-    .makeBlank("longitude");
+    .removeValue("longitude");
 	FactualApiException exception = null;
 	try {
 		SuggestResponse resp = factual.suggest("global", "randomwrongid", write, new Metadata().user("testuser"));
@@ -591,83 +588,56 @@ public class FactualTest {
   @Test
   public void testFlagDuplicate() {
 	FlagResponse resp = factual.flagDuplicate("global", "0545b03f-9413-44ed-8882-3a9a461848da", new Metadata().user("testuser"));
-	System.out.println(resp.getJson());
+    assertOk(resp);
   }
   
   @Test
   public void testFlagInaccurate() {
 	FlagResponse resp = factual.flagInaccurate("global", "0545b03f-9413-44ed-8882-3a9a461848da", new Metadata().user("testuser"));
-	System.out.println(resp.getJson());
+    assertOk(resp);
   }
 
   @Test
   public void testFlagInappropriate() {
 	FlagResponse resp = factual.flagInappropriate("global", "0545b03f-9413-44ed-8882-3a9a461848da", new Metadata().user("testuser"));
-	System.out.println(resp.getJson());
+    assertOk(resp);
   }  
 
   @Test
   public void testFlagNonExistent() {
 	FlagResponse resp = factual.flagNonExistent("global", "0545b03f-9413-44ed-8882-3a9a461848da", new Metadata().user("testuser"));
-	System.out.println(resp.getJson());
+    assertOk(resp);
   }  
   
   @Test
   public void testFlagSpam() {
 	FlagResponse resp = factual.flagSpam("global", "0545b03f-9413-44ed-8882-3a9a461848da", new Metadata().user("testuser"));
-	System.out.println(resp.getJson());
+    assertOk(resp);
   }  
 
   @Test
   public void testFlagOther() {
 	FlagResponse resp = factual.flagOther("global", "0545b03f-9413-44ed-8882-3a9a461848da", new Metadata().user("testuser"));
-	System.out.println(resp.getJson());
+    assertOk(resp);
   }  
   
   @Test
   public void testDiff() {
-	Diffs diff = new Diffs(1318890505254L);
+	DiffsQuery diff = new DiffsQuery(1318890505254L);
 	DiffsResponse resp = factual.fetch("places", diff);
-	System.out.println(resp.getJson());
+    assertOk(resp);
   }
   
   @Test
   public void testMulti() {
-	  factual.setFactHome("http://api.bm01.factual.com/");
 	  Query q = new Query().limit(1);
 	  factual.queueFetch("places", q.field("country").equal("US"));
-	  factual.queueFetch("places", 
-		new Query().limit(1)); 
-	  /*
-	  factual.queueFetch("places", new Facet()
-		.search("Starbucks")
-		.select("region", "locality")
-		.facetLimit(20)
-		.minCount(100)
-		.includeRowCount());
-		*/
-	  /*
-	  factual.queueFetch("places", new CrosswalkQuery()
-      .factualId("97598010-433f-4946-8fd5-4a6dd1639d77"));
-	  factual.queueFetch("places", new ResolveQuery()
-      .add("name", "McDonalds")
-      .add("address", "10451 Santa Monica Blvd")
-      .add("region", "CA")
-      .add("postcode", "90025"));
-      */
-	  /*
-	    .field("name").equal("Stand")
-	    .within(new Circle(latitude, longitude, meters)));
-	    */
+	  factual.queueFetch("places", new Query().limit(1)); 
 	  MultiResponse multi = factual.sendRequests();
-	  
 	  for (Response resp : multi.getData()) {
 		  System.out.println(resp);
 	  }
-	  
-	  factual.setFactHome("http://api.v3.factual.com/");
   }
-
   
   /**
    * Test debug mode

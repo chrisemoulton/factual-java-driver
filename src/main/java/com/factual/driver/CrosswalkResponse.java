@@ -30,7 +30,7 @@ public class CrosswalkResponse extends Response {
     try {
       JSONObject rootJsonObj = new JSONObject(json);
       Response.withMeta(this, rootJsonObj);
-      parseCrosswalks(rootJsonObj.getJSONObject("response").getJSONArray("data"));
+      parseCrosswalks(rootJsonObj.getJSONObject(Constants.RESPONSE).getJSONArray(Constants.CROSSWALK_DATA));
     } catch (JSONException e) {
       throw new RuntimeException(e);
     }
@@ -76,11 +76,11 @@ public class CrosswalkResponse extends Response {
 
   private static Crosswalk crosswalkFrom(JSONObject jo) throws JSONException {
     Crosswalk cw = new Crosswalk();
-    cw.setFactualId(jo.getString("factual_id"));
-    cw.setNamespace(jo.getString("namespace"));
-    cw.setNamespaceId(jo.getString("namespace_id"));
-    if(jo.has("url")) {
-      cw.setUrl(jo.getString("url"));
+    cw.setFactualId(jo.getString(Constants.CROSSWALK_FACTUAL_ID));
+    cw.setNamespace(jo.getString(Constants.CROSSWALK_NAMESPACE));
+    cw.setNamespaceId(jo.getString(Constants.CROSSWALK_NAMESPACE_ID));
+    if(jo.has(Constants.CROSSWALK_URL)) {
+      cw.setUrl(jo.getString(Constants.CROSSWALK_URL));
     }
     return cw;
   }

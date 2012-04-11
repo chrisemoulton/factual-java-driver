@@ -35,14 +35,14 @@ public class SchemaResponse extends Response implements Tabular {
     try{
       JSONObject rootJsonObj = new JSONObject(json);
       Response.withMeta(this, rootJsonObj);
-      JSONObject respObj = rootJsonObj.getJSONObject("response");
-      JSONObject view = respObj.getJSONObject("view");
-      data = JsonUtil.data(view.getJSONArray("fields"));
+      JSONObject respObj = rootJsonObj.getJSONObject(Constants.RESPONSE);
+      JSONObject view = respObj.getJSONObject(Constants.SCHEMA_VIEW);
+      data = JsonUtil.data(view.getJSONArray(Constants.SCHEMA_FIELDS));
       columnSchemas = makeColumnSchemas(data);
-      title = view.getString("title");
-      description = view.getString("description");
-      searchEnabled = view.getBoolean("search_enabled");
-      geoEnabled = view.getBoolean("geo_enabled");
+      title = view.getString(Constants.SCHEMA_TITLE);
+      description = view.getString(Constants.SCHEMA_DESCRIPTION);
+      searchEnabled = view.getBoolean(Constants.SCHEMA_SEARCH_ENABLED);
+      geoEnabled = view.getBoolean(Constants.SCHEMA_GEO_ENABLED);
     } catch (JSONException e) {
       throw new RuntimeException(e);
     }
@@ -51,7 +51,7 @@ public class SchemaResponse extends Response implements Tabular {
   private Map<String, ColumnSchema> makeColumnSchemas(List<Map<String, Object>> data) {
     Map<String, ColumnSchema> schemas = Maps.newHashMap();
     for(Map<String, Object> smap : data) {
-      schemas.put(smap.get("name").toString(), new ColumnSchema(smap));
+      schemas.put(smap.get(Constants.SCHEMA_COLUMN_NAME).toString(), new ColumnSchema(smap));
     }
     return schemas;
   }

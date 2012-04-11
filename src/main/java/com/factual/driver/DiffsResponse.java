@@ -21,14 +21,14 @@ public class DiffsResponse extends Response {
 		try {
 			JSONObject rootJsonObj = new JSONObject(json);
 			Response.withMeta(this, rootJsonObj);
-			parseResponse(rootJsonObj.getJSONObject("response"));
+			parseResponse(rootJsonObj.getJSONObject(Constants.RESPONSE));
 		} catch (JSONException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
 	private void parseResponse(JSONObject jo) throws JSONException {
-	    data = JsonUtil.data(jo.getJSONArray("data"));
+	    data = JsonUtil.data(jo.getJSONArray(Constants.DIFFS_DATA));
 	}
 	
 	/**

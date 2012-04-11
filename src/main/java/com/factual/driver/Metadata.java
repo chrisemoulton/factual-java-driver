@@ -8,6 +8,11 @@ import java.util.Map;
  */
 public class Metadata {
 	
+	private static final String USER = "user";
+	private static final String DEBUG = "debug";
+	private static final String COMMENT = "comment";
+	private static final String REFERENCE = "reference";
+	
 	private Parameters queryParams = new Parameters();
 
 	/**
@@ -29,7 +34,7 @@ public class Metadata {
 	 */
 	public Metadata user(String username) {
 		Parameters params = queryParams.copy();
-		params.setParam("user", username);
+		params.setParam(USER, username);
 		return new Metadata(params);
 	}
 	
@@ -49,7 +54,7 @@ public class Metadata {
 	 */
 	private Metadata debug(boolean debug) {
 		Parameters params = queryParams.copy();
-		params.setParam("debug", debug);
+		params.setParam(DEBUG, debug);
 		return new Metadata(params);
 	}
 
@@ -60,7 +65,7 @@ public class Metadata {
 	 */
 	public Metadata comment(String comment) {
 		Parameters params = queryParams.copy();
-		params.setParam("comment", comment);
+		params.setParam(COMMENT, comment);
 		return new Metadata(params);
 	}
 
@@ -71,7 +76,7 @@ public class Metadata {
 	 */
 	public Metadata reference(String reference) {
 		Parameters params = queryParams.copy();
-		params.setParam("reference", reference);
+		params.setParam(REFERENCE, reference);
 		return new Metadata(params);
 	}
 

@@ -9,8 +9,6 @@ import java.util.Map;
  */
 public class Suggest {
 
-	private static final String VALUES = "values";
-	
 	/**
 	 * Holds all parameters for this Suggest.
 	 */
@@ -44,7 +42,7 @@ public class Suggest {
 	 * @return this Suggest
 	 */
 	public Suggest setValue(String field, Object value) {
-		queryParams.setJsonMapParam(VALUES, field, value);
+		queryParams.setJsonMapParam(Constants.SUGGEST_VALUES, field, value);
 		return this;
 	}
 
@@ -53,7 +51,7 @@ public class Suggest {
 	 * @param field the field to set as empty, or null.
 	 * @return this Suggest
 	 */
-	public Suggest makeBlank(String field) {
+	public Suggest removeValue(String field) {
 		setValue(field, null);
 		return this;
 	}

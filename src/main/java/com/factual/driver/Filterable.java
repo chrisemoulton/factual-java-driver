@@ -13,6 +13,5 @@ public interface Filterable {
 	 */
 	List<Filter> getFilterList();
 	
-
 	void add(Filter filter);
 }

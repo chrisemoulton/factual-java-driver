@@ -23,15 +23,15 @@ public class SuggestResponse extends Response {
 		try {
 			JSONObject rootJsonObj = new JSONObject(json);
 			Response.withMeta(this, rootJsonObj);
-			parseResponse(rootJsonObj.getJSONObject("response"));
+			parseResponse(rootJsonObj.getJSONObject(Constants.RESPONSE));
 		} catch (JSONException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
 	private void parseResponse(JSONObject jo) throws JSONException {
-	    factualId = jo.getString("factual_id");
-	    newEntity = jo.getBoolean("new_entity");
+	    factualId = jo.getString(Constants.SUGGEST_FACTUAL_ID);
+	    newEntity = jo.getBoolean(Constants.SUGGEST_NEW_ENTITY);
 	}
 	
 	/**
