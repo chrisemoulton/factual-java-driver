@@ -73,9 +73,9 @@ public class Constants {
 	// Resolve
 	protected static final String RESOLVE_VALUES = "values";
 
-	// Suggest
-	protected static final String SUGGEST_VALUES = "values";
-	protected static final String SUGGEST_FACTUAL_ID = "factual_id";
-	protected static final String SUGGEST_NEW_ENTITY = "new_entity";
+	// Contribute
+	protected static final String CONTRIBUTE_VALUES = "values";
+	protected static final String CONTRIBUTE_FACTUAL_ID = "factual_id";
+	protected static final String CONTRIBUTE_NEW_ENTITY = "new_entity";
 
 }

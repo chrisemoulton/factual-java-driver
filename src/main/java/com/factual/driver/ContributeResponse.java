@@ -4,11 +4,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Represents the response from running a Suggest request against Factual.
+ * Represents the response from running a Contribute request against Factual.
  * 
  * @author brandon
  */
-public class SuggestResponse extends Response {
+public class ContributeResponse extends Response {
 	private String json = null;
 	private String factualId;
 	private boolean newEntity;
@@ -18,7 +18,7 @@ public class SuggestResponse extends Response {
 	 * 
 	 * @param json the JSON response String returned by Factual.
 	 */
-	public SuggestResponse(String json) {
+	public ContributeResponse(String json) {
 		this.json = json;
 		try {
 			JSONObject rootJsonObj = new JSONObject(json);
@@ -30,19 +30,19 @@ public class SuggestResponse extends Response {
 	}
 
 	private void parseResponse(JSONObject jo) throws JSONException {
-	    factualId = jo.getString(Constants.SUGGEST_FACTUAL_ID);
-	    newEntity = jo.getBoolean(Constants.SUGGEST_NEW_ENTITY);
+	    factualId = jo.getString(Constants.CONTRIBUTE_FACTUAL_ID);
+	    newEntity = jo.getBoolean(Constants.CONTRIBUTE_NEW_ENTITY);
 	}
 	
 	/**
-	 * @return the factual id that suggest was performed on
+	 * @return the factual id that contribute was performed on
 	 */
 	public String getFactualId() {
 		return factualId;
 	}
 
 	/**
-	 * @return whether or not this was a suggestion to add a new row or update an existing row
+	 * @return whether or not this was a contribution to add a new row or update an existing row
 	 */
 	public boolean isNewEntity() {
 		return newEntity;

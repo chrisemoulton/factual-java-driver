@@ -546,39 +546,39 @@ public class FactualTest {
   }
   
   @Test
-  public void testSuggestAdd() {
-	Suggest write = new Suggest()
+  public void testContributeAdd() {
+	Contribute contribute = new Contribute()
     .setValue("longitude", 100);
-	SuggestResponse resp = factual.suggest("global", write, new Metadata().user("test_driver_user"));
+	ContributeResponse resp = factual.contribute("global", contribute, new Metadata().user("test_driver_user"));
     assertOk(resp);
     assertTrue(resp.isNewEntity());
   }
   
   @Test
-  public void testSuggestEdit() {
-	Suggest write = new Suggest()
+  public void testContributeEdit() {
+	Contribute contribute = new Contribute()
     .setValue("longitude", 100);
-	SuggestResponse resp = factual.suggest("global", "0545b03f-9413-44ed-8882-3a9a461848da",write, new Metadata().user("test_driver_user"));
+	ContributeResponse resp = factual.contribute("global", "0545b03f-9413-44ed-8882-3a9a461848da",contribute, new Metadata().user("test_driver_user"));
     assertOk(resp);
     assertFalse(resp.isNewEntity());
   }
 
   @Test
-  public void testSuggestDelete() {
-	Suggest write = new Suggest()
+  public void testContributeDelete() {
+	Contribute contribute = new Contribute()
     .removeValue("longitude");
-	SuggestResponse resp = factual.suggest("global", "0545b03f-9413-44ed-8882-3a9a461848da",write, new Metadata().user("test_driver_user"));
+	ContributeResponse resp = factual.contribute("global", "0545b03f-9413-44ed-8882-3a9a461848da",contribute, new Metadata().user("test_driver_user"));
     assertOk(resp);
     assertFalse(resp.isNewEntity());
   }
 
   @Test
-  public void testSuggestError() {
-	Suggest write = new Suggest()
+  public void testConributeError() {
+	Contribute contribute = new Contribute()
     .removeValue("longitude");
 	FactualApiException exception = null;
 	try {
-		SuggestResponse resp = factual.suggest("global", "randomwrongid", write, new Metadata().user("test_driver_user"));
+		ContributeResponse resp = factual.contribute("global", "randomwrongid", contribute, new Metadata().user("test_driver_user"));
 	} catch (FactualApiException e) {
 		exception = e;
 	}
@@ -668,30 +668,6 @@ public class FactualTest {
     factual.debug(false);
     assertOk(resp);
     assertAll(resp, "country", "US");
-  }
-  
-  private void printFacetResponse(FacetResponse resp) {
-	Map<String, Map<String, Object>> data = resp.getData();
-	for (String field : data.keySet()) {
-		Map<String, Object> map = data.get(field);
-		for (String facetValue : map.keySet()) {
-			System.out.println(field+" : "+facetValue + " : "+map.get(facetValue));
-		}
-	}
-	printResponse(resp);
-  }
-  
-  private void printSuggestResponse(SuggestResponse resp) {
-	  System.out.println("factual id: "+resp.getFactualId());
-	  System.out.println("is new entity: "+resp.isNewEntity());
-	  printResponse(resp);
-  }
-  
-  private void printResponse(Response resp) {
-	System.out.println("version: "+resp.getVersion());
-	System.out.println("included row count: "+resp.getIncludedRowCount());
-	System.out.println("total row count: "+resp.getTotalRowCount());
-	System.out.println("status: "+resp.getStatus());
   }
   
   private void assertFactualId(List<Crosswalk> crosswalks, String id) {

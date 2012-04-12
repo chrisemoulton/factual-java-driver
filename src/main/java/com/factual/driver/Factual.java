@@ -115,37 +115,37 @@ public class Factual {
   }
 
   /**
-   * Runs a <tt>suggest</tt> input against the specified Factual table.
+   * Runs a <tt>contribute</tt> input against the specified Factual table.
    * 
    * @param tableName
-   * 		  the name of the table you wish to suggest updates for (e.g., "places")
+   * 		  the name of the table you wish to contribute updates for (e.g., "places")
    * @param factualId
-   * 		  the factual id on which the suggest is run
-   * @param suggest
-   * 		  the suggest parameters to run against <tt>table</tt>
+   * 		  the factual id on which the contribute is run
+   * @param contribute
+   * 		  the contribute parameters to run against <tt>table</tt>
    * @param metadata
    * 		  the metadata to send with information on this request
    * 	  	 
-   * @return the response of running <tt>suggest</tt> against Factual.
+   * @return the response of running <tt>contribute</tt> against Factual.
    */
-  public SuggestResponse suggest(String tableName, String factualId, Suggest suggest, Metadata metadata) {
-	return suggestCustom("t/"+tableName+"/"+factualId+"/input", suggest, metadata);
+  public ContributeResponse contribute(String tableName, String factualId, Contribute contribute, Metadata metadata) {
+	return contributeCustom("t/"+tableName+"/"+factualId+"/contribute", contribute, metadata);
   }
 
   /**
-   * Runs a <tt>suggest</tt> to add a row against the specified Factual table.
+   * Runs a <tt>contribute</tt> to add a row against the specified Factual table.
    * 
    * @param tableName
-   * 		  the name of the table you wish to suggest the add for (e.g., "places")
-   * @param suggest
-   * 		  the suggest parameters to run against <tt>table</tt>
+   * 		  the name of the table you wish to contribute the add for (e.g., "places")
+   * @param contribute
+   * 		  the contribute parameters to run against <tt>table</tt>
    * @param metadata
    * 		  the metadata to send with information on this request
    * 	  	 
-   * @return the response of running <tt>suggest</tt> against Factual.
+   * @return the response of running <tt>contribute</tt> against Factual.
    */
-  public SuggestResponse suggest(String tableName, Suggest suggest, Metadata metadata) {
-	return suggestCustom("t/"+tableName+"/input", suggest, metadata);
+  public ContributeResponse contribute(String tableName, Contribute contribute, Metadata metadata) {
+	return contributeCustom("t/"+tableName+"/contribute", contribute, metadata);
   }
   
   /**
@@ -275,12 +275,12 @@ public class Factual {
 	return new ReadResponse(request(toUrl(factHome + root, query.toUrlQuery())));
   }
   
-  private SuggestResponse suggestCustom(String root, Suggest input, Metadata metadata) {
+  private ContributeResponse contributeCustom(String root, Contribute contribute, Metadata metadata) {
 	Map<String, String> params = Maps.newHashMap();
 	// TODO: Switch parameters to POST content when supported.
 	//params.putAll(metadata.toParamMap());
-	//params.putAll(input.toParamMap());
-	return new SuggestResponse(requestPost(factHome + root+"?"+input.toUrlQuery()+"&"+metadata.toUrlQuery(), params));
+	//params.putAll(contribute.toParamMap());
+	return new ContributeResponse(requestPost(factHome + root+"?"+contribute.toUrlQuery()+"&"+metadata.toUrlQuery(), params));
   }
 
   private FlagResponse flagCustom(String root, String flagType, Metadata metadata) {

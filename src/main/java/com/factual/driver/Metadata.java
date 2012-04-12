@@ -3,7 +3,7 @@ package com.factual.driver;
 import java.util.Map;
 
 /**
- * Represents metadata to be sent with suggest and flag requests
+ * Represents metadata to be sent with contribute and flag requests
  * @author brandon
  */
 public class Metadata {
@@ -16,11 +16,9 @@ public class Metadata {
 	private Parameters queryParams = new Parameters();
 
 	/**
-	 * Constructor.  Create metadata to associate with suggest and flag requests
+	 * Constructor.  Create metadata to associate with contribute and flag requests
 	 */
 	public Metadata() {
-		// Temporary
-		queryParams.setParam(DEBUG, true);
 	}
 	
 	private Metadata(Parameters queryParams) {

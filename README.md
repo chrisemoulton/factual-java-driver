@@ -532,33 +532,33 @@ The <tt>flag</tt> method flags a problematic row:
   </tr>
 </table>  
 
-# Suggest
+# Contribute
 
-The driver fully supports Factual's Suggest feature, which enables you to contribute edits to existing rows and/or contribute new rows of data in Factual tables. For information on deleting records, see Flag.
+The driver fully supports Factual's Contribute feature, which enables you to contribute edits to existing rows and/or contribute new rows of data in Factual tables. For information on deleting records, see Flag.
 
-## Simple Suggest Examples
+## Simple Contribute Examples
 
-The <tt>suggest</tt> method is a contribution to edit an existing row or add a new row:
+The <tt>contribute</tt> method is a contribution to edit an existing row or add a new row:
 
 	// Field-value mapping for an entity.
 	Map<String, Object> values = …;
 	Metadata metadata = new Metadata().user("my_username");
 
-	// Suggest adding a new row
-	Suggest suggest = new Suggest(values)
-	SuggestResponse resp = factual.suggest("global", suggest, metadata);
+	// Contribute the addition of a new row
+	Contribute contribute = new Contribute(values)
+	ContributeResponse resp = factual.contribute("global", contribute, metadata);
 	
-    // Suggest a field update
-	Suggest suggest = new Suggest(values)
+    // Contribute a field update
+	Contribute contribute = new Contribute(values)
     .setValue("longitude", 100);
-	SuggestResponse resp = factual.suggest("global", "0545b03f-9413-44ed-8882-3a9a461848da",suggest, metadata);
+	ContributeResponse resp = factual.contribute("global", "0545b03f-9413-44ed-8882-3a9a461848da",contribute, metadata);
 
-	// Suggest a field become blank
-	Suggest suggest = new Suggest(values)
-    .makeBlank("longitude");
-	SuggestResponse resp = factual.suggest("global", "0545b03f-9413-44ed-8882-3a9a461848da",suggest, metadata);
+	// Contribute an update for a field to become blank
+	Contribute contribute = new Contribute(values)
+    .removeValue("longitude");
+	ContributeResponse resp = factual.contribute("global", "0545b03f-9413-44ed-8882-3a9a461848da",contribute, metadata);
 
-## All Top Level Suggest Parameters
+## All Top Level Contribute Parameters
 
 <table>
   <tr>
