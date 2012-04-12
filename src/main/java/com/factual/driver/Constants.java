@@ -39,12 +39,6 @@ public class Constants {
 	protected static final String CROSSWALK_DATA = "data";
 	protected static final String CROSSWALK_URL = "url";
 
-	// Diffs
-	protected static final String DIFFS_START_DATE = "start-date";
-	protected static final String DIFFS_END_DATE = "end-date";
-
-	protected static final String DIFFS_DATA = "data";
-
 	// Filters
 	protected static final String FILTERS = "filters";
 	protected static final String FILTER_GEO = "geo";

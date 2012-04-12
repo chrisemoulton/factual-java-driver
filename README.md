@@ -11,13 +11,13 @@ The driver is in Maven Central, so you can just add this to your Maven <tt>pom.x
     <dependency>
       <groupId>com.factual</groupId>
       <artifactId>factual-java-driver</artifactId>
-      <version>1.3.0-alpha</version>
+      <version>1.2.0</version>
     </dependency>
     
 ## Non Maven users
 
 You can download the individual driver jar, and view the pom.xml file, here:
-[Driver download folder](http://repo1.maven.org/maven2/com/factual/factual-java-driver/1.3.0-alpha/)
+[Driver download folder](http://repo1.maven.org/maven2/com/factual/factual-java-driver/1.2.0/)
 
 The pom.xml tells you what dependencies you'll need to plug into your project to get the driver to work (see the <dependencies> section).
 
@@ -586,53 +586,7 @@ The <tt>contribute</tt> method is a contribution to edit an existing row or add 
     <td>A reference to a URL, title, person, etc. that is the source of this data.</td>
     <td><tt>metadata.reference("http://...")</tt></td>
   </tr>
-</table>  
-
-# Diffs
-
-The driver fully supports Factual's experimental Diffs feature, which enables Factual data update downloads.
-
-## Simple Diffs Example
-
-The <tt>fetch</tt> method gives the diff data:
-
-	// Fetch a diffs response
-	DiffsQuery diffs = new DiffsQuery(1318890505254L);
-	DiffsResponse resp = factual.fetch("places", diffs);
-
-## All Top Level Facet Parameters
-
-<table>
-  <tr>
-    <th>Parameter</th>
-    <th>Description</th>
-    <th>Example</th>
-  </tr>
-  <tr>
-    <td>before</td>
-    <td>The start time for a diff request</td>
-    <td><tt>d.before(long timestamp)</tt></td>
-  </tr>
-  <tr>
-    <td>after</td>
-    <td>The end time for a diff request</td>
-    <td><tt>d.after(long timestamp)</tt></td>
-  </tr>
-</table>  
-
-
-# Multi
-
-The driver fully supports Factual's experimental Multi feature, which enables making multiple requests on the same connection.
-Queue responses using <tt>queueFetch</tt>, and send all queued reads using <tt>sendRequests</tt>.  The <tt>sendRequest</tt> method requests all reads queued since the last <tt>sendRequest</tt>
-
-## Simple Multi Example
-
-
-	// Fetch a multi response
-	factual.queueFetch("places", new Query().field("country").equal("US"));
-	factual.queueFetch("places", new Query().limit(1)); 
-	MultiResponse multi = factual.sendRequests();	
+</table>	
 
 # Exception Handling
 

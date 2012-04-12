@@ -573,7 +573,7 @@ public class FactualTest {
   }
 
   @Test
-  public void testConributeError() {
+  public void testContributeError() {
 	Contribute contribute = new Contribute()
     .removeValue("longitude");
 	FactualApiException exception = null;
@@ -620,42 +620,6 @@ public class FactualTest {
 	FlagResponse resp = factual.flagOther("global", "0545b03f-9413-44ed-8882-3a9a461848da", new Metadata().user("test_driver_user"));
     assertOk(resp);
   }  
-  
-  @Test
-  public void testDiffs() {
-	DiffsQuery diff = new DiffsQuery(1318890505254L);
-	//diff.after(new Date().getTime());
-	DiffsResponse resp = factual.fetch("places", diff);
-  }
-  
-  @Test
-  public void testMulti() {
-	Query q = new Query().limit(1);
-	factual.queueFetch("places", q.field("country").equal("US"));
-	factual.queueFetch("places", new Query().limit(1)); 
-	MultiResponse multi = factual.sendRequests();
-	for (Response resp : multi.getData()) {
-		System.out.println(resp);
-	}
-  }
-  
-  @Test
-  public void testMultiComplex() {
-	factual.queueFetch("places", new CrosswalkQuery()
-    	.factualId("97598010-433f-4946-8fd5-4a6dd1639d77")
-    	.limit(1));
-	factual.queueFetch("places", new FacetQuery("region", "locality"));
-	factual.queueFetch("places", new Query().limit(1)); 
-	factual.queueFetch("places", new ResolveQuery()
-      	.add("name", "McDonalds")
-      	.add("address", "10451 Santa Monica Blvd")
-      	.add("region", "CA")
-      	.add("postcode", "90025"));
-	MultiResponse multi = factual.sendRequests();
-	for (Response resp : multi.getData()) {
-		System.out.println(resp);
-	}
-  }
   
   /**
    * Test debug mode

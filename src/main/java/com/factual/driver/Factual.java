@@ -38,14 +38,12 @@ import com.google.common.io.Closeables;
  * @author aaron
  */
 public class Factual {
-  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.3.0-alpha";
+  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.2.0";
   private String factHome = "http://api.v3.factual.com/";
   private final String key;
   private final OAuthHmacSigner signer;
   private boolean debug = false;
   private StreamHandler debugHandler = null;
-  
-  private Queue<FullQuery> fetchQueue = Lists.newLinkedList();
   
 
   /**
@@ -295,14 +293,6 @@ public class Factual {
 	return root + "?" + parameters;
   }
 
-  public DiffsResponse fetch(String tableName, DiffsQuery diff) {
-	return fetchCustom(urlForFetch(tableName)+"/diffs", diff);
-  }
-
-  private DiffsResponse fetchCustom(String root, DiffsQuery diff) {
-	return new DiffsResponse(request(toUrl(factHome + root, diff.toUrlQuery())));
-  }
-
   private class FullQuery {
 	  protected Object query;
 	  protected String table;
@@ -311,94 +301,6 @@ public class Factual {
 		  this.query = query;
 	  }
   }
-  
-  /**
-   * Queue a read request for inclusion in the next multi request.
-   * @param table
-   *          the name of the table you wish to query (e.g., "places")
-   * @param query
-   *          the read query to run against <tt>table</tt>.
-   */
-  public void queueFetch(String table, Query query) {
-	fetchQueue.add(new FullQuery(table, query));
-  }
-
-  /**
-   * Queue a crosswalk request for inclusion in the next multi request.
-   * @param table
-   *          the name of the table you wish to use crosswalk against (e.g., "places")
-   * @param query
-   *          the crosswalk query to run against <tt>table</tt>.
-   */
-  public void queueFetch(String table, CrosswalkQuery query) {
-	fetchQueue.add(new FullQuery(table, query));
-  }
-
-  /**
-   * Queue a resolve request for inclusion in the next multi request.
-   * @param table
-   *          the name of the table you wish to use resolve against (e.g., "places")
-   * @param query
-   *          the resolve query to run against <tt>table</tt>.
-   */
-  public void queueFetch(String table, ResolveQuery query) {
-	fetchQueue.add(new FullQuery(table, query));
-  }
-  
-  /**
-   * Queue a facet request for inclusion in the next multi request.
-   * @param table
-   *          the name of the table you wish to use a facet request against (e.g., "places")
-   * @param query
-   *          the facet query to run against <tt>table</tt>.
-   */
-  public void queueFetch(String table, FacetQuery query) {
-	fetchQueue.add(new FullQuery(table, query));
-  }
-  
-  /**
-   * Use this to send all queued reads as a multi request
-   * @return response for a multi request
-   */
-  public MultiResponse sendRequests() {
-	Map<String, String> multi = Maps.newHashMap();
-	int i = 0;
-	Map<String, Object> requestMapping = Maps.newHashMap();
-	while (!fetchQueue.isEmpty()) {
-		FullQuery fullQuery = fetchQueue.poll();
-		String url = null;
-		Object query = fullQuery.query;
-		String table = fullQuery.table;
-	    if (query instanceof Query) {
-			url = toUrl("/"+urlForFetch(table), ((Query)query).toUrlQuery());
-	    } else if (query instanceof CrosswalkQuery) {
-			url = toUrl("/"+urlForCrosswalk(table), ((CrosswalkQuery)query).toUrlQuery());
-	    } else if (query instanceof ResolveQuery) {
-			url = toUrl("/"+urlForResolve(table), ((ResolveQuery)query).toUrlQuery());
-	    } else if (query instanceof FacetQuery) {
-			url = toUrl("/"+urlForFacets(table), ((FacetQuery)query).toUrlQuery());
-	    }
-		if (url != null) {
-			String multiKey = "q"+i;
-			multi.put(multiKey, url);
-			requestMapping.put(multiKey, query);
-			i++;
-		}
-	}
-	String json = JsonUtil.toJsonStr(multi);
-	String url = "";
-	try {
-		String encoded = URLEncoder.encode(json, "UTF-8");
-		url = toUrl(factHome + "multi", "queries=" + encoded+"&"+"KEY="+key);
-	} catch (UnsupportedEncodingException e) {
-		e.printStackTrace();
-	}
-	String jsonResponse = request(url, false);
-	MultiResponse resp = new MultiResponse(requestMapping);
-	resp.setJson(jsonResponse);
-	return resp;
-  }
-
 
   /**
    * Convenience method to return Crosswalks for the specific query.
