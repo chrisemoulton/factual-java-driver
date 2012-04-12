@@ -20,7 +20,7 @@ public class Metadata {
 	 */
 	public Metadata() {
 		// Temporary
-		debug();
+		queryParams.setParam(DEBUG, true);
 	}
 	
 	private Metadata(Parameters queryParams) {

@@ -67,12 +67,14 @@ public abstract class Response {
     try {
       resp.version = rootJsonObj.getString(Constants.VERSION);
       resp.status = rootJsonObj.getString(Constants.STATUS);
-      JSONObject respJson = rootJsonObj.getJSONObject(Constants.RESPONSE);
-      if(respJson.has(Constants.TOTAL_ROW_COUNT)) {
-        resp.totalRowCount = respJson.getInt(Constants.TOTAL_ROW_COUNT);
-      }
-      if(respJson.has(Constants.INCLUDED_ROWS)) {
-        resp.includedRows = respJson.getInt(Constants.INCLUDED_ROWS);
+      if(rootJsonObj.has(Constants.RESPONSE)) {
+    	  JSONObject respJson = rootJsonObj.getJSONObject(Constants.RESPONSE);
+          if(respJson.has(Constants.TOTAL_ROW_COUNT)) {
+             resp.totalRowCount = respJson.getInt(Constants.TOTAL_ROW_COUNT);
+          }
+          if(respJson.has(Constants.INCLUDED_ROWS)) {
+             resp.includedRows = respJson.getInt(Constants.INCLUDED_ROWS);
+          }
       }
     } catch (JSONException e) {
       throw new RuntimeException(e);

@@ -50,7 +50,6 @@ public class MultiResponse extends Response {
 		   String key = iter.next();
 		   if (requestMapping.containsKey(key)) {
 			   String responseJson = jo.getJSONObject(key).toString();
-			   System.out.println(responseJson);
 			   Object type = requestMapping.get(key);		
 			   Response resp = null;
 			   if (type instanceof Query) {

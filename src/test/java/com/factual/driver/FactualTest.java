@@ -549,7 +549,7 @@ public class FactualTest {
   public void testSuggestAdd() {
 	Suggest write = new Suggest()
     .setValue("longitude", 100);
-	SuggestResponse resp = factual.suggest("global", write, new Metadata().user("testuser"));
+	SuggestResponse resp = factual.suggest("global", write, new Metadata().user("test_driver_user"));
     assertOk(resp);
     assertTrue(resp.isNewEntity());
   }
@@ -558,7 +558,7 @@ public class FactualTest {
   public void testSuggestEdit() {
 	Suggest write = new Suggest()
     .setValue("longitude", 100);
-	SuggestResponse resp = factual.suggest("global", "0545b03f-9413-44ed-8882-3a9a461848da",write, new Metadata().user("testuser"));
+	SuggestResponse resp = factual.suggest("global", "0545b03f-9413-44ed-8882-3a9a461848da",write, new Metadata().user("test_driver_user"));
     assertOk(resp);
     assertFalse(resp.isNewEntity());
   }
@@ -567,7 +567,7 @@ public class FactualTest {
   public void testSuggestDelete() {
 	Suggest write = new Suggest()
     .removeValue("longitude");
-	SuggestResponse resp = factual.suggest("global", "0545b03f-9413-44ed-8882-3a9a461848da",write, new Metadata().user("testuser"));
+	SuggestResponse resp = factual.suggest("global", "0545b03f-9413-44ed-8882-3a9a461848da",write, new Metadata().user("test_driver_user"));
     assertOk(resp);
     assertFalse(resp.isNewEntity());
   }
@@ -578,7 +578,7 @@ public class FactualTest {
     .removeValue("longitude");
 	FactualApiException exception = null;
 	try {
-		SuggestResponse resp = factual.suggest("global", "randomwrongid", write, new Metadata().user("testuser"));
+		SuggestResponse resp = factual.suggest("global", "randomwrongid", write, new Metadata().user("test_driver_user"));
 	} catch (FactualApiException e) {
 		exception = e;
 	}
@@ -587,56 +587,74 @@ public class FactualTest {
   
   @Test
   public void testFlagDuplicate() {
-	FlagResponse resp = factual.flagDuplicate("global", "0545b03f-9413-44ed-8882-3a9a461848da", new Metadata().user("testuser"));
+	FlagResponse resp = factual.flagDuplicate("global", "0545b03f-9413-44ed-8882-3a9a461848da", new Metadata().user("test_driver_user"));
     assertOk(resp);
   }
   
   @Test
   public void testFlagInaccurate() {
-	FlagResponse resp = factual.flagInaccurate("global", "0545b03f-9413-44ed-8882-3a9a461848da", new Metadata().user("testuser"));
+	FlagResponse resp = factual.flagInaccurate("global", "0545b03f-9413-44ed-8882-3a9a461848da", new Metadata().user("test_driver_user"));
     assertOk(resp);
   }
 
   @Test
   public void testFlagInappropriate() {
-	FlagResponse resp = factual.flagInappropriate("global", "0545b03f-9413-44ed-8882-3a9a461848da", new Metadata().user("testuser"));
+	FlagResponse resp = factual.flagInappropriate("global", "0545b03f-9413-44ed-8882-3a9a461848da", new Metadata().user("test_driver_user"));
     assertOk(resp);
   }  
 
   @Test
   public void testFlagNonExistent() {
-	FlagResponse resp = factual.flagNonExistent("global", "0545b03f-9413-44ed-8882-3a9a461848da", new Metadata().user("testuser"));
+	FlagResponse resp = factual.flagNonExistent("global", "0545b03f-9413-44ed-8882-3a9a461848da", new Metadata().user("test_driver_user"));
     assertOk(resp);
   }  
   
   @Test
   public void testFlagSpam() {
-	FlagResponse resp = factual.flagSpam("global", "0545b03f-9413-44ed-8882-3a9a461848da", new Metadata().user("testuser"));
+	FlagResponse resp = factual.flagSpam("global", "0545b03f-9413-44ed-8882-3a9a461848da", new Metadata().user("test_driver_user"));
     assertOk(resp);
   }  
 
   @Test
   public void testFlagOther() {
-	FlagResponse resp = factual.flagOther("global", "0545b03f-9413-44ed-8882-3a9a461848da", new Metadata().user("testuser"));
+	FlagResponse resp = factual.flagOther("global", "0545b03f-9413-44ed-8882-3a9a461848da", new Metadata().user("test_driver_user"));
     assertOk(resp);
   }  
   
   @Test
-  public void testDiff() {
+  public void testDiffs() {
 	DiffsQuery diff = new DiffsQuery(1318890505254L);
+	//diff.after(new Date().getTime());
 	DiffsResponse resp = factual.fetch("places", diff);
-    assertOk(resp);
   }
   
   @Test
   public void testMulti() {
-	  Query q = new Query().limit(1);
-	  factual.queueFetch("places", q.field("country").equal("US"));
-	  factual.queueFetch("places", new Query().limit(1)); 
-	  MultiResponse multi = factual.sendRequests();
-	  for (Response resp : multi.getData()) {
-		  System.out.println(resp);
-	  }
+	Query q = new Query().limit(1);
+	factual.queueFetch("places", q.field("country").equal("US"));
+	factual.queueFetch("places", new Query().limit(1)); 
+	MultiResponse multi = factual.sendRequests();
+	for (Response resp : multi.getData()) {
+		System.out.println(resp);
+	}
+  }
+  
+  @Test
+  public void testMultiComplex() {
+	factual.queueFetch("places", new CrosswalkQuery()
+    	.factualId("97598010-433f-4946-8fd5-4a6dd1639d77")
+    	.limit(1));
+	factual.queueFetch("places", new FacetQuery("region", "locality"));
+	factual.queueFetch("places", new Query().limit(1)); 
+	factual.queueFetch("places", new ResolveQuery()
+      	.add("name", "McDonalds")
+      	.add("address", "10451 Santa Monica Blvd")
+      	.add("region", "CA")
+      	.add("postcode", "90025"));
+	MultiResponse multi = factual.sendRequests();
+	for (Response resp : multi.getData()) {
+		System.out.println(resp);
+	}
   }
   
   /**

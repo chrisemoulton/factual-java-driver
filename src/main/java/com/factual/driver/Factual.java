@@ -111,7 +111,7 @@ public class Factual {
    * @return the response of running <tt>facet</tt> against Factual.
    */
   public FacetResponse fetch(String tableName, FacetQuery facet) {
-	return fetchCustom(urlForFetch(tableName)+"/facets", facet);
+	return fetchCustom(urlForFacets(tableName), facet);
   }
 
   /**
@@ -277,16 +277,18 @@ public class Factual {
   
   private SuggestResponse suggestCustom(String root, Suggest input, Metadata metadata) {
 	Map<String, String> params = Maps.newHashMap();
-	params.putAll(metadata.toParamMap());
-	params.putAll(input.toParamMap());
-	return new SuggestResponse(requestPost(factHome + root, params));
+	// TODO: Switch parameters to POST content when supported.
+	//params.putAll(metadata.toParamMap());
+	//params.putAll(input.toParamMap());
+	return new SuggestResponse(requestPost(factHome + root+"?"+input.toUrlQuery()+"&"+metadata.toUrlQuery(), params));
   }
 
   private FlagResponse flagCustom(String root, String flagType, Metadata metadata) {
 	Map<String, String> params = Maps.newHashMap();
-	params.putAll(metadata.toParamMap());
-	params.put("problem", flagType);
-	return new FlagResponse(requestPost(factHome + root, params));
+	// TODO: Switch parameters to POST content when supported.
+	//params.putAll(metadata.toParamMap());
+	//params.put("problem", flagType);
+	return new FlagResponse(requestPost(factHome + root+"?problem="+flagType+"&"+metadata.toUrlQuery(), params));
   }
   
   private String toUrl(String root, String parameters) {
@@ -374,7 +376,7 @@ public class Factual {
 	    } else if (query instanceof ResolveQuery) {
 			url = toUrl("/"+urlForResolve(table), ((ResolveQuery)query).toUrlQuery());
 	    } else if (query instanceof FacetQuery) {
-			url = toUrl("/"+urlForFetch(table), ((FacetQuery)query).toUrlQuery());
+			url = toUrl("/"+urlForFacets(table), ((FacetQuery)query).toUrlQuery());
 	    }
 		if (url != null) {
 			String multiKey = "q"+i;
@@ -497,6 +499,10 @@ public class Factual {
   private String urlForFlag(String tableName, String factualId) {
 	return "t/"+tableName+"/"+factualId+"/flag";
   }
+
+  private String urlForFacets(String tableName) {
+	return "t/" + tableName+"/facets";
+  }
   
   private String request(String urlStr) {
 	  return request(urlStr, true);
@@ -547,7 +553,6 @@ public class Factual {
       HttpHeaders headers = new HttpHeaders();
       headers.set("X-Factual-Lib", DRIVER_HEADER_TAG);
       request.setHeaders(headers);
-
       if (debug) {
           Logger logger = Logger.getLogger(HttpTransport.class.getName());
           logger.removeHandler(debugHandler);
