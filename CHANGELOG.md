@@ -1,6 +1,11 @@
+## 1.3.0-alpha
+
+ * Experimental support for multi request and diffs features.
+
 ## 1.2.0
 
- * Adds support for facet, suggest, and report features.
+ * Adds support for facet, contribute, and flag features.
+ * Adds raw read and debug info features.
 
 ## 1.1.0
 
