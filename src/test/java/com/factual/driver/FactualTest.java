@@ -573,7 +573,7 @@ public class FactualTest {
   }
 
   @Test
-  public void testConributeError() {
+  public void testContributeError() {
 	Contribute contribute = new Contribute()
     .removeValue("longitude");
 	FactualApiException exception = null;

@@ -600,7 +600,7 @@ The <tt>fetch</tt> method gives the diff data:
 	DiffsQuery diffs = new DiffsQuery(1318890505254L);
 	DiffsResponse resp = factual.fetch("places", diffs);
 
-## All Top Level Facet Parameters
+## All Top Level Diffs Parameters
 
 <table>
   <tr>
