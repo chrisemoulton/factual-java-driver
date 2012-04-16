@@ -490,6 +490,8 @@ The <tt>fetch</tt> method gives the facet counts:
 
 The driver fully supports Factual's Flag feature, which enables flagging problematic rows in Factual tables. Use this feature if you are requesting for an entity to be deleted or merged into a duplicate record.
 
+*Note that the flag feature is new and may not yet be available in the Factual API.  If you experience any errors, please check back at a later time.
+
 ## Simple Flag Example
 
 The <tt>flag</tt> method flags a problematic row:
@@ -535,6 +537,8 @@ The <tt>flag</tt> method flags a problematic row:
 # Contribute
 
 The driver fully supports Factual's Contribute feature, which enables you to contribute edits to existing rows and/or contribute new rows of data in Factual tables. For information on deleting records, see Flag.
+
+*Note that the contribute feature is new and may not yet be available in the Factual API.  If you experience any errors, please check back at a later time.
 
 ## Simple Contribute Examples
 
