@@ -38,7 +38,7 @@ import com.google.common.io.Closeables;
  * @author aaron
  */
 public class Factual {
-  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.3.0-alpha";
+  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.3.0-beta";
   private String factHome = "http://api.v3.factual.com/";
   private final String key;
   private final OAuthHmacSigner signer;
@@ -562,8 +562,13 @@ public class Factual {
       
       // get the response
       br = new BufferedReader(new InputStreamReader(request.execute().getContent()));
+      String line = null;
+      StringBuffer sb = new StringBuffer();
+      while ((line = br.readLine())!= null) {
+    	  sb.append(line);
+      }
+      return sb.toString();
       
-      return br.readLine();
     } catch (HttpResponseException e) {
       throw new FactualApiException(e).requestUrl(urlStr).requestMethod(requestMethod).response(e.getResponse());
     } catch (IOException e) {
