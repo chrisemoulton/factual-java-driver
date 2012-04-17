@@ -38,8 +38,10 @@ import com.google.common.io.Closeables;
  * @author aaron
  */
 public class Factual {
-  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.3.0-beta";
+  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.3.1-beta";
+  private static final String DEFAULT_HOST_HEADER = "api.v3.factual.com";
   private String factHome = "http://api.v3.factual.com/";
+  private String host = DEFAULT_HOST_HEADER;
   private final String key;
   private final OAuthHmacSigner signer;
   private boolean debug = false;
@@ -87,6 +89,16 @@ public class Factual {
     this.factHome = urlBase;
   }
 
+  /**
+   * Change the host header value for a request to Factual's API.
+   * 
+   * @param host
+   *          the host header value for a request to Factual's API.
+   */
+  public void setRequestHost(String host) {
+    this.host = host;
+  }
+  
   /**
    * Runs a read <tt>query</tt> against the specified Factual table.
    * 
@@ -552,6 +564,7 @@ public class Factual {
     	  request = f.buildGetRequest(url);
       HttpHeaders headers = new HttpHeaders();
       headers.set("X-Factual-Lib", DRIVER_HEADER_TAG);
+      headers.set("Host", host);
       request.setHeaders(headers);
       if (debug) {
           Logger logger = Logger.getLogger(HttpTransport.class.getName());
