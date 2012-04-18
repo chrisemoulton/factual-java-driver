@@ -1,3 +1,7 @@
+## 1.3.2-beta
+
+ * Updates for multi request calls.
+
 ## 1.3.0-alpha
 
  * Experimental support for multi request and diffs features.

@@ -38,7 +38,7 @@ import com.google.common.io.Closeables;
  * @author aaron
  */
 public class Factual {
-  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.3.1-beta";
+  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.3.2-beta";
   private static final String DEFAULT_HOST_HEADER = "api.v3.factual.com";
   private String factHome = "http://api.v3.factual.com/";
   private String host = DEFAULT_HOST_HEADER;
@@ -375,7 +375,7 @@ public class Factual {
   public MultiResponse sendRequests() {
 	Map<String, String> multi = Maps.newHashMap();
 	int i = 0;
-	Map<String, Object> requestMapping = Maps.newHashMap();
+	Map<String, Object> requestMapping = Maps.newLinkedHashMap();
 	while (!fetchQueue.isEmpty()) {
 		FullQuery fullQuery = fetchQueue.poll();
 		String url = null;
@@ -391,7 +391,7 @@ public class Factual {
 			url = toUrl("/"+urlForFacets(table), ((FacetQuery)query).toUrlQuery());
 	    }
 		if (url != null) {
-			String multiKey = "q"+i;
+			String multiKey = "q"+Integer.toString(i);
 			multi.put(multiKey, url);
 			requestMapping.put(multiKey, query);
 			i++;
@@ -401,11 +401,11 @@ public class Factual {
 	String url = "";
 	try {
 		String encoded = URLEncoder.encode(json, "UTF-8");
-		url = toUrl(factHome + "multi", "queries=" + encoded+"&"+"KEY="+key);
+		url = toUrl(factHome + "multi", "queries=" + encoded);
 	} catch (UnsupportedEncodingException e) {
 		e.printStackTrace();
 	}
-	String jsonResponse = request(url, false);
+	String jsonResponse = request(url);
 	MultiResponse resp = new MultiResponse(requestMapping);
 	resp.setJson(jsonResponse);
 	return resp;

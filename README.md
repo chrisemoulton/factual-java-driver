@@ -11,13 +11,13 @@ The driver is in Maven Central, so you can just add this to your Maven <tt>pom.x
     <dependency>
       <groupId>com.factual</groupId>
       <artifactId>factual-java-driver</artifactId>
-      <version>1.3.1-beta</version>
+      <version>1.3.2-beta</version>
     </dependency>
     
 ## Non Maven users
 
 You can download the individual driver jar, and view the pom.xml file, here:
-[Driver download folder](http://repo1.maven.org/maven2/com/factual/factual-java-driver/1.3.1-beta/)
+[Driver download folder](http://repo1.maven.org/maven2/com/factual/factual-java-driver/1.3.2-beta/)
 
 The pom.xml tells you what dependencies you'll need to plug into your project to get the driver to work (see the <dependencies> section).
 
@@ -628,13 +628,13 @@ The <tt>fetch</tt> method gives the diff data:
 # Multi
 
 The driver fully supports Factual's experimental Multi feature, which enables making multiple requests on the same connection.
-Queue responses using <tt>queueFetch</tt>, and send all queued reads using <tt>sendRequests</tt>.  The <tt>sendRequest</tt> method requests all reads queued since the last <tt>sendRequest</tt>
+Queue responses using <tt>queueFetch</tt>, and send all queued reads using <tt>sendRequests</tt>.  The <tt>sendRequest</tt> method requests all reads queued since the last <tt>sendRequest</tt>.  The responses from the multi request are returned in a list, corresponding to the same order in which they were queued.
 
 ## Simple Multi Example
 
 
 	// Fetch a multi response
-	factual.queueFetch("places", new Query().field("country").equal("US"));
+	factual.queueFetch("places", new Query().field("region").equal("CA"));
 	factual.queueFetch("places", new Query().limit(1)); 
 	MultiResponse multi = factual.sendRequests();	
 

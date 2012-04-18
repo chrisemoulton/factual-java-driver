@@ -3,6 +3,7 @@ package com.factual.driver;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,25 +46,21 @@ public class MultiResponse extends Response {
 	
 	private void parseResponse(JSONObject jo) throws JSONException {
 	   data.clear();
-	   Iterator<String> iter = jo.keys();
-	   while (iter.hasNext()) {
-		   String key = iter.next();
-		   if (requestMapping.containsKey(key)) {
-			   String responseJson = jo.getJSONObject(key).toString();
-			   Object type = requestMapping.get(key);		
-			   Response resp = null;
-			   if (type instanceof Query) {
-					resp = new ReadResponse(responseJson);
-			   } else if (type instanceof CrosswalkQuery) {
-					resp = new CrosswalkResponse(responseJson);
-			   } else if (type instanceof ResolveQuery) {
-					resp = new ReadResponse(responseJson);
-			   } else if (type instanceof FacetQuery) {
-					resp = new FacetResponse(responseJson);
-			   }
-			   if (resp != null)
-				   data.add(resp);
+	   for (Entry<String, Object> entry : requestMapping.entrySet()) {
+		   String responseJson = jo.getJSONObject(entry.getKey()).toString();
+		   Object type = entry.getValue();	
+		   Response resp = null;
+		   if (type instanceof Query) {
+				resp = new ReadResponse(responseJson);
+		   } else if (type instanceof CrosswalkQuery) {
+				resp = new CrosswalkResponse(responseJson);
+		   } else if (type instanceof ResolveQuery) {
+				resp = new ReadResponse(responseJson);
+		   } else if (type instanceof FacetQuery) {
+				resp = new FacetResponse(responseJson);
 		   }
+		   if (resp != null)
+			   data.add(resp);
 	   }
 	}
 	

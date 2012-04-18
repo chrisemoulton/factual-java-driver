@@ -630,20 +630,25 @@ public class FactualTest {
   
   @Test
   public void testMulti() {
-	Query q = new Query().limit(1);
-	factual.queueFetch("places", q.field("country").equal("US"));
+	factual.queueFetch("places", new Query().field("region").equal("CA"));
 	factual.queueFetch("places", new Query().limit(1)); 
 	MultiResponse multi = factual.sendRequests();
-	for (Response resp : multi.getData()) {
-		System.out.println(resp);
+	List<Response> data = multi.getData();
+	assertTrue(data.size() == 2);
+	for (int i=0;i<2;i++) {
+		Response resp = data.get(i);
+		if (i == 0) {
+			assertTrue(resp.getIncludedRowCount() == 20);
+			assertOk(resp);
+		} else if (i == 1) {
+			assertTrue(resp.getIncludedRowCount() == 1);
+			assertOk(resp);
+		}
 	}
   }
   
   @Test
   public void testMultiComplex() {
-	factual.queueFetch("places", new CrosswalkQuery()
-    	.factualId("97598010-433f-4946-8fd5-4a6dd1639d77")
-    	.limit(1));
 	factual.queueFetch("places", new FacetQuery("region", "locality"));
 	factual.queueFetch("places", new Query().limit(1)); 
 	factual.queueFetch("places", new ResolveQuery()
@@ -652,10 +657,34 @@ public class FactualTest {
       	.add("region", "CA")
       	.add("postcode", "90025"));
 	MultiResponse multi = factual.sendRequests();
+	List<Response> data = multi.getData();
+	assertTrue(data.size() == 3);
+	for (int i=0;i<3;i++) {
+		Response resp = data.get(i);
+		if (i == 0) {
+			assertTrue(resp instanceof FacetResponse);
+			assertOk(resp);
+		} else if (i == 1) {
+			assertTrue(resp instanceof ReadResponse);
+			assertOk(resp);
+			assertTrue(resp.getIncludedRowCount() == 1);
+		} else if (i == 2) {
+			assertTrue(resp instanceof ReadResponse);
+			assertOk(resp);
+		}
+	}
+  }
+  @Test
+  public void testMultiCrosswalk() {
+	factual.queueFetch("places", new CrosswalkQuery()
+	.factualId("97598010-433f-4946-8fd5-4a6dd1639d77")
+	.limit(1));
+	MultiResponse multi = factual.sendRequests();
 	for (Response resp : multi.getData()) {
 		System.out.println(resp);
 	}
   }
+
   
   /**
    * Test debug mode
