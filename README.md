@@ -422,20 +422,19 @@ or modify an existing instance to toggle debug mode on and off for individual re
 	
 Debug information will be printed to standard out, with detailed request and response information, including headers.
 
-# Facet
 
-The driver fully supports Factual's Facet feature, which lets you return row counts for Factual tables, grouped by facets of data.  For example, you may want to query all businesses within 1 mile of a location and for a count of those businesses by category.
-Not all fields are configured to return facet counts.  To determine what fields you can return facets for, use the schema call.  The faceted attribute of the schema will let you know.
+# Facets
 
-## Simple Facet Example
+The driver fully supports Factual's Facets feature, which lets you return row counts for Factual tables, grouped by facets of data.  For example, you may want to query all businesses within 1 mile of a location and for a count of those businesses by category.
 
-The <tt>fetch</tt> method gives the facet counts:
 
-    // Get facet counts for the specified fields
-    FacetResponse resp = factual.fetch(new FacetQuery("region", "locality")
-	.search("Starbucks")
-	.maxValuesPerFacet(20)
-	.minCountPerFacetValue(100));
+## Simple Facets Example
+
+    // Returns a count of Starbucks by country
+    FacetResponse resp = factual.fetch("global", new FacetQuery("country").search("starbucks"));
+
+Not all fields are configured to return facet counts. To determine what fields you can return facets for, use the schema call.  The faceted attribute of the schema will let you know.
+
 
 ## All Top Level Facet Parameters
 
