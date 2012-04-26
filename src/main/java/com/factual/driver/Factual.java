@@ -34,11 +34,12 @@ import com.google.common.io.Closeables;
  * Represents the public Factual API. Supports running queries against Factual
  * and inspecting the response. Supports the same levels of authentication
  * supported by Factual's API.
- * 
+ *
  * @author aaron
  */
 public class Factual {
-  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.3.2-beta";
+
+  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.3.3-beta";
   private static final String DEFAULT_HOST_HEADER = "api.v3.factual.com";
   private String factHome = "http://api.v3.factual.com/";
   private String host = DEFAULT_HOST_HEADER;
@@ -46,23 +47,23 @@ public class Factual {
   private final OAuthHmacSigner signer;
   private boolean debug = false;
   private StreamHandler debugHandler = null;
-  
+
   private Queue<FullQuery> fetchQueue = Lists.newLinkedList();
-  
+
 
   /**
    * Constructor. Represents your authenticated access to Factual.
-   * 
+   *
    * @param key your oauth key.
    * @param secret your oauth secret.
    */
   public Factual(String key, String secret) {
 	this(key, secret, false);
   }
-  
+
   /**
    * Constructor. Represents your authenticated access to Factual.
-   * 
+   *
    * @param key your oauth key.
    * @param secret your oauth secret.
    * @param debug whether or not this is in debug mode
@@ -73,7 +74,7 @@ public class Factual {
 	this.signer.clientSharedSecret = secret;
 	debug(debug);
   }
-  
+
 
   /**
    * Change the base URL at which to contact Factual's API. This
@@ -81,7 +82,7 @@ public class Factual {
    * server.
    * <p>
    * Example value: <tt>http://staging.api.v3.factual.com/t/</tt>
-   * 
+   *
    * @param urlBase
    *          the base URL at which to contact Factual's API.
    */
@@ -91,17 +92,17 @@ public class Factual {
 
   /**
    * Change the host header value for a request to Factual's API.
-   * 
+   *
    * @param host
    *          the host header value for a request to Factual's API.
    */
   public void setRequestHost(String host) {
     this.host = host;
   }
-  
+
   /**
    * Runs a read <tt>query</tt> against the specified Factual table.
-   * 
+   *
    * @param tableName
    *          the name of the table you wish to query (e.g., "places")
    * @param query
@@ -111,11 +112,11 @@ public class Factual {
   public ReadResponse fetch(String tableName, Query query) {
     return fetchCustom(urlForFetch(tableName), query);
   }
-  
+
   /**
    * Runs a <tt>facet</tt> read against the specified Factual table.
-   * 
-   * 
+   *
+   *
    * @param tableName
    * 		  the name of the table you wish to query for facets (e.g., "places")
    * @param facet
@@ -127,49 +128,49 @@ public class Factual {
   }
 
   /**
-   * Runs a <tt>contribute</tt> input against the specified Factual table.
-   * 
+   * Runs a <tt>submit</tt> input against the specified Factual table.
+   *
    * @param tableName
-   * 		  the name of the table you wish to contribute updates for (e.g., "places")
+   * 		  the name of the table you wish to submit updates for (e.g., "places")
    * @param factualId
-   * 		  the factual id on which the contribute is run
-   * @param contribute
-   * 		  the contribute parameters to run against <tt>table</tt>
+   * 		  the factual id on which the submit is run
+   * @param submit
+   * 		  the submit parameters to run against <tt>table</tt>
    * @param metadata
    * 		  the metadata to send with information on this request
-   * 	  	 
-   * @return the response of running <tt>contribute</tt> against Factual.
+   *
+   * @return the response of running <tt>submit</tt> against Factual.
    */
-  public ContributeResponse contribute(String tableName, String factualId, Contribute contribute, Metadata metadata) {
-	return contributeCustom("t/"+tableName+"/"+factualId+"/contribute", contribute, metadata);
+  public SubmitResponse submit(String tableName, String factualId, Submit submit, Metadata metadata) {
+	return submitCustom("t/"+tableName+"/"+factualId+"/submit", submit, metadata);
   }
 
   /**
-   * Runs a <tt>contribute</tt> to add a row against the specified Factual table.
-   * 
+   * Runs a <tt>submit</tt> to add a row against the specified Factual table.
+   *
    * @param tableName
-   * 		  the name of the table you wish to contribute the add for (e.g., "places")
-   * @param contribute
-   * 		  the contribute parameters to run against <tt>table</tt>
+   * 		  the name of the table you wish to submit the add for (e.g., "places")
+   * @param submit
+   * 		  the submit parameters to run against <tt>table</tt>
    * @param metadata
    * 		  the metadata to send with information on this request
-   * 	  	 
-   * @return the response of running <tt>contribute</tt> against Factual.
+   *
+   * @return the response of running <tt>submit</tt> against Factual.
    */
-  public ContributeResponse contribute(String tableName, Contribute contribute, Metadata metadata) {
-	return contributeCustom("t/"+tableName+"/contribute", contribute, metadata);
+  public SubmitResponse submit(String tableName, Submit submit, Metadata metadata) {
+	return submitCustom("t/"+tableName+"/submit", submit, metadata);
   }
-  
+
   /**
    * Flags a row as a duplicate in the specified Factual table.
-   * 
+   *
    * @param tableName
    * 		  the name of the table you wish to flag a duplicate for (e.g., "places")
    * @param factualId
    * 		  the factual id that is the duplicate
    * @param metadata
    * 		  the metadata to send with information on this request
-   * 	  	 
+   *
    * @return the response from flagging a duplicate row.
    */
   public FlagResponse flagDuplicate(String tableName, String factualId, Metadata metadata) {
@@ -178,30 +179,30 @@ public class Factual {
 
   /**
    * Flags a row as inaccurate in the specified Factual table.
-   * 
+   *
    * @param tableName
    * 		  the name of the table you wish to flag an inaccurate row for (e.g., "places")
    * @param factualId
    * 		  the factual id that is inaccurate
    * @param metadata
    * 		  the metadata to send with information on this request
-   * 	  	 
+   *
    * @return the response from flagging an inaccurate row.
    */
   public FlagResponse flagInaccurate(String tableName, String factualId, Metadata metadata) {
 	return flagCustom(urlForFlag(tableName, factualId), "inaccurate", metadata);
-  }  
-  
+  }
+
   /**
    * Flags a row as inappropriate in the specified Factual table.
-   * 
+   *
    * @param tableName
    * 		  the name of the table you wish to flag an inappropriate row for (e.g., "places")
    * @param factualId
    * 		  the factual id that is inappropriate
    * @param metadata
    * 		  the metadata to send with information on this request
-   * 	  	 
+   *
    * @return the response from flagging an inappropriate row.
    */
   public FlagResponse flagInappropriate(String tableName, String factualId, Metadata metadata) {
@@ -210,52 +211,52 @@ public class Factual {
 
   /**
    * Flags a row as non-existent in the specified Factual table.
-   * 
+   *
    * @param tableName
    * 		  the name of the table you wish to flag a non-existent row for (e.g., "places")
    * @param factualId
    * 		  the factual id that is non-existent
    * @param metadata
    * 		  the metadata to send with information on this request
-   * 	  	 
+   *
    * @return the response from flagging a non-existent row.
    */
   public FlagResponse flagNonExistent(String tableName, String factualId, Metadata metadata) {
 	return flagCustom(urlForFlag(tableName, factualId), "nonexistent", metadata);
-  }  
+  }
 
   /**
    * Flags a row as spam in the specified Factual table.
-   * 
+   *
    * @param tableName
    * 		  the name of the table you wish to flag a row as spam (e.g., "places")
    * @param factualId
    * 		  the factual id that is spam
    * @param metadata
    * 		  the metadata to send with information on this request
-   * 	  	 
+   *
    * @return the response from flagging a row as spam.
    */
   public FlagResponse flagSpam(String tableName, String factualId, Metadata metadata) {
 	return flagCustom(urlForFlag(tableName, factualId), "spam", metadata);
-  }   
-  
+  }
+
   /**
    * Flags a row as problematic in the specified Factual table.
-   * 
+   *
    * @param tableName
    * 		  the name of the table for which you wish to flag as problematic (e.g., "places")
    * @param factualId
    * 		  the factual id that has a problem other than duplicate, inaccurate, inappropriate, non-existent, or spam.
    * @param metadata
    * 		  the metadata to send with information on this request
-   * 	  	 
+   *
    * @return the response from flagging a row as problematic.
    */
   public FlagResponse flagOther(String tableName, String factualId, Metadata metadata) {
 	return flagCustom(urlForFlag(tableName, factualId), "other", metadata);
-  }  
-  
+  }
+
   /**
    * Runs a "GET" request against the path specified using the parameters specified and your Oauth token.
    * @param path the path to run the request against
@@ -270,29 +271,29 @@ public class Factual {
 	String paramString = Joiner.on("&").skipNulls().join(paramList);
 	return request(toUrl(factHome + path, paramString));
   }
-  
+
   private ReadResponse fetchCustom(String root, Query query) {
 	return new ReadResponse(request(toUrl(factHome + root, query.toUrlQuery())));
   }
-  
+
   private FacetResponse fetchCustom(String root, FacetQuery facet) {
 	return new FacetResponse(request(toUrl(factHome + root, facet.toUrlQuery())));
   }
-  
+
   private CrosswalkResponse fetchCustom(String root, CrosswalkQuery query) {
 	return new CrosswalkResponse(request(toUrl(factHome + root, query.toUrlQuery())));
-  } 
-  
+  }
+
   private ReadResponse fetchCustom(String root, ResolveQuery query) {
 	return new ReadResponse(request(toUrl(factHome + root, query.toUrlQuery())));
   }
-  
-  private ContributeResponse contributeCustom(String root, Contribute contribute, Metadata metadata) {
+
+  private SubmitResponse submitCustom(String root, Submit submit, Metadata metadata) {
 	Map<String, String> params = Maps.newHashMap();
 	// TODO: Switch parameters to POST content when supported.
 	//params.putAll(metadata.toParamMap());
-	//params.putAll(contribute.toParamMap());
-	return new ContributeResponse(requestPost(factHome + root+"?"+contribute.toUrlQuery()+"&"+metadata.toUrlQuery(), params));
+	//params.putAll(submit.toParamMap());
+	return new SubmitResponse(requestPost(factHome + root+"?"+submit.toUrlQuery()+"&"+metadata.toUrlQuery(), params));
   }
 
   private FlagResponse flagCustom(String root, String flagType, Metadata metadata) {
@@ -302,7 +303,7 @@ public class Factual {
 	//params.put("problem", flagType);
 	return new FlagResponse(requestPost(factHome + root+"?problem="+flagType+"&"+metadata.toUrlQuery(), params));
   }
-  
+
   private String toUrl(String root, String parameters) {
 	return root + "?" + parameters;
   }
@@ -323,7 +324,7 @@ public class Factual {
 		  this.query = query;
 	  }
   }
-  
+
   /**
    * Queue a read request for inclusion in the next multi request.
    * @param table
@@ -356,7 +357,7 @@ public class Factual {
   public void queueFetch(String table, ResolveQuery query) {
 	fetchQueue.add(new FullQuery(table, query));
   }
-  
+
   /**
    * Queue a facet request for inclusion in the next multi request.
    * @param table
@@ -367,7 +368,7 @@ public class Factual {
   public void queueFetch(String table, FacetQuery query) {
 	fetchQueue.add(new FullQuery(table, query));
   }
-  
+
   /**
    * Use this to send all queued reads as a multi request
    * @return response for a multi request
@@ -422,7 +423,7 @@ public class Factual {
   /**
    * Query's Factual for the Crosswalk data matching the specified
    * <tt>query</tt>.
-   * 
+   *
    * @param tableName
    *          the name of the table to crosswalk.
    * @param query
@@ -439,7 +440,7 @@ public class Factual {
    * <p>
    * Returns the read response from a Factual Resolve request, which includes
    * all records that are potential matches.
-   * 
+   *
    * @param query
    *          the Resolve query to run against Factual's Places table.
    * @return the response from Factual for the Resolve request.
@@ -453,7 +454,7 @@ public class Factual {
    * <tt>query</tt>. Returns a record representing the resolved entity if
    * Factual successfully identified the entity with full confidence, or null if
    * the entity was not resolved.
-   * 
+   *
    * @param query
    *          a Resolve query with partial attributes for an entity.
    * @return a record representing the resolved entity if Factual successfully
@@ -477,7 +478,7 @@ public class Factual {
    * <p>
    * There will be 0 or 1 entities returned with "resolved"=true. If there was a
    * full match, it is guaranteed to be the first record in the response.
-   * 
+   *
    * @param tableName
    *          the name of the table to resolve within.
    * @param query
@@ -515,11 +516,11 @@ public class Factual {
   private String urlForFacets(String tableName) {
 	return "t/" + tableName+"/facets";
   }
-  
+
   private String request(String urlStr) {
 	  return request(urlStr, true);
   }
-  
+
   private String request(String urlStr, boolean useOAuth) {
 	  return request(urlStr, "GET", null, useOAuth);
   }
@@ -531,7 +532,7 @@ public class Factual {
   private String requestPost(String urlStr, Map<String, String> postData, boolean useOAuth) {
 	  return request(urlStr, "POST", postData, useOAuth);
   }
-  
+
   private String request(String urlStr, String requestMethod, Map<String, String> postData, boolean useOAuth) {
     GenericUrl url = new GenericUrl(urlStr);
     // Configure OAuth request params
@@ -572,7 +573,7 @@ public class Factual {
           logger.setLevel(Level.ALL);
           logger.addHandler(debugHandler);
 	  }
-      
+
       // get the response
       br = new BufferedReader(new InputStreamReader(request.execute().getContent()));
       String line = null;
@@ -581,7 +582,7 @@ public class Factual {
     	  sb.append(line);
       }
       return sb.toString();
-      
+
     } catch (HttpResponseException e) {
       throw new FactualApiException(e).requestUrl(urlStr).requestMethod(requestMethod).response(e.getResponse());
     } catch (IOException e) {
@@ -592,7 +593,7 @@ public class Factual {
       Closeables.closeQuietly(br);
     }
   }
-  
+
   /**
    * Set the driver in or out of debug mode.
    * @param debug whether or not this is in debug mode

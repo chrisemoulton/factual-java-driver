@@ -546,39 +546,39 @@ public class FactualTest {
   }
   
   @Test
-  public void testContributeAdd() {
-	Contribute contribute = new Contribute()
+  public void testSubmitAdd() {
+	Submit submit = new Submit()
     .setValue("longitude", 100);
-	ContributeResponse resp = factual.contribute("global", contribute, new Metadata().user("test_driver_user"));
+	SubmitResponse resp = factual.submit("global", submit, new Metadata().user("test_driver_user"));
     assertOk(resp);
     assertTrue(resp.isNewEntity());
   }
   
   @Test
-  public void testContributeEdit() {
-	Contribute contribute = new Contribute()
+  public void testSubmitEdit() {
+	Submit submit = new Submit()
     .setValue("longitude", 100);
-	ContributeResponse resp = factual.contribute("global", "0545b03f-9413-44ed-8882-3a9a461848da",contribute, new Metadata().user("test_driver_user"));
+	SubmitResponse resp = factual.submit("global", "0545b03f-9413-44ed-8882-3a9a461848da",submit, new Metadata().user("test_driver_user"));
     assertOk(resp);
     assertFalse(resp.isNewEntity());
   }
 
   @Test
-  public void testContributeDelete() {
-	Contribute contribute = new Contribute()
+  public void testSubmitDelete() {
+	Submit submit = new Submit()
     .removeValue("longitude");
-	ContributeResponse resp = factual.contribute("global", "0545b03f-9413-44ed-8882-3a9a461848da",contribute, new Metadata().user("test_driver_user"));
+	SubmitResponse resp = factual.submit("global", "0545b03f-9413-44ed-8882-3a9a461848da",submit, new Metadata().user("test_driver_user"));
     assertOk(resp);
     assertFalse(resp.isNewEntity());
   }
 
   @Test
-  public void testContributeError() {
-	Contribute contribute = new Contribute()
+  public void testSubmitError() {
+	Submit submit = new Submit()
     .removeValue("longitude");
 	FactualApiException exception = null;
 	try {
-		ContributeResponse resp = factual.contribute("global", "randomwrongid", contribute, new Metadata().user("test_driver_user"));
+		SubmitResponse resp = factual.submit("global", "randomwrongid", submit, new Metadata().user("test_driver_user"));
 	} catch (FactualApiException e) {
 		exception = e;
 	}

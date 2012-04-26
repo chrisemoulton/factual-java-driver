@@ -11,13 +11,13 @@ The driver is in Maven Central, so you can just add this to your Maven <tt>pom.x
     <dependency>
       <groupId>com.factual</groupId>
       <artifactId>factual-java-driver</artifactId>
-      <version>1.3.2-beta</version>
+      <version>1.3.3-beta</version>
     </dependency>
     
 ## Non Maven users
 
 You can download the individual driver jar, and view the pom.xml file, here:
-[Driver download folder](http://repo1.maven.org/maven2/com/factual/factual-java-driver/1.3.2-beta/)
+[Driver download folder](http://repo1.maven.org/maven2/com/factual/factual-java-driver/1.3.3-beta/)
 
 The pom.xml tells you what dependencies you'll need to plug into your project to get the driver to work (see the <dependencies> section).
 
@@ -518,7 +518,7 @@ The <tt>flag</tt> method flags a problematic row:
   </tr>
   <tr>
     <td>user</td>
-    <td>An arbitrary token representing the user contributing the data.</td>
+    <td>An arbitrary token representing the user flagging the data.</td>
     <td><tt>Metadata metadata = new Metadata().user("my_username")</tt></td>
   </tr>
   <tr>
@@ -533,35 +533,35 @@ The <tt>flag</tt> method flags a problematic row:
   </tr>
 </table>  
 
-# Contribute
+# Submit
 
-The driver fully supports Factual's Contribute feature, which enables you to contribute edits to existing rows and/or contribute new rows of data in Factual tables. For information on deleting records, see Flag.
+The driver fully supports Factual's Submit feature, which enables you to submit edits to existing rows and/or submit new rows of data in Factual tables. For information on deleting records, see Flag.
 
-*Note that the contribute feature is new and may not yet be available in the Factual API.  If you experience any errors, please check back at a later time.
+*Note that the submit feature is new and may not yet be available in the Factual API.  If you experience any errors, please check back at a later time.
 
-## Simple Contribute Examples
+## Simple Submit Examples
 
-The <tt>contribute</tt> method is a contribution to edit an existing row or add a new row:
+The <tt>submit</tt> method is a submission to edit an existing row or add a new row:
 
 	// Field-value mapping for an entity.
 	Map<String, Object> values = …;
 	Metadata metadata = new Metadata().user("my_username");
 
-	// Contribute the addition of a new row
-	Contribute contribute = new Contribute(values)
-	ContributeResponse resp = factual.contribute("global", contribute, metadata);
+	// Submit the addition of a new row
+	Submit submit = new Submit(values)
+	SubmitResponse resp = factual.submit("global", submit, metadata);
 	
-    // Contribute a field update
-	Contribute contribute = new Contribute(values)
+    // Submit a field update
+	Submit submit = new Submit(values)
     .setValue("longitude", 100);
-	ContributeResponse resp = factual.contribute("global", "0545b03f-9413-44ed-8882-3a9a461848da",contribute, metadata);
+	SubmitResponse resp = factual.submit("global", "0545b03f-9413-44ed-8882-3a9a461848da",submit, metadata);
 
-	// Contribute an update for a field to become blank
-	Contribute contribute = new Contribute(values)
+	// Submit an update for a field to become blank
+	Submit submit = new Submit(values)
     .removeValue("longitude");
-	ContributeResponse resp = factual.contribute("global", "0545b03f-9413-44ed-8882-3a9a461848da",contribute, metadata);
+	SubmitResponse resp = factual.submit("global", "0545b03f-9413-44ed-8882-3a9a461848da",submit, metadata);
 
-## All Top Level Contribute Parameters
+## All Top Level Submit Parameters
 
 <table>
   <tr>
@@ -576,7 +576,7 @@ The <tt>contribute</tt> method is a contribution to edit an existing row or add 
   </tr>
   <tr>
     <td>user</td>
-    <td>An arbitrary token representing the user contributing the data.</td>
+    <td>An arbitrary token representing the user submitting the data.</td>
     <td><tt>new Metadata().user("my_username")</tt></td>
   </tr>
   <tr>

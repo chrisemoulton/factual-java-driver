@@ -1,3 +1,7 @@
+## 1.3.3-beta
+
+ * Renames Contribute feature to Submit
+
 ## 1.3.2-beta
 
  * Updates for multi request calls.
