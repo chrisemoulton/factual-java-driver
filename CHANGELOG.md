@@ -1,3 +1,7 @@
+## 1.2.1
+
+ * Renames Contribute feature to Submit
+
 ## 1.2.0
 
  * Adds support for facet, contribute, and flag features.

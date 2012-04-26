@@ -67,9 +67,9 @@ public class Constants {
 	// Resolve
 	protected static final String RESOLVE_VALUES = "values";
 
-	// Contribute
-	protected static final String CONTRIBUTE_VALUES = "values";
-	protected static final String CONTRIBUTE_FACTUAL_ID = "factual_id";
-	protected static final String CONTRIBUTE_NEW_ENTITY = "new_entity";
+	// Submit
+	protected static final String SUBMIT_VALUES = "values";
+	protected static final String SUBMIT_FACTUAL_ID = "factual_id";
+	protected static final String SUBMIT_NEW_ENTITY = "new_entity";
 
 }

@@ -38,7 +38,7 @@ import com.google.common.io.Closeables;
  * @author aaron
  */
 public class Factual {
-  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.2.0";
+  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.2.1";
   private String factHome = "http://api.v3.factual.com/";
   private final String key;
   private final OAuthHmacSigner signer;
@@ -113,37 +113,37 @@ public class Factual {
   }
 
   /**
-   * Runs a <tt>contribute</tt> input against the specified Factual table.
+   * Runs a <tt>submit</tt> input against the specified Factual table.
    * 
    * @param tableName
-   * 		  the name of the table you wish to contribute updates for (e.g., "places")
+   * 		  the name of the table you wish to submit updates for (e.g., "places")
    * @param factualId
-   * 		  the factual id on which the contribute is run
-   * @param contribute
-   * 		  the contribute parameters to run against <tt>table</tt>
+   * 		  the factual id on which the submit is run
+   * @param submit
+   * 		  the submit parameters to run against <tt>table</tt>
    * @param metadata
    * 		  the metadata to send with information on this request
    * 	  	 
-   * @return the response of running <tt>contribute</tt> against Factual.
+   * @return the response of running <tt>submit</tt> against Factual.
    */
-  public ContributeResponse contribute(String tableName, String factualId, Contribute contribute, Metadata metadata) {
-	return contributeCustom("t/"+tableName+"/"+factualId+"/contribute", contribute, metadata);
+  public SubmitResponse submit(String tableName, String factualId, Submit submit, Metadata metadata) {
+	return submitCustom("t/"+tableName+"/"+factualId+"/submit", submit, metadata);
   }
 
   /**
-   * Runs a <tt>contribute</tt> to add a row against the specified Factual table.
+   * Runs a <tt>submit</tt> to add a row against the specified Factual table.
    * 
    * @param tableName
-   * 		  the name of the table you wish to contribute the add for (e.g., "places")
-   * @param contribute
-   * 		  the contribute parameters to run against <tt>table</tt>
+   * 		  the name of the table you wish to submit the add for (e.g., "places")
+   * @param submit
+   * 		  the submit parameters to run against <tt>table</tt>
    * @param metadata
    * 		  the metadata to send with information on this request
    * 	  	 
-   * @return the response of running <tt>contribute</tt> against Factual.
+   * @return the response of running <tt>submit</tt> against Factual.
    */
-  public ContributeResponse contribute(String tableName, Contribute contribute, Metadata metadata) {
-	return contributeCustom("t/"+tableName+"/contribute", contribute, metadata);
+  public SubmitResponse submit(String tableName, Submit submit, Metadata metadata) {
+	return submitCustom("t/"+tableName+"/submit", submit, metadata);
   }
   
   /**
@@ -273,12 +273,12 @@ public class Factual {
 	return new ReadResponse(request(toUrl(factHome + root, query.toUrlQuery())));
   }
   
-  private ContributeResponse contributeCustom(String root, Contribute contribute, Metadata metadata) {
+  private SubmitResponse submitCustom(String root, Submit submit, Metadata metadata) {
 	Map<String, String> params = Maps.newHashMap();
 	// TODO: Switch parameters to POST content when supported.
 	//params.putAll(metadata.toParamMap());
-	//params.putAll(contribute.toParamMap());
-	return new ContributeResponse(requestPost(factHome + root+"?"+contribute.toUrlQuery()+"&"+metadata.toUrlQuery(), params));
+	//params.putAll(submit.toParamMap());
+	return new SubmitResponse(requestPost(factHome + root+"?"+submit.toUrlQuery()+"&"+metadata.toUrlQuery(), params));
   }
 
   private FlagResponse flagCustom(String root, String flagType, Metadata metadata) {
