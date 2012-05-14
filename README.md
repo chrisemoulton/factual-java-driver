@@ -21,15 +21,15 @@ You can download the individual driver jar, and view the pom.xml file, here:
 
 The pom.xml tells you what dependencies you'll need to plug into your project to get the driver to work.
 
-# Application Development
+# Usage
 
 For a description of all the features available in the driver, please refer to the 
-[Non-Android Java driver](https://github.com/Factual/factual-java-driver)
+[Non-Android Java driver](https://github.com/Factual/factual-java-driver) documentation.  For a sample Android project using the Java driver, refer to [Factual Android SDK Demo](https://github.com/Factual/factual-android-sdk-demo)
 
 ## Tips
 
-Ensure your application AndroidManifest.xml has Internet access enabled: 
+* Ensure your application's AndroidManifest.xml has Internet access enabled: 
 
 	<uses-permission android:name="android.permission.INTERNET" />
 
-Perform Factual requests using the Android AsyncTask to prevent errors related to blocking of the main thread.
+* Perform Factual requests using the Android AsyncTask to prevent errors related to blocking of the main thread.
