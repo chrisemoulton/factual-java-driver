@@ -648,6 +648,35 @@ public class FactualTest {
   }
   
   @Test
+  public void testMultiRawRead() {
+	factual.debug(true);
+    Map<String, Object> params = Maps.newHashMap();
+    params.put("filters", JsonUtil.toJsonStr(
+		new HashMap() {{  
+			put("country", new HashMap() {{
+				put("$eq", "US");	    
+			}});
+		}})
+    );
+	factual.queueFetch("places", new FacetQuery("region", "locality"));
+	factual.queueFetch("t/places", params);
+	//factual.queueFetch("places", new Query().limit(1)); 
+	MultiResponse multi = factual.sendRequests();
+	List<Response> data = multi.getData();
+	assertTrue(data.size() == 2);
+	for (int i=0;i<2;i++) {
+		Response resp = data.get(i);
+		if (i == 0) {
+			assertTrue(resp instanceof FacetResponse);
+		} else {
+			assertTrue(resp instanceof RawReadResponse);
+			assertTrue(resp.getIncludedRowCount() == 20);
+		}
+		assertOk(resp);
+	}
+  }
+  
+  @Test
   public void testMultiComplex() {
 	factual.queueFetch("places", new FacetQuery("region", "locality"));
 	factual.queueFetch("places", new Query().limit(1)); 

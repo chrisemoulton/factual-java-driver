@@ -58,6 +58,8 @@ public class MultiResponse extends Response {
 				resp = new ReadResponse(responseJson);
 		   } else if (type instanceof FacetQuery) {
 				resp = new FacetResponse(responseJson);
+		   } else if (type instanceof Map) {
+			   	resp = new RawReadResponse(responseJson);
 		   }
 		   if (resp != null)
 			   data.add(resp);

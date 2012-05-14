@@ -260,16 +260,20 @@ public class Factual {
   /**
    * Runs a "GET" request against the path specified using the parameters specified and your Oauth token.
    * @param path the path to run the request against
-   * @param params the parameters to send with the request, URL-encoded
+   * @param params the parameters to send with the request
    * @return the response of running <tt>query</tt> against Factual.
    */
   public String get(String path, Map<String, Object> params) {
+	return request(constructRawReadUrl(path, params));
+  }
+  
+  private String constructRawReadUrl(String path, Map<String, Object> params) {
 	List<Object> paramList = Lists.newArrayList();
 	for (Entry<String, Object> entry : params.entrySet()) {
 		paramList.add(Parameters.urlPair(entry.getKey(), String.valueOf(entry.getValue()), true));
 	}
 	String paramString = Joiner.on("&").skipNulls().join(paramList);
-	return request(toUrl(factHome + path, paramString));
+	return toUrl(factHome + path, paramString);
   }
 
   private ReadResponse fetchCustom(String root, Query query) {
@@ -323,6 +327,15 @@ public class Factual {
 		  this.table = table;
 		  this.query = query;
 	  }
+  }
+
+  /**
+   * Queue a raw read request for inclusion in the next multi request.
+   * @param path the path to run the request against
+   * @param params the parameters to send with the request
+   */
+  public void queueFetch(String path, Map<String, Object> params) {
+	fetchQueue.add(new FullQuery(path, params));
   }
 
   /**
@@ -390,6 +403,8 @@ public class Factual {
 			url = toUrl("/"+urlForResolve(table), ((ResolveQuery)query).toUrlQuery());
 	    } else if (query instanceof FacetQuery) {
 			url = toUrl("/"+urlForFacets(table), ((FacetQuery)query).toUrlQuery());
+	    } else if (query instanceof Map) {
+	    	url = constructRawReadUrl(table, (Map) query);
 	    }
 		if (url != null) {
 			String multiKey = "q"+Integer.toString(i);

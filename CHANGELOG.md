@@ -1,6 +1,7 @@
 ## 1.3.3-beta
 
  * Renames Contribute feature to Submit
+ * Adds raw read capability to multi request
 
 ## 1.3.2-beta
 
