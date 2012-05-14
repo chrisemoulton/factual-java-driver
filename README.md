@@ -28,5 +28,8 @@ For a description of all the features available in the driver, please refer to t
 
 ## Tips
 
-1. Ensure your application AndroidManifest.xml has Internet access enabled: <uses-permission android:name="android.permission.INTERNET" />.
-2. Perform Factual requests using the Android AsyncTask to prevent errors related to blocking of the main thread.
+Ensure your application AndroidManifest.xml has Internet access enabled: 
+
+	<uses-permission android:name="android.permission.INTERNET" />
+
+Perform Factual requests using the Android AsyncTask to prevent errors related to blocking of the main thread.
