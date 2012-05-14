@@ -649,7 +649,6 @@ public class FactualTest {
   
   @Test
   public void testMultiRawRead() {
-	factual.debug(true);
     Map<String, Object> params = Maps.newHashMap();
     params.put("filters", JsonUtil.toJsonStr(
 		new HashMap() {{  
@@ -660,7 +659,6 @@ public class FactualTest {
     );
 	factual.queueFetch("places", new FacetQuery("region", "locality"));
 	factual.queueFetch("t/places", params);
-	//factual.queueFetch("places", new Query().limit(1)); 
 	MultiResponse multi = factual.sendRequests();
 	List<Response> data = multi.getData();
 	assertTrue(data.size() == 2);
