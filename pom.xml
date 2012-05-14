@@ -4,7 +4,7 @@
 
   <groupId>com.factual</groupId>
   <artifactId>factual-java-driver</artifactId>
-  <version>1.2.1</version>
+  <version>1.2.1-android</version>
   <packaging>jar</packaging>
 
   <name>factual-java-driver</name>
@@ -42,15 +42,46 @@
   </developers>
 
   <dependencies>
+
+    <dependency>
+      <groupId>com.google.android</groupId>
+      <artifactId>android</artifactId>
+      <version>4.0.1.2</version>
+      <scope>provided</scope>
+    </dependency>
+
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>r09</version>
+      <version>11.0.2</version>
     </dependency>
+
     <dependency>
       <groupId>com.google.api-client</groupId>
       <artifactId>google-api-client</artifactId>
-      <version>1.7.0-beta</version>
+      <version>1.8.0-beta</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>xpp3</artifactId>
+          <groupId>xpp3</groupId>
+        </exclusion>
+        <exclusion>
+        <artifactId>httpclient</artifactId>
+        <groupId>org.apache.httpcomponents</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>junit</artifactId>
+          <groupId>junit</groupId>
+        </exclusion>
+        <exclusion>
+        <artifactId>android</artifactId>
+        <groupId>com.google.android</groupId>
+        </exclusion>
+        <exclusion>
+        <artifactId>commons-logging</artifactId>
+        <groupId>commons-logging</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.codehaus.jackson</groupId>
@@ -61,6 +92,7 @@
       <groupId>org.codehaus.jackson</groupId>
       <artifactId>jackson-core-lgpl</artifactId>
       <version>1.9.1</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.codehaus.jackson</groupId>
@@ -76,6 +108,7 @@
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
       <version>20090211</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
