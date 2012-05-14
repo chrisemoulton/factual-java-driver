@@ -627,7 +627,7 @@ The <tt>fetch</tt> method gives the diff data:
 # Multi
 
 The driver fully supports Factual's experimental Multi feature, which enables making multiple requests on the same connection.
-Queue responses using <tt>queueFetch</tt>, and send all queued reads using <tt>sendRequests</tt>.  The <tt>sendRequest</tt> method requests all reads queued since the last <tt>sendRequest</tt>.  The responses from the multi request are returned in a list, corresponding to the same order in which they were queued.
+Queue responses using <tt>queueFetch</tt>, and send all queued reads using <tt>sendRequests</tt>.  The <tt>sendRequests</tt> method requests all reads queued since the last <tt>sendRequests</tt>.  The responses from the multi request are returned in a list, corresponding to the same order in which they were queued.
 
 ## Simple Multi Example
 
