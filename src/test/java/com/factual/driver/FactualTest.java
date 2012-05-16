@@ -620,6 +620,32 @@ public class FactualTest {
 	FlagResponse resp = factual.flagOther("global", "0545b03f-9413-44ed-8882-3a9a461848da", new Metadata().user("test_driver_user"));
     assertOk(resp);
   }  
+
+  @Test
+  public void testGeopulse() {
+	ReadResponse resp = factual.geopulse(new Geopulse(new Point(latitude, longitude))
+												.only("commercial_density", "commercial_profile"));
+	System.out.println(resp.getJson());
+    assertOk(resp);
+  }  
+  
+  @Test
+  public void testGeocode() {
+	ReadResponse resp = factual.reverseGeocode(new Point(latitude, longitude));
+	System.out.println(resp.getJson());
+    assertOk(resp);
+  }  
+  
+  @Test
+  public void testWorldGeographies() {
+	Query query = new Query()
+	.and(new Query().field("name").equal("philadelphia"),
+		 new Query().field("country").equal("us"),
+		 new Query().field("placetype").equal("locality"));
+	ReadResponse resp = factual.fetch("world-geographies", query);
+	System.out.println(resp.getJson());
+    assertOk(resp);
+  }  
   
   /**
    * Test debug mode

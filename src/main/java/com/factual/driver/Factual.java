@@ -98,6 +98,14 @@ public class Factual {
     return fetchCustom(urlForFetch(tableName), query);
   }
   
+  public ReadResponse geopulse(Geopulse geopulse) {
+	return new ReadResponse(request(toUrl(factHome + "places/geopulse", geopulse.toUrlQuery())));
+  }
+
+  public ReadResponse reverseGeocode(Point point) {
+	return new ReadResponse(request(toUrl(factHome + "places/geocode", new Geocode(point).toUrlQuery())));
+  }
+  
   /**
    * Runs a <tt>facet</tt> read against the specified Factual table.
    * 
