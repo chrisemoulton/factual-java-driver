@@ -599,7 +599,7 @@ The <tt>submit</tt> method is a submission to edit an existing row or add a new 
 
 # Multi
 
-The driver fully supports Factual's experimental Multi feature, which enables making multiple requests on the same connection.
+The driver fully supports Factual's Multi feature, which enables making multiple requests on the same connection.
 Queue responses using <tt>queueFetch</tt>, and send all queued reads using <tt>sendRequests</tt>.  The <tt>sendRequests</tt> method requests all reads queued since the last <tt>sendRequests</tt>.  The responses from the multi request are returned in a list, corresponding to the same order in which they were queued.
 
 ## Simple Multi Example

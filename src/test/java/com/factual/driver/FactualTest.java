@@ -721,6 +721,7 @@ public class FactualTest {
 		}
 	}
   }
+  
   @Test
   public void testMultiCrosswalk() {
 	factual.queueFetch("places", new CrosswalkQuery()
@@ -728,7 +729,7 @@ public class FactualTest {
 	.limit(1));
 	MultiResponse multi = factual.sendRequests();
 	for (Response resp : multi.getData()) {
-		System.out.println(resp);
+		assertOk(resp);
 	}
   }
   
@@ -737,21 +738,23 @@ public class FactualTest {
 	factual.queueFetch(new Geocode(new Point(latitude, longitude)));
 	factual.queueFetch(new Geopulse(new Point(latitude, longitude)));
 	MultiResponse multi = factual.sendRequests();
+	assertTrue(multi.getData().size() == 2);
 	for (Response resp : multi.getData()) {
-		System.out.println(resp);
+		assertOk(resp);
 	}
   }
   
   @Test
   public void testMultiGeopulseWithNearestPlace() {
-	System.out.println(new Query().within(new Circle(latitude, longitude, meters)).queryParams.toUrlQuery(null, false));
 	factual.queueFetch("global", new Query().within(new Circle(latitude, longitude, meters)));
 	factual.queueFetch(new Geopulse(new Point(latitude, longitude)));
 	MultiResponse multi = factual.sendRequests();
+	assertTrue(multi.getData().size() == 2);
 	for (Response resp : multi.getData()) {
-		System.out.println(resp);
+		assertOk(resp);
 	}
   } 
+  
   /**
    * Test debug mode
    */
