@@ -649,6 +649,109 @@ public class FactualTest {
     assertOk(resp);
   }  
   
+  public void testMulti() {
+	factual.queueFetch("places", new Query().field("region").equal("CA"));
+	factual.queueFetch("places", new Query().limit(1)); 
+	MultiResponse multi = factual.sendRequests();
+	List<Response> data = multi.getData();
+	assertTrue(data.size() == 2);
+	for (int i=0;i<2;i++) {
+		Response resp = data.get(i);
+		if (i == 0) {
+			assertTrue(resp.getIncludedRowCount() == 20);
+			assertOk(resp);
+		} else if (i == 1) {
+			assertTrue(resp.getIncludedRowCount() == 1);
+			assertOk(resp);
+		}
+	}
+  }
+  
+  @Test
+  public void testMultiRawRead() {
+    Map<String, Object> params = Maps.newHashMap();
+    params.put("filters", JsonUtil.toJsonStr(
+		new HashMap() {{  
+			put("country", new HashMap() {{
+				put("$eq", "US");	    
+			}});
+		}})
+    );
+	factual.queueFetch("places", new FacetQuery("region", "locality"));
+	factual.queueFetch("t/places", params);
+	MultiResponse multi = factual.sendRequests();
+	List<Response> data = multi.getData();
+	assertTrue(data.size() == 2);
+	for (int i=0;i<2;i++) {
+		Response resp = data.get(i);
+		if (i == 0) {
+			assertTrue(resp instanceof FacetResponse);
+		} else {
+			assertTrue(resp instanceof RawReadResponse);
+			assertTrue(resp.getIncludedRowCount() == 20);
+		}
+		assertOk(resp);
+	}
+  }
+  
+  @Test
+  public void testMultiComplex() {
+	factual.queueFetch("places", new FacetQuery("region", "locality"));
+	factual.queueFetch("places", new Query().limit(1)); 
+	factual.queueFetch("places", new ResolveQuery()
+      	.add("name", "McDonalds")
+      	.add("address", "10451 Santa Monica Blvd")
+      	.add("region", "CA")
+      	.add("postcode", "90025"));
+	MultiResponse multi = factual.sendRequests();
+	List<Response> data = multi.getData();
+	assertTrue(data.size() == 3);
+	for (int i=0;i<3;i++) {
+		Response resp = data.get(i);
+		if (i == 0) {
+			assertTrue(resp instanceof FacetResponse);
+			assertOk(resp);
+		} else if (i == 1) {
+			assertTrue(resp instanceof ReadResponse);
+			assertOk(resp);
+			assertTrue(resp.getIncludedRowCount() == 1);
+		} else if (i == 2) {
+			assertTrue(resp instanceof ReadResponse);
+			assertOk(resp);
+		}
+	}
+  }
+  @Test
+  public void testMultiCrosswalk() {
+	factual.queueFetch("places", new CrosswalkQuery()
+	.factualId("97598010-433f-4946-8fd5-4a6dd1639d77")
+	.limit(1));
+	MultiResponse multi = factual.sendRequests();
+	for (Response resp : multi.getData()) {
+		System.out.println(resp);
+	}
+  }
+  
+  @Test
+  public void testMultiGeopulseWithNearestAddress() {
+	factual.queueFetch(new Geocode(new Point(latitude, longitude)));
+	factual.queueFetch(new Geopulse(new Point(latitude, longitude)));
+	MultiResponse multi = factual.sendRequests();
+	for (Response resp : multi.getData()) {
+		System.out.println(resp);
+	}
+  }
+  
+  @Test
+  public void testMultiGeopulseWithNearestPlace() {
+	System.out.println(new Query().within(new Circle(latitude, longitude, meters)).queryParams.toUrlQuery(null, false));
+	factual.queueFetch("global", new Query().within(new Circle(latitude, longitude, meters)));
+	factual.queueFetch(new Geopulse(new Point(latitude, longitude)));
+	MultiResponse multi = factual.sendRequests();
+	for (Response resp : multi.getData()) {
+		System.out.println(resp);
+	}
+  } 
   /**
    * Test debug mode
    */

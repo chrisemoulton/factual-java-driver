@@ -1,3 +1,9 @@
+## 1.4.0
+
+ * Adds Multi call
+ * Adds geopulse
+ * Adds reverse geocode
+
 ## 1.2.1
 
  * Renames Contribute feature to Submit

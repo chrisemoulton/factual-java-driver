@@ -11,13 +11,13 @@ The driver is in Maven Central, so you can just add this to your Maven <tt>pom.x
     <dependency>
       <groupId>com.factual</groupId>
       <artifactId>factual-java-driver</artifactId>
-      <version>1.2.1</version>
+      <version>1.4.0</version>
     </dependency>
     
 ## Non Maven users
 
 You can download the individual driver jar, and view the pom.xml file, here:
-[Driver download folder](http://repo1.maven.org/maven2/com/factual/factual-java-driver/1.2.1/)
+[Driver download folder](http://repo1.maven.org/maven2/com/factual/factual-java-driver/1.4.0/)
 
 The pom.xml tells you what dependencies you'll need to plug into your project to get the driver to work (see the <dependencies> section).
 
@@ -442,7 +442,6 @@ The driver fully supports Factual's Facets feature, which lets you return row co
 
 Not all fields are configured to return facet counts. To determine what fields you can return facets for, use the schema call.  The faceted attribute of the schema will let you know.
 
-
 ## All Top Level Facets Parameters
 
 <table>
@@ -598,6 +597,17 @@ The <tt>submit</tt> method is a submission to edit an existing row or add a new 
   </tr>
 </table>	
 
+# Multi
+
+The driver fully supports Factual's experimental Multi feature, which enables making multiple requests on the same connection.
+Queue responses using <tt>queueFetch</tt>, and send all queued reads using <tt>sendRequests</tt>.  The <tt>sendRequests</tt> method requests all reads queued since the last <tt>sendRequests</tt>.  The responses from the multi request are returned in a list, corresponding to the same order in which they were queued.
+
+## Simple Multi Example
+
+	// Fetch a multi response
+	factual.queueFetch("places", new Query().field("region").equal("CA"));
+	factual.queueFetch("places", new Query().limit(1)); 
+	MultiResponse multi = factual.sendRequests();
 
 # Geopulse
 
@@ -637,7 +647,7 @@ The <tt>geopulse</tt> method fetches results based on the given point:
 The driver fully supports Factual's <a href="http://wiki.corp.factual.com/display/DOCS/Places+API+-+Reverse+Geocoder">Reverse Geocoder</a> feature, which returns the nearest valid address given a longitude and latitude. 
 
 ## Simple Reverse Geocoder Example
-
+	
 The <tt>reverseGeocode</tt> method fetches results based on the given point:
 
 	ReadResponse resp = factual.reverseGeocode(new Point(latitude, longitude));	
@@ -656,7 +666,7 @@ The <tt>reverseGeocode</tt> method fetches results based on the given point:
     <td><tt>new Point(latitude, longitude)</tt></td>
   </tr>
 </table>
-
+	
 
 # Exception Handling
 
@@ -680,7 +690,6 @@ For more code examples:
 
 * See the standalone demos in <tt>src/test/java/com/factual/demo</tt>
 * See the integration tests in <tt>src/test/java/com/factual/FactualTest.java</tt>
-
 
 # Where to Get Help
 
