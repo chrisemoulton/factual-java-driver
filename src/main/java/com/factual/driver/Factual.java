@@ -3,12 +3,9 @@ package com.factual.driver;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -98,10 +95,22 @@ public class Factual {
     return fetchCustom(urlForFetch(tableName), query);
   }
   
+  /**
+   * Runs a <tt>geopulse</tt> query against the specified Factual table.
+   * 
+   * @param geopulse the geopulse query to run.
+   * @return the response of running <tt>geopulse</tt> against Factual.
+   */
   public ReadResponse geopulse(Geopulse geopulse) {
 	return new ReadResponse(request(toUrl(factHome + "places/geopulse", geopulse.toUrlQuery())));
   }
 
+  /**
+   * Reverse geocodes by returning a response containing the address nearest to the given point.
+   * 
+   * @param point the point for which the nearest address is returned
+   * @return the response of running a reverse geocode query for <tt>point</tt> against Factual.
+   */
   public ReadResponse reverseGeocode(Point point) {
 	return new ReadResponse(request(toUrl(factHome + "places/geocode", new Geocode(point).toUrlQuery())));
   }

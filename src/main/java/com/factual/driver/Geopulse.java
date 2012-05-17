@@ -1,8 +1,16 @@
 package com.factual.driver;
 
+/**
+ * 
+ * Represents a Geopulse query against Factual
+ * 
+ * @author brandon
+ *
+ */
 public class Geopulse {
+
   /**
-   * Holds all parameters for this Query.
+   * Holds all parameters for this Geopulse.
    */
   protected final Parameters queryParams = new Parameters();
 
