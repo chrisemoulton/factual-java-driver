@@ -612,3 +612,15 @@ For more code examples:
 
 * See the standalone demos in <tt>src/test/java/com/factual/demo</tt>
 * See the integration tests in <tt>src/test/java/com/factual/FactualTest.java</tt>
+
+
+# Where to Get Help
+
+If you think you've identified a specific bug in this driver, please file an issue in the github repo. Please be as specific as you can, including:
+
+  * What you did to surface the bug
+  * What you expected to happen
+  * What actually happened
+  * Detailed stack trace and/or line numbers
+
+If you are having any other kind of issue, such as unexpected data or strange behaviour from Factual's API (or you're just not sure WHAT'S going on), please contact us through [GetSatisfaction](http://support.factual.com/factual).

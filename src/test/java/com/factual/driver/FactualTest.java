@@ -625,16 +625,18 @@ public class FactualTest {
   public void testGeopulse() {
 	ReadResponse resp = factual.geopulse(new Geopulse(new Point(latitude, longitude))
 												.only("commercial_density", "commercial_profile"));
-	System.out.println(resp.getJson());
+	Map<String, Object> pulse = resp.getData().get(0);
+	assertTrue(pulse.containsKey("commercial_profile"));
+	assertTrue(pulse.containsKey("commercial_density"));
     assertOk(resp);
   }  
   
   @Test
   public void testGeocode() {
 	ReadResponse resp = factual.reverseGeocode(new Point(latitude, longitude));
-	System.out.println(resp.getJson());
+	assertTrue(resp.getData().size() == 1);
     assertOk(resp);
-  }  
+  }
   
   @Test
   public void testWorldGeographies() {
@@ -643,7 +645,7 @@ public class FactualTest {
 		 new Query().field("country").equal("us"),
 		 new Query().field("placetype").equal("locality"));
 	ReadResponse resp = factual.fetch("world-geographies", query);
-	System.out.println(resp.getJson());
+	assertTrue(resp.getData().size() == 14);
     assertOk(resp);
   }  
   
