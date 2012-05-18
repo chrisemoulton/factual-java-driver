@@ -11,13 +11,13 @@ The driver is in Maven Central, so you can just add this to your Maven <tt>pom.x
     <dependency>
       <groupId>com.factual</groupId>
       <artifactId>factual-java-driver</artifactId>
-      <version>1.2.1</version>
+      <version>1.4.0</version>
     </dependency>
     
 ## Non Maven users
 
 You can download the individual driver jar, and view the pom.xml file, here:
-[Driver download folder](http://repo1.maven.org/maven2/com/factual/factual-java-driver/1.2.1/)
+[Driver download folder](http://repo1.maven.org/maven2/com/factual/factual-java-driver/1.4.0/)
 
 The pom.xml tells you what dependencies you'll need to plug into your project to get the driver to work (see the <dependencies> section).
 
@@ -40,6 +40,13 @@ Results are returned as the JSON returned by Factual. Optionally, there are JSON
     System.out.println(
       factual.fetch("places", new Query().limit(3)));
 	
+These queries can be used to read results any of Factual's tables.  For example:
+
+* <a href="http://wiki.corp.factual.com/display/DOCS/Global+Places+Database">Global Places</a>
+* <a href="http://wiki.corp.factual.com/display/DOCS/Places+API+-+Restaurants">Restaurants</a>
+* <a href="http://wiki.corp.factual.com/display/DOCS/World+Geographies">World Geographies</a>
+* And more!
+
 # Full Text Search
 
     // Print entities that match a full text search for Sushi in Santa Monica:
@@ -279,6 +286,7 @@ You can nest AND and OR logic to whatever level of complexity you need. For exam
         )
     );
 
+
 # Crosswalk
 
 The driver fully supports Factual's Crosswalk feature, which lets you "crosswalk" the web and relate entities between Factual's data and that of other web authorities.
@@ -433,7 +441,6 @@ The driver fully supports Factual's Facets feature, which lets you return row co
     FacetResponse resp = factual.fetch("global", new FacetQuery("country").search("starbucks"));
 
 Not all fields are configured to return facet counts. To determine what fields you can return facets for, use the schema call.  The faceted attribute of the schema will let you know.
-
 
 ## All Top Level Facets Parameters
 
@@ -590,6 +597,77 @@ The <tt>submit</tt> method is a submission to edit an existing row or add a new 
   </tr>
 </table>	
 
+# Multi
+
+The driver fully supports Factual's Multi feature, which enables making multiple requests on the same connection.
+Queue responses using <tt>queueFetch</tt>, and send all queued reads using <tt>sendRequests</tt>.  The <tt>sendRequests</tt> method requests all reads queued since the last <tt>sendRequests</tt>.  The responses from the multi request are returned in a list, corresponding to the same order in which they were queued.
+
+## Simple Multi Example
+
+	// Fetch a multi response
+	factual.queueFetch("places", new Query().field("region").equal("CA"));
+	factual.queueFetch("places", new Query().limit(1)); 
+	MultiResponse multi = factual.sendRequests();
+
+# Geopulse
+
+The driver fully supports Factual's <a href="http://wiki.corp.factual.com/display/DOCS/Places+API+-+Geopulse">Geopulse</a> feature, which provides point-based access to geographic attributes: you provide a long/lat coordinate pair, we provide everything we can know about that geography. 
+
+## Simple Geopulse Example
+
+The <tt>geopulse</tt> method fetches results based on the given point:
+
+	ReadResponse resp = factual.geopulse(new Geopulse(new Point(latitude, longitude))
+												.only("commercial_density", "commercial_profile"));
+
+
+## All Top Level Geopulse Parameters
+
+<table>
+  <tr>
+    <th>Parameter</th>
+    <th>Description</th>
+    <th>Example</th>
+  </tr>
+  <tr>
+    <td>geo</td>
+    <td>A geographic point around which information is retrieved.</td>
+    <td><tt>new Point(latitude, longitude)</tt></td>
+  </tr>
+  <tr>
+    <td>select</td>
+    <td>What fields to include in the query results. Note that the order of fields will not necessarily be preserved in the resulting JSON response due to the nature of JSON hashes.</td>
+    <td><tt>geopulse.only("commercial_density", "commercial_profile")</tt></td>
+  </tr>
+</table>	
+
+
+# Reverse Geocoder
+
+The driver fully supports Factual's <a href="http://wiki.corp.factual.com/display/DOCS/Places+API+-+Reverse+Geocoder">Reverse Geocoder</a> feature, which returns the nearest valid address given a longitude and latitude. 
+
+## Simple Reverse Geocoder Example
+	
+The <tt>reverseGeocode</tt> method fetches results based on the given point:
+
+	ReadResponse resp = factual.reverseGeocode(new Point(latitude, longitude));	
+
+## All Top Level Reverse Geocoder Parameters
+
+<table>
+  <tr>
+    <th>Parameter</th>
+    <th>Description</th>
+    <th>Example</th>
+  </tr>
+  <tr>
+    <td>geo</td>
+    <td>A valid geographic point for which the closest address is retrieved.</td>
+    <td><tt>new Point(latitude, longitude)</tt></td>
+  </tr>
+</table>
+	
+
 # Exception Handling
 
 If Factual's API indicates an error, a <tt>FactualApiException</tt> unchecked Exception will be thrown. It will contain details about the request you sent and the error that Factual returned.
@@ -612,7 +690,6 @@ For more code examples:
 
 * See the standalone demos in <tt>src/test/java/com/factual/demo</tt>
 * See the integration tests in <tt>src/test/java/com/factual/FactualTest.java</tt>
-
 
 # Where to Get Help
 
