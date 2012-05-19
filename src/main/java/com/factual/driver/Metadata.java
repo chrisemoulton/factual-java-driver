@@ -78,12 +78,8 @@ public class Metadata {
 		return new Metadata(params);
 	}
 
-	protected String toUrlQuery() {
-		return queryParams.toUrlQuery(true);
-	}
-
-	protected Map<String, String> toParamMap() {
-		return queryParams.toParamMap();
+	protected Map<String, Object> toUrlParams() {
+		return queryParams.toUrlParams(null);
 	}
 	
 }

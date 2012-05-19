@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.factual.driver.Factual.FullQuery;
 import com.google.common.collect.Lists;
 
 /**
@@ -19,13 +20,13 @@ public class MultiResponse extends Response {
 	private String json = null;
 	private List<Response> data = Lists.newArrayList();
 
-	private Map<String, Object> requestMapping = null;
+	private Map<String, FullQuery> requestMapping = null;
 	
 	/**
 	 * 
 	 * @param requestMapping
 	 */
-	public MultiResponse(Map<String, Object> requestMapping) {
+	public MultiResponse(Map<String, FullQuery> requestMapping) {
 		this.requestMapping = requestMapping;
 	}
 
@@ -45,30 +46,15 @@ public class MultiResponse extends Response {
 	
 	private void parseResponse(JSONObject jo) throws JSONException {
 	   data.clear();
-	   for (Entry<String, Object> entry : requestMapping.entrySet()) {
+	   for (Entry<String, FullQuery> entry : requestMapping.entrySet()) {
 		   String responseJson = jo.getJSONObject(entry.getKey()).toString();
-		   Object type = entry.getValue();	
-		   Response resp = null;
-		   if (type instanceof Query) {
-				resp = new ReadResponse(responseJson);
-		   } else if (type instanceof CrosswalkQuery) {
-				resp = new CrosswalkResponse(responseJson);
-		   } else if (type instanceof ResolveQuery) {
-				resp = new ReadResponse(responseJson);
-		   } else if (type instanceof FacetQuery) {
-				resp = new FacetResponse(responseJson);
-		   } else if (type instanceof Map) {
-			   	resp = new RawReadResponse(responseJson);
-		   } else if (type instanceof Geopulse) {
-			    resp = new ReadResponse(responseJson);
-		   } else if (type instanceof Geocode) {
-			    resp = new ReadResponse(responseJson);
-		   }
+		   FullQuery query = entry.getValue();	
+		   Response resp = query.getResponse(responseJson);
 		   if (resp != null)
 			   data.add(resp);
 	   }
 	}
-	
+
     /**
      * A collection of the responses returned by Factual for a multi query.
      * 

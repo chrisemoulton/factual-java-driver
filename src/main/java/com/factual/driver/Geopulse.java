@@ -1,5 +1,7 @@
 package com.factual.driver;
 
+import java.util.Map;
+
 /**
  * 
  * Represents a Geopulse query against Factual
@@ -23,10 +25,14 @@ public class Geopulse {
 	queryParams.setParam(Constants.FILTER_GEO, point);
   }
   
-  public String toUrlQuery() {
-	return queryParams.toUrlQuery(null, true);
+  protected Map<String, Object> toUrlParams() {
+	return queryParams.toUrlParams(null);
   }
   
+  protected String toUrlQuery() {
+	return UrlUtil.toUrlQuery(toUrlParams());
+  }
+	
   /**
    * Sets the fields to select. This is optional; default behaviour is generally
    * to select all fields in the schema.

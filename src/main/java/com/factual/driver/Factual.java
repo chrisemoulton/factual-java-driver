@@ -3,12 +3,9 @@ package com.factual.driver;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,7 +22,6 @@ import com.google.api.client.http.HttpResponseException;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.UrlEncodedContent;
 import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Closeables;
@@ -108,9 +104,30 @@ public class Factual {
    * @return the response of running <tt>query</tt> against Factual.
    */
   public ReadResponse fetch(String tableName, Query query) {
-    return fetchCustom(urlForFetch(tableName), query);
+    return new ReadResponse(get(urlForFetch(tableName), query.toUrlParams()));
   }
+	protected static String urlForCrosswalk(String tableName) {
+		return tableName + "/crosswalk";
+	}
 
+	protected static String urlForResolve(String tableName) {
+		return tableName + "/resolve";
+	}
+
+	protected static String urlForFetch(String tableName) {
+		return "t/" + tableName;
+	}
+
+	protected static String urlForFacets(String tableName) {
+		return "t/" + tableName + "/facets";
+	}
+	protected static String urlForGeocode() {
+		return "places/geocode";
+	}
+	protected static String urlForGeopulse() {
+		return "places/geopulse";
+	}
+	
   /**
    * Runs a <tt>geopulse</tt> query against Factual.
    * 
@@ -118,7 +135,7 @@ public class Factual {
    * @return the response of running <tt>geopulse</tt> against Factual.
    */
   public ReadResponse geopulse(Geopulse geopulse) {
-	return new ReadResponse(request(toUrl(factHome + "places/geopulse", geopulse.toUrlQuery())));
+	return new ReadResponse(get(urlForGeopulse(), geopulse.toUrlParams()));
   }
 
   /**
@@ -128,7 +145,7 @@ public class Factual {
    * @return the response of running a reverse geocode query for <tt>point</tt> against Factual.
    */
   public ReadResponse reverseGeocode(Point point) {
-	return new ReadResponse(request(toUrl(factHome + "places/geocode", new Geocode(point).toUrlQuery())));
+	return new ReadResponse(get(urlForGeocode(), new Geocode(point).toUrlParams()));
   }
   
   /**
@@ -142,7 +159,7 @@ public class Factual {
    * @return the response of running <tt>facet</tt> against Factual.
    */
   public FacetResponse fetch(String tableName, FacetQuery facet) {
-	return fetchCustom(urlForFacets(tableName), facet);
+	return new FacetResponse(get(urlForFacets(tableName), facet.toUrlParams()));
   }
 
   /**
@@ -189,6 +206,10 @@ public class Factual {
    */
   public FlagResponse flagDuplicate(String tableName, String factualId, Metadata metadata) {
 	return flagCustom(urlForFlag(tableName, factualId), "duplicate", metadata);
+  }
+
+  protected static String urlForFlag(String tableName, String factualId) {
+	return "t/"+tableName+"/"+factualId+"/flag";
   }
 
   /**
@@ -278,61 +299,29 @@ public class Factual {
    * @return the response of running <tt>query</tt> against Factual.
    */
   public String get(String path, Map<String, Object> params) {
-	return request(constructRawReadUrl(path, params));
+	return request(new FullQuery(path, params, FullQuery.ResponseType.RAW_READ_RESPONSE));
   }
   
-  private String constructRawReadUrl(String path, Map<String, Object> params) {
-	List<Object> paramList = Lists.newArrayList();
-	for (Entry<String, Object> entry : params.entrySet()) {
-		paramList.add(Parameters.urlPair(entry.getKey(), String.valueOf(entry.getValue()), true));
-	}
-	String paramString = Joiner.on("&").skipNulls().join(paramList);
-	return toUrl(factHome + path, paramString);
-  }
-
-  private ReadResponse fetchCustom(String root, Query query) {
-	return new ReadResponse(request(toUrl(factHome + root, query.toUrlQuery())));
-  }
-
-  private FacetResponse fetchCustom(String root, FacetQuery facet) {
-	return new FacetResponse(request(toUrl(factHome + root, facet.toUrlQuery())));
-  }
-
-  private CrosswalkResponse fetchCustom(String root, CrosswalkQuery query) {
-	return new CrosswalkResponse(request(toUrl(factHome + root, query.toUrlQuery())));
-  }
-
-  private ReadResponse fetchCustom(String root, ResolveQuery query) {
-	return new ReadResponse(request(toUrl(factHome + root, query.toUrlQuery())));
+  private String post(String path, Map<String, Object> params) {
+	return requestPost(new FullQuery(path, params, FullQuery.ResponseType.RAW_READ_RESPONSE));
   }
 
   private SubmitResponse submitCustom(String root, Submit submit, Metadata metadata) {
-	Map<String, String> params = Maps.newHashMap();
+	Map<String, Object> params = Maps.newHashMap();
 	// TODO: Switch parameters to POST content when supported.
-	//params.putAll(metadata.toParamMap());
-	//params.putAll(submit.toParamMap());
-	return new SubmitResponse(requestPost(factHome + root+"?"+submit.toUrlQuery()+"&"+metadata.toUrlQuery(), params));
+	params.putAll(metadata.toUrlParams());
+	params.putAll(submit.toUrlParams());
+	String jsonResponse = post(root, params);
+	return new SubmitResponse(jsonResponse);
   }
 
   private FlagResponse flagCustom(String root, String flagType, Metadata metadata) {
-	Map<String, String> params = Maps.newHashMap();
+	Map<String, Object> params = Maps.newHashMap();
 	// TODO: Switch parameters to POST content when supported.
-	//params.putAll(metadata.toParamMap());
-	//params.put("problem", flagType);
-	return new FlagResponse(requestPost(factHome + root+"?problem="+flagType+"&"+metadata.toUrlQuery(), params));
-  }
-
-  private String toUrl(String root, String parameters) {
-	return root + "?" + parameters;
-  }
-
-  private class FullQuery {
-	  protected Object query;
-	  protected String table;
-	  public FullQuery(String table, Object query) {
-		  this.table = table;
-		  this.query = query;
-	  }
+	params.putAll(metadata.toUrlParams());
+	params.put("problem", flagType);
+	String jsonResponse = post(root, params);
+	return new FlagResponse(jsonResponse);
   }
 
   /**
@@ -341,7 +330,7 @@ public class Factual {
    * @param params the parameters to send with the request
    */
   public void queueFetch(String path, Map<String, Object> params) {
-	fetchQueue.add(new FullQuery(path, params));
+	fetchQueue.add(new FullQuery(path, params, FullQuery.ResponseType.RAW_READ_RESPONSE));
   }
 
   /**
@@ -352,7 +341,7 @@ public class Factual {
    *          the read query to run against <tt>table</tt>.
    */
   public void queueFetch(String table, Query query) {
-	fetchQueue.add(new FullQuery(table, query));
+	fetchQueue.add(new FullQuery(urlForFetch(table), query.toUrlParams(), FullQuery.ResponseType.READ_RESPONSE));
   }
 
   /**
@@ -363,7 +352,7 @@ public class Factual {
    *          the crosswalk query to run against <tt>table</tt>.
    */
   public void queueFetch(String table, CrosswalkQuery query) {
-	fetchQueue.add(new FullQuery(table, query));
+	fetchQueue.add(new FullQuery(urlForCrosswalk(table), query.toUrlParams(), FullQuery.ResponseType.CROSSWALK_RESPONSE));
   }
 
   /**
@@ -374,7 +363,7 @@ public class Factual {
    *          the resolve query to run against <tt>table</tt>.
    */
   public void queueFetch(String table, ResolveQuery query) {
-	fetchQueue.add(new FullQuery(table, query));
+	fetchQueue.add(new FullQuery(urlForResolve(table), query.toUrlParams(), FullQuery.ResponseType.READ_RESPONSE));
   }
 
   /**
@@ -385,14 +374,15 @@ public class Factual {
    *          the facet query to run against <tt>table</tt>.
    */
   public void queueFetch(String table, FacetQuery query) {
-	fetchQueue.add(new FullQuery(table, query));
+	fetchQueue.add(new FullQuery(urlForFacets(table), query.toUrlParams(), FullQuery.ResponseType.FACET_RESPONSE));
   }
 
   public void queueFetch(Geocode query) {
-	fetchQueue.add(new FullQuery(null, query));
+	fetchQueue.add(new FullQuery(urlForGeocode(), query.toUrlParams(), FullQuery.ResponseType.READ_RESPONSE));
   }
+  
   public void queueFetch(Geopulse query) {
-	fetchQueue.add(new FullQuery(null, query));
+	fetchQueue.add(new FullQuery(urlForGeopulse(), query.toUrlParams(), FullQuery.ResponseType.READ_RESPONSE));
   }
   
   /**
@@ -402,43 +392,21 @@ public class Factual {
   public MultiResponse sendRequests() {
 	Map<String, String> multi = Maps.newHashMap();
 	int i = 0;
-	Map<String, Object> requestMapping = Maps.newLinkedHashMap();
+	Map<String, FullQuery> requestMapping = Maps.newLinkedHashMap();
 	while (!fetchQueue.isEmpty()) {
 		FullQuery fullQuery = fetchQueue.poll();
-		String url = null;
-		Object query = fullQuery.query;
-		String table = fullQuery.table;
-	    if (query instanceof Query) {
-			url = toUrl("/"+urlForFetch(table), ((Query)query).toUrlQuery());
-	    } else if (query instanceof CrosswalkQuery) {
-			url = toUrl("/"+urlForCrosswalk(table), ((CrosswalkQuery)query).toUrlQuery());
-	    } else if (query instanceof ResolveQuery) {
-			url = toUrl("/"+urlForResolve(table), ((ResolveQuery)query).toUrlQuery());
-	    } else if (query instanceof FacetQuery) {
-			url = toUrl("/"+urlForFacets(table), ((FacetQuery)query).toUrlQuery());
-	    } else if (query instanceof Map) {
-	    	url = constructRawReadUrl(table, (Map) query);
-	    } else if (query instanceof Geocode) {
-	    	url = toUrl(factHome + "places/geocode", ((Geocode) query).toUrlQuery());
-	    } else if (query instanceof Geopulse) {
-	    	url = toUrl(factHome + "places/geopulse", ((Geopulse) query).toUrlQuery());
-	    }
+		String url = "/"+fullQuery.toUrlString();
 		if (url != null) {
 			String multiKey = "q"+Integer.toString(i);
 			multi.put(multiKey, url);
-			requestMapping.put(multiKey, query);
+			requestMapping.put(multiKey, fullQuery);
 			i++;
 		}
 	}
 	String json = JsonUtil.toJsonStr(multi);
-	String url = "";
-	try {
-		String encoded = URLEncoder.encode(json, "UTF-8");
-		url = toUrl(factHome + "multi", "queries=" + encoded);
-	} catch (UnsupportedEncodingException e) {
-		e.printStackTrace();
-	}
-	String jsonResponse = request(url);
+	Map<String, Object> params = Maps.newHashMap();
+	params.put("queries", json);
+	String jsonResponse = get("multi", params);
 	MultiResponse resp = new MultiResponse(requestMapping);
 	resp.setJson(jsonResponse);
 	return resp;
@@ -462,7 +430,7 @@ public class Factual {
    * @return Factual's response to the Crosswalk query.
    */
   public CrosswalkResponse fetch(String tableName, CrosswalkQuery query) {
-    return fetchCustom(urlForCrosswalk(tableName), query);
+    return new CrosswalkResponse(request(new FullQuery(urlForCrosswalk(tableName), query.toUrlParams(), FullQuery.ResponseType.CROSSWALK_RESPONSE)));
   }
 
   /**
@@ -517,55 +485,52 @@ public class Factual {
    * @return the response from Factual for the Resolve request.
    */
   public ReadResponse fetch(String tableName, ResolveQuery query) {
-    return fetchCustom(urlForResolve(tableName), query);
+    return new ReadResponse(request(new FullQuery(urlForResolve(tableName), query.toUrlParams(), FullQuery.ResponseType.READ_RESPONSE)));
   }
 
   public SchemaResponse schema(String tableName) {
-    return new SchemaResponse(request(factHome+urlForSchema(tableName)));
+	Map<String, Object> params = Maps.newHashMap();
+    return new SchemaResponse(get(urlForSchema(tableName), params));
   }
 
   private String urlForSchema(String tableName) {
     return "t/" + tableName + "/schema";
   }
 
-  private String urlForCrosswalk(String tableName) {
-    return tableName + "/crosswalk";
+  private String request(FullQuery query) {
+	  return request(query, true);
   }
 
-  private String urlForResolve(String tableName) {
-    return tableName + "/resolve";
+  private String request(FullQuery query, boolean useOAuth) {
+	  return request(query, "GET", useOAuth);
   }
 
-  private String urlForFetch(String tableName) {
-    return "t/" + tableName;
+  private String requestPost(FullQuery query) {
+	  return requestPost(query, true);
   }
 
-  private String urlForFlag(String tableName, String factualId) {
-	return "t/"+tableName+"/"+factualId+"/flag";
+  private String requestPost(FullQuery query, boolean useOAuth) {
+	  return request(query, "POST", useOAuth);
   }
 
-  private String urlForFacets(String tableName) {
-	return "t/" + tableName+"/facets";
-  }
+  private String request(FullQuery fullQuery, String requestMethod, boolean useOAuth) {
+	Map<String, Object> requestParams = fullQuery.getRequestParams();
+	Map<String, String> postData = fullQuery.getPostData();
+	String urlStr = factHome + fullQuery.toUrlString();
+	GenericUrl url = new GenericUrl(urlStr);
 
-  private String request(String urlStr) {
-	  return request(urlStr, true);
-  }
-
-  private String request(String urlStr, boolean useOAuth) {
-	  return request(urlStr, "GET", null, useOAuth);
-  }
-
-  private String requestPost(String urlStr, Map<String, String> postData) {
-	  return requestPost(urlStr, postData, true);
-  }
-
-  private String requestPost(String urlStr, Map<String, String> postData, boolean useOAuth) {
-	  return request(urlStr, "POST", postData, useOAuth);
-  }
-
-  private String request(String urlStr, String requestMethod, Map<String, String> postData, boolean useOAuth) {
-    GenericUrl url = new GenericUrl(urlStr);
+	if (debug) {
+		System.out.println("=== "+urlStr+" ===");
+		System.out.println("Parameters:");
+		for (String key : requestParams.keySet()) {
+			System.out.println(key+": "+requestParams.get(key));
+		}
+        Logger logger = Logger.getLogger(HttpTransport.class.getName());
+        logger.removeHandler(debugHandler);
+        logger.setLevel(Level.ALL);
+        logger.addHandler(debugHandler);
+	}
+    
     // Configure OAuth request params
     OAuthParameters params = new OAuthParameters();
     params.consumerKey = key;
@@ -598,12 +563,6 @@ public class Factual {
       headers.set("X-Factual-Lib", DRIVER_HEADER_TAG);
       headers.set("Host", host);
       request.setHeaders(headers);
-      if (debug) {
-          Logger logger = Logger.getLogger(HttpTransport.class.getName());
-          logger.removeHandler(debugHandler);
-          logger.setLevel(Level.ALL);
-          logger.addHandler(debugHandler);
-	  }
 
       // get the response
       br = new BufferedReader(new InputStreamReader(request.execute().getContent()));
@@ -636,5 +595,57 @@ public class Factual {
           debugHandler.setLevel(Level.ALL);
 	  }
   }
+  
+  /**
+   * Represents a request against Factual given a path and parameters
+   * 
+   * @author brandon
+   * 
+   */
+  protected static class FullQuery {
+  	
+  	public static enum ResponseType { READ_RESPONSE, CROSSWALK_RESPONSE, FACET_RESPONSE, FLAG_RESPONSE, SCHEMA_RESPONSE, SUBMIT_RESPONSE, RAW_READ_RESPONSE};
+  	
+  	private Map<String, Object> params;
+  	private String path;
+  	private ResponseType responseType;
 
+  	public FullQuery(String path, Map<String, Object> params, ResponseType responseType) {
+  		this.path = path;
+  		this.params = params;
+  		this.responseType = responseType;
+  	}
+
+  	public Map<String, Object> getRequestParams() {
+  		return params;
+  	}
+  	
+  	public String toUrlString() {
+  		return UrlUtil.toUrl(path, getRequestParams());
+  	}
+  	
+  	public Map<String, String> getPostData() {
+  		return Maps.newHashMap();
+  	}
+  	
+  	public Response getResponse(String json) {
+  		switch (responseType) {
+  			case READ_RESPONSE:
+  				return new ReadResponse(json);
+  			case CROSSWALK_RESPONSE:
+  				return new CrosswalkResponse(json);
+  			case FACET_RESPONSE:
+  				return new FacetResponse(json);
+  			case FLAG_RESPONSE:
+  				return new FlagResponse(json);
+  			case SUBMIT_RESPONSE:
+  				return new SubmitResponse(json);
+  			case SCHEMA_RESPONSE:
+  				return new SchemaResponse(json);
+  			case RAW_READ_RESPONSE:
+  				return new RawReadResponse(json);
+  		}
+  		return null;
+  	}
+  }
 }

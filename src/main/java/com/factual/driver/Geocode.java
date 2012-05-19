@@ -1,5 +1,7 @@
 package com.factual.driver;
 
+import java.util.Map;
+
 /**
  * Represents a Geocode query against Factual
  * 
@@ -21,7 +23,12 @@ public class Geocode {
 	queryParams.setParam(Constants.FILTER_GEO, point);
   }
   
-  public String toUrlQuery() {
-	return queryParams.toUrlQuery(null, true);
+  protected Map<String, Object> toUrlParams() {
+	return queryParams.toUrlParams(null);
   }
+  
+  protected String toUrlQuery() {
+	return UrlUtil.toUrlQuery(toUrlParams());
+  }
+  
 }

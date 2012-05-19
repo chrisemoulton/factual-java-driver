@@ -649,6 +649,7 @@ public class FactualTest {
     assertOk(resp);
   }  
   
+  @Test
   public void testMulti() {
 	factual.queueFetch("places", new Query().field("region").equal("CA"));
 	factual.queueFetch("places", new Query().limit(1)); 
@@ -668,6 +669,7 @@ public class FactualTest {
   }
   
   @Test
+  @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
   public void testMultiRawRead() {
     Map<String, Object> params = Maps.newHashMap();
     params.put("filters", JsonUtil.toJsonStr(
@@ -692,6 +694,31 @@ public class FactualTest {
 		}
 		assertOk(resp);
 	}
+  }
+  
+  @Test
+  @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+  public void testRawReadMulti() {
+    final Map<String, Object> queryParams1 = Maps.newHashMap();
+    queryParams1.put("filters", JsonUtil.toJsonStr(
+		new HashMap() {{  
+			put("country", new HashMap() {{
+				put("$eq", "US");	    
+			}});
+		}})
+    );
+	Map<String, Object> params = Maps.newHashMap();
+    params.put("queries", JsonUtil.toJsonStr(
+		new HashMap() {{  
+			put("q1", UrlUtil.toUrl("/t/places",new HashMap() {
+				{
+					put("limit", 1);
+				}
+			}));
+		}})
+    );
+    String respRaw = factual.get("multi", params);
+	assertTrue(respRaw != null);
   }
   
   @Test
