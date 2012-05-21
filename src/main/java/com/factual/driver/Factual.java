@@ -106,27 +106,30 @@ public class Factual {
   public ReadResponse fetch(String tableName, Query query) {
     return new ReadResponse(get(urlForFetch(tableName), query.toUrlParams()));
   }
-	protected static String urlForCrosswalk(String tableName) {
-		return tableName + "/crosswalk";
-	}
+  
+  protected static String urlForCrosswalk(String tableName) {
+	return tableName + "/crosswalk";
+  }
 
-	protected static String urlForResolve(String tableName) {
-		return tableName + "/resolve";
-	}
+  protected static String urlForResolve(String tableName) {
+	return tableName + "/resolve";
+  }
 
-	protected static String urlForFetch(String tableName) {
-		return "t/" + tableName;
-	}
+  protected static String urlForFetch(String tableName) {
+	return "t/" + tableName;
+  }
 
-	protected static String urlForFacets(String tableName) {
-		return "t/" + tableName + "/facets";
-	}
-	protected static String urlForGeocode() {
-		return "places/geocode";
-	}
-	protected static String urlForGeopulse() {
-		return "places/geopulse";
-	}
+  protected static String urlForFacets(String tableName) {
+	return "t/" + tableName + "/facets";
+  }
+
+  protected static String urlForGeocode() {
+	return "places/geocode";
+  }
+  
+  protected static String urlForGeopulse() {
+	return "places/geopulse";
+  }
 	
   /**
    * Runs a <tt>geopulse</tt> query against Factual.
