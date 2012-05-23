@@ -1,5 +1,7 @@
 package com.factual.driver;
 
+import java.util.Map;
+
 /**
  * Represents a Factual Crosswalk query.
  * 
@@ -74,9 +76,12 @@ public class CrosswalkQuery {
 		queryParams.addCommaSeparatedParam(Constants.CROSSWALK_ONLY, namespace);
 	return this;
   }
-
-  protected String toUrlQuery() {
-	return queryParams.toUrlQuery(true);
+  
+  protected Map<String, Object> toUrlParams() {
+	return queryParams.toUrlParams();
   }
   
+  protected String toUrlQuery() {
+	return UrlUtil.toUrlQuery(toUrlParams());
+  }  
 }

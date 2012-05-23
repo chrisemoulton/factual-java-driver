@@ -1,6 +1,7 @@
 package com.factual.driver;
 
 import java.util.List;
+import java.util.Map;
 
 import com.factual.data_science_toolkit.Coord;
 import com.factual.data_science_toolkit.DataScienceToolkit;
@@ -29,13 +30,13 @@ public class FacetQuery implements Filterable {
 	 */
 	private final Parameters queryParams = new Parameters();
 
-	public String toUrlQuery() {
+	protected Map<String, Object> toUrlParams() {
 		Parameters additional = null;
 		if (includeRowCount) {
 			additional = new Parameters();
 			additional.setParam(Constants.INCLUDE_COUNT,true);
 		}
-		return queryParams.toUrlQuery(additional, true);
+		return queryParams.toUrlParams(additional);
 	}
 
 	/**
@@ -187,5 +188,8 @@ public class FacetQuery implements Filterable {
 	public List<Filter> getFilterList() {
 		return queryParams.getFilterList();
 	}
-
+	
+	public String toUrlQuery() {
+		return UrlUtil.toUrlQuery(toUrlParams());
+	}
 }

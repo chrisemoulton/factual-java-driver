@@ -1,6 +1,5 @@
 package com.factual.driver;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 /**

@@ -3,6 +3,7 @@ package com.factual.driver;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.List;
+import java.util.Map;
 
 import com.factual.data_science_toolkit.Coord;
 import com.factual.data_science_toolkit.DataScienceToolkit;
@@ -232,19 +233,19 @@ public class Query implements Filterable {
    * @return the query string to represent this Query when talking to Factual's
    *         API.
    */
-  public String toUrlQuery() {
+  protected Map<String, Object> toUrlParams() {
 	Parameters additional = null;
 	if (includeRowCount) {
 		additional = new Parameters();
 		additional.setParam(Constants.INCLUDE_COUNT,true);
 	}
-	return queryParams.toUrlQuery(additional, true);
+	return queryParams.toUrlParams(additional);
   }
 	
   @Override
   public String toString() {
     try {
-      return URLDecoder.decode(toUrlQuery(), "UTF-8");
+      return URLDecoder.decode(UrlUtil.toUrlQuery(toUrlParams()), "UTF-8");
     } catch (UnsupportedEncodingException e) {
       throw new RuntimeException(e);
     }
@@ -253,6 +254,10 @@ public class Query implements Filterable {
   @Override
   public List<Filter> getFilterList() {
 	return queryParams.getFilterList();
+  }
+
+  public String toUrlQuery() {
+	return UrlUtil.toUrlQuery(toUrlParams());
   }
 
 }
