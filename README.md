@@ -40,13 +40,6 @@ Results are returned as the JSON returned by Factual. Optionally, there are JSON
     System.out.println(
       factual.fetch("places", new Query().limit(3)));
 	
-These queries can be used to read results any of Factual's tables.  For example:
-
-* <a href="http://wiki.corp.factual.com/display/DOCS/Global+Places+Database">Global Places</a>
-* <a href="http://wiki.corp.factual.com/display/DOCS/Places+API+-+Restaurants">Restaurants</a>
-* <a href="http://wiki.corp.factual.com/display/DOCS/World+Geographies">World Geographies</a>
-* And more!
-
 # Full Text Search
 
     // Print entities that match a full text search for Sushi in Santa Monica:
@@ -611,7 +604,7 @@ Queue responses using <tt>queueFetch</tt>, and send all queued reads using <tt>s
 
 # Geopulse
 
-The driver fully supports Factual's <a href="http://wiki.corp.factual.com/display/DOCS/Places+API+-+Geopulse">Geopulse</a> feature, which provides point-based access to geographic attributes: you provide a long/lat coordinate pair, we provide everything we can know about that geography. 
+The driver fully supports Factual's <a href="http://developer.factual.com/display/docs/Places+API+-+Geopulse">Geopulse</a> feature, which provides point-based access to geographic attributes: you provide a long/lat coordinate pair, we provide everything we can know about that geography. 
 
 ## Simple Geopulse Example
 
@@ -644,7 +637,7 @@ The <tt>geopulse</tt> method fetches results based on the given point:
 
 # Reverse Geocoder
 
-The driver fully supports Factual's <a href="http://wiki.corp.factual.com/display/DOCS/Places+API+-+Reverse+Geocoder">Reverse Geocoder</a> feature, which returns the nearest valid address given a longitude and latitude. 
+The driver fully supports Factual's <a href="http://developer.factual.com/display/docs/Places+API+-+Reverse+Geocoder">Reverse Geocoder</a> feature, which returns the nearest valid address given a longitude and latitude. 
 
 ## Simple Reverse Geocoder Example
 	
