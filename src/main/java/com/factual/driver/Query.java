@@ -5,9 +5,6 @@ import java.net.URLDecoder;
 import java.util.List;
 import java.util.Map;
 
-import com.factual.data_science_toolkit.Coord;
-import com.factual.data_science_toolkit.DataScienceToolkit;
-
 /**
  * Represents a top level Factual query. Knows how to represent the query as URL
  * encoded key value pairs, ready for the query string in a GET request. (See
@@ -57,9 +54,9 @@ public class Query implements Filterable {
    * @return this Query
    */
   public Query only(String... fields) {
-	for (String field : fields) {
-		queryParams.addCommaSeparatedParam(Constants.QUERY_SELECT, field);
-	}
+    for (String field : fields) {
+      queryParams.addCommaSeparatedParam(Constants.QUERY_SELECT, field);
+    }
     return this;
   }
 
@@ -67,7 +64,7 @@ public class Query implements Filterable {
    * @return array of select fields set by only(), null if none.
    */
   public String[] getSelectFields() {
-	return queryParams.getCommaSeparatedParam(Constants.QUERY_SELECT);
+    return queryParams.getCommaSeparatedParam(Constants.QUERY_SELECT);
   }
 
   /**
@@ -78,7 +75,7 @@ public class Query implements Filterable {
    * @return this Query
    */
   public Query sortAsc(String field) {
-	queryParams.addCommaSeparatedParam(Constants.QUERY_SORT, field + ":asc");
+    queryParams.addCommaSeparatedParam(Constants.QUERY_SORT, field + ":asc");
     return this;
   }
 
@@ -90,7 +87,7 @@ public class Query implements Filterable {
    * @return this Query
    */
   public Query sortDesc(String field) {
-	queryParams.addCommaSeparatedParam(Constants.QUERY_SORT, field + ":desc");
+    queryParams.addCommaSeparatedParam(Constants.QUERY_SORT, field + ":desc");
     return this;
   }
 
@@ -160,15 +157,6 @@ public class Query implements Filterable {
     return new QueryBuilder<Query>(this, field);
   }
 
-  public Query near(String text, int meters) {
-    Coord coord = new DataScienceToolkit().streetToCoord(text);
-    if(coord != null) {
-      return within(new Circle(coord, meters));
-    } else {
-      throw new FactualApiException("Could not locate place based on text: '" + text + "'");
-    }
-  }
-
   /**
    * Adds a filter so that results can only be (roughly) within the specified
    * geographic circle.
@@ -177,7 +165,7 @@ public class Query implements Filterable {
    * @return this Query.
    */
   public Query within(Circle circle) {
-	queryParams.setParam(Constants.FILTER_GEO, circle);
+    queryParams.setParam(Constants.FILTER_GEO, circle);
     return this;
   }
 
@@ -202,7 +190,7 @@ public class Query implements Filterable {
    */
   @Override
   public void add(Filter filter) {
-	queryParams.add(filter);
+    queryParams.add(filter);
   }
 
   /**
@@ -210,12 +198,12 @@ public class Query implements Filterable {
    * @param key the field name of the parameter to add
    * @param value the field value that will be serialized using value.toString()
    * @return this Query
-   */  
+   */
   private Query addParam(String key, Object value) {
-	queryParams.setParam(key, value);
+    queryParams.setParam(key, value);
     return this;
   }
-    
+
   /**
    * Builds and returns the query string to represent this Query when talking to
    * Factual's API. Provides proper URL encoding and escaping.
@@ -234,14 +222,14 @@ public class Query implements Filterable {
    *         API.
    */
   protected Map<String, Object> toUrlParams() {
-	Parameters additional = null;
-	if (includeRowCount) {
-		additional = new Parameters();
-		additional.setParam(Constants.INCLUDE_COUNT,true);
-	}
-	return queryParams.toUrlParams(additional);
+    Parameters additional = null;
+    if (includeRowCount) {
+      additional = new Parameters();
+      additional.setParam(Constants.INCLUDE_COUNT,true);
+    }
+    return queryParams.toUrlParams(additional);
   }
-	
+
   @Override
   public String toString() {
     try {
@@ -253,11 +241,11 @@ public class Query implements Filterable {
 
   @Override
   public List<Filter> getFilterList() {
-	return queryParams.getFilterList();
+    return queryParams.getFilterList();
   }
 
   public String toUrlQuery() {
-	return UrlUtil.toUrlQuery(toUrlParams());
+    return UrlUtil.toUrlQuery(toUrlParams());
   }
 
 }
