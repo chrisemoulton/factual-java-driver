@@ -31,7 +31,7 @@ public class Submit {
 	}
 
 	protected String toUrlQuery() {
-		return queryParams.toUrlQuery(true);
+		return UrlUtil.toUrlQuery(toUrlParams());
 	}
 
 	/**
@@ -56,8 +56,8 @@ public class Submit {
 		return this;
 	}
 
-	protected Map<String, String> toParamMap() {
-		return queryParams.toParamMap();
+	protected Map<String, Object> toUrlParams() {
+		return queryParams.toUrlParams(null);
 	}
-
+	
 }

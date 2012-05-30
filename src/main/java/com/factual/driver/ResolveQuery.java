@@ -1,5 +1,7 @@
 package com.factual.driver;
 
+import java.util.Map;
+
 
 public class ResolveQuery {
 	
@@ -13,8 +15,11 @@ public class ResolveQuery {
 		return this;
 	}
 	
-	protected String toUrlQuery() {
-		return queryParams.toUrlQuery(true);
+    protected Map<String, Object> toUrlParams() {
+		return queryParams.toUrlParams();
 	}
-
+    
+    protected String toUrlQuery() {
+    	return UrlUtil.toUrlQuery(toUrlParams());
+    }
 }

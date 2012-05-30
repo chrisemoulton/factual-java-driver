@@ -6,6 +6,9 @@ public class Constants {
 	protected static final String CIRCLE = "$circle";
 	protected static final String CENTER = "$center";
 	protected static final String METERS = "$meters";
+	
+	// Point
+	protected static final String POINT = "$point";
 
 	// Response
 	protected static final String RESPONSE = "response";
