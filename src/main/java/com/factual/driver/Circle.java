@@ -2,8 +2,6 @@ package com.factual.driver;
 
 import java.util.HashMap;
 
-import com.factual.data_science_toolkit.Coord;
-
 
 /**
  * Represents a geographic sub query confining results to a circle.
@@ -30,16 +28,6 @@ public class Circle {
   }
 
   /**
-   * Constructs a geographic Circle representation.
-   * 
-   * @param coord the coordinates of the center of the Circle.
-   * @param meters the radius, in meters, of this Circle.
-   */
-  public Circle(Coord coord, int meters) {
-    this(coord.getLatitude(), coord.getLongitude(), meters);
-  }
-
-  /**
    * View this circle as a json string representation
    * 
    * @return a json string representation of this Circle
@@ -55,21 +43,21 @@ public class Circle {
    */
   @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
   private Object toJsonObject() {
-	  return new HashMap() {
-		{
-			put(Constants.CIRCLE, new HashMap() {
-				{
-					put(Constants.CENTER, new double[]{centerLat, centerLong});
-					put(Constants.METERS, meters);
-				}
-			});
-		}
-	  };
+    return new HashMap() {
+      {
+        put(Constants.CIRCLE, new HashMap() {
+          {
+            put(Constants.CENTER, new double[]{centerLat, centerLong});
+            put(Constants.METERS, meters);
+          }
+        });
+      }
+    };
   }
-  
+
   @Override
   public String toString() {
-	  return toJsonStr();
+    return toJsonStr();
   }
 
 }

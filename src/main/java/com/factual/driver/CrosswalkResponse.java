@@ -78,7 +78,11 @@ public class CrosswalkResponse extends Response {
     Crosswalk cw = new Crosswalk();
     cw.setFactualId(jo.getString(Constants.CROSSWALK_FACTUAL_ID));
     cw.setNamespace(jo.getString(Constants.CROSSWALK_NAMESPACE));
-    cw.setNamespaceId(jo.getString(Constants.CROSSWALK_NAMESPACE_ID));
+
+    if(jo.has(Constants.CROSSWALK_NAMESPACE_ID)) {
+      cw.setNamespaceId(jo.getString(Constants.CROSSWALK_NAMESPACE_ID));
+    }
+
     if(jo.has(Constants.CROSSWALK_URL)) {
       cw.setUrl(jo.getString(Constants.CROSSWALK_URL));
     }

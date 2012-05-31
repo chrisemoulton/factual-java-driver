@@ -1,3 +1,6 @@
+## 1.4.1
+ * Adds better testing, improved debugging, etc.
+
 ## 1.4.0
 
  * Adds Multi call
