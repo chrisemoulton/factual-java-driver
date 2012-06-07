@@ -11,13 +11,13 @@ The driver is in Maven Central, so you can just add this to your Maven <tt>pom.x
     <dependency>
       <groupId>com.factual</groupId>
       <artifactId>factual-java-driver</artifactId>
-      <version>1.4.1</version>
+      <version>1.4.2</version>
     </dependency>
     
 ## Non Maven users
 
 You can download the individual driver jar, and view the pom.xml file, here:
-[Driver download folder](http://repo1.maven.org/maven2/com/factual/factual-java-driver/1.4.1/)
+[Driver download folder](http://repo1.maven.org/maven2/com/factual/factual-java-driver/1.4.2/)
 
 The pom.xml tells you what dependencies you'll need to plug into your project to get the driver to work (see the <dependencies> section).
 
@@ -659,7 +659,16 @@ The <tt>reverseGeocode</tt> method fetches results based on the given point:
     <td><tt>new Point(latitude, longitude)</tt></td>
   </tr>
 </table>
+
+# Monetize
+
+The driver fully supports Factual's Monetize feature, which enables you to find deals for places in Factual's Global Places database.  Use the Query object to specify filters on which to run the monetize request.
+
+## Simple Monetize Example
 	
+The <tt>monetize</tt> method fetches deals based on a specified query:
+
+    ReadResponse resp = factual.monetize(new Query().field("place_locality").equal("Los Angeles"));
 
 # Exception Handling
 

@@ -1,3 +1,6 @@
+## 1.4.2
+ * Adds monetize API support.
+
 ## 1.4.1
  * Adds better testing, improved debugging, etc.
 
