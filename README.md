@@ -455,7 +455,7 @@ Not all fields are configured to return facet counts. To determine what fields y
   </tr>
   <tr>
     <td>limit</td>
-    <td>The maximum number of unique facet values that can be returned for a single field. Range is 1-250. The default is 25.</td>
+    <td>The maximum number of unique facet values that can be returned for a single field. Range is 1-250. The default is 20.</td>
     <td><tt>f.maxValuesPerFacet(10)</tt></td>
   </tr>
   <tr>
