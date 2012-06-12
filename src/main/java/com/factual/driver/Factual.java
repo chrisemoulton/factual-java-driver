@@ -69,6 +69,12 @@ public class Factual {
     debug(debug);
   }
 
+  private HeaderProvider headerProvider = null;
+
+  public void setHeaderProvider(HeaderProvider headerProvider) {
+    this.headerProvider = headerProvider;
+  }
+
 
   /**
    * Change the base URL at which to contact Factual's API. This
@@ -565,6 +571,14 @@ public class Factual {
       HttpHeaders headers = new HttpHeaders();
       headers.set("X-Factual-Lib", DRIVER_HEADER_TAG);
       headers.set("Host", host);
+
+      if (headerProvider != null) {
+        Map<String, Object> info = headerProvider.getHeaders();
+        for (String key : info.keySet()) {
+          headers.set(key, info.get(key));
+        }
+      }
+
       request.setHeaders(headers);
 
       // get the response
