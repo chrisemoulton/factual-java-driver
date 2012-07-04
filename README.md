@@ -11,13 +11,13 @@ The driver is in Maven Central, so you can just add this to your Maven <tt>pom.x
     <dependency>
       <groupId>com.factual</groupId>
       <artifactId>factual-java-driver</artifactId>
-      <version>1.4.2</version>
+      <version>1.4.3</version>
     </dependency>
     
 ## Non Maven users
 
 You can download the individual driver jar, and view the pom.xml file, here:
-[Driver download folder](http://repo1.maven.org/maven2/com/factual/factual-java-driver/1.4.2/)
+[Driver download folder](http://repo1.maven.org/maven2/com/factual/factual-java-driver/1.4.3/)
 
 The pom.xml tells you what dependencies you'll need to plug into your project to get the driver to work (see the <dependencies> section).
 
@@ -284,67 +284,15 @@ You can nest AND and OR logic to whatever level of complexity you need. For exam
 
 The driver fully supports Factual's Crosswalk feature, which lets you "crosswalk" the web and relate entities between Factual's data and that of other web authorities.
 
-(See [the Crosswalk Blog](http://blog.factual.com/crosswalk-api) for more background.)
+(See [the Crosswalk API](http://developer.factual.com/display/docs/Places+API+-+Crosswalk) for more background.)
+
+Note that as of v1.4.3, crosswalk requests are treated as any other table read, as seen in the example below.  All query parameters apply.
+
 
 ## Simple Crosswalk Example
 
     // Get all Crosswalk data for a specific Places entity, using its Factual ID:
-    factual.fetch("places",
-      new CrosswalkQuery().factualId("97598010-433f-4946-8fd5-4a6dd1639d77"));
-
-## Crosswalk Filter Parameters
-
-<table>
-  <tr>
-    <th>Filter</th>
-    <th>Description</th>
-    <th>Example</th>
-  </tr>
-  <tr>
-    <td>factualId</td>
-    <td>A Factual ID for an entity in the Factual places database</td>
-    <td><tt>q.factualId("97598010-433f-4946-8fd5-4a6dd1639d77")</tt></td>
-  </tr>
-  <tr>
-    <td>limit</td>
-    <td>A Factual ID for an entity in the Factual places database</td>
-    <td><tt>q.limit(100)</tt></td>
-  </tr>
-  <tr>
-    <td>namespace</td>
-    <td>The namespace to search for a third party ID within. A list of <b>currently supported</b> services is <a href="http://developer.factual.com/display/docs/Places+API+-+Supported+Crosswalk+Services">here</a>.</td>
-    <td><tt>q.namespace("foursquare")</tt></td>
-  </tr>
-  <tr>
-    <td>namespaceId</td>
-    <td>The id used by a third party to identify a place.</td>
-    <td><tt>q.namespaceId("443338")</tt></td>
-  </tr>
-  <tr>
-    <td>only</td>
-    <td>A Factual ID for an entity in the Factual places database</td>
-    <td><tt>q.only("foursquare", "yelp")</tt></td>
-  </tr>
-</table>
-
-NOTE: although these parameters are individually optional, at least one of the following parameter combinations is required:
-
-* factualId
-* namespace and namespaceId
-
-## More Crosswalk Examples
-
-    // Get Loopt's Crosswalk data for a specific Places entity, using its Factual ID:
-    CrosswalkResponse resp = factual.fetch("places",
-        new CrosswalkQuery()
-          .factualId("97598010-433f-4946-8fd5-4a6dd1639d77")
-          .only("loopt"));
-
-    // Get all Crosswalk data for a specific Places entity, using its Foursquare ID
-    CrosswalkResponse resp = factual.fetch("places",
-        new CrosswalkQuery()
-          .namespace("foursquare")
-          .namespaceId("4ae4df6df964a520019f21e3"));
+    ReadResponse resp = factual.fetch("crosswalk", new Query().field("factual_id").equal("97598010-433f-4946-8fd5-4a6dd1639d77"));    
           
 # Resolve
 

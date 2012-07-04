@@ -1,3 +1,6 @@
+## 1.4.3
+ * Crosswalk updates: deprecate old API and document usage of Crosswalk table read.
+
 ## 1.4.2
  * Adds monetize API support.
 
