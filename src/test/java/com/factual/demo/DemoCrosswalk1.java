@@ -2,11 +2,11 @@ package com.factual.demo;
 
 import static com.factual.driver.FactualTest.read;
 
-import com.factual.driver.Crosswalk;
-import com.factual.driver.CrosswalkQuery;
-import com.factual.driver.CrosswalkResponse;
-import com.factual.driver.Factual;
+import java.util.Map;
 
+import com.factual.driver.Factual;
+import com.factual.driver.Query;
+import com.factual.driver.ReadResponse;
 
 public class DemoCrosswalk1 {
   private static String key = read("key.txt");
@@ -14,11 +14,14 @@ public class DemoCrosswalk1 {
   private static Factual factual = new Factual(key, secret);
 
   public static void main(String[] args) {
-    // Get all Crosswalk data for a specific Places entity, using its on Factual ID:
-    CrosswalkResponse resp = factual.fetch("places",
-        new CrosswalkQuery().factualId("97598010-433f-4946-8fd5-4a6dd1639d77"));
+    // Get all Crosswalk data for a specific Places entity, using its on Factual
+    // ID:
+    ReadResponse resp = factual.fetch(
+        "crosswalk",
+        new Query().field("factual_id").equal(
+            "97598010-433f-4946-8fd5-4a6dd1639d77"));
 
-    for(Crosswalk cw : resp.getCrosswalks()) {
+    for (Map<String, Object> cw : resp.getData()) {
       System.out.println(cw);
     }
   }

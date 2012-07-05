@@ -1,5 +1,9 @@
-## 1.4.1-android
+## 1.4.3-android
+ * Crosswalk updates: deprecate old API and document usage of Crosswalk table read.
+ * Adds monetize API support.
+ * Adds better testing, improved debugging, etc.
 
+## 1.4.1-android
  * Adds Multi call
  * Adds geopulse
  * Adds reverse geocode

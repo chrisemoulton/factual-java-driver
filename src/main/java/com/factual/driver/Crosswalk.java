@@ -3,8 +3,11 @@ package com.factual.driver;
 /**
  * Represents a Crosswalk record from Factual.
  * 
+ * @deprecated No longer in use due to deprecated CrosswalkQuery and
+ *             CrosswalkResponse.
  * @author aaron
  */
+@Deprecated
 public class Crosswalk {
   private String factualId;
   private String url;
@@ -45,12 +48,8 @@ public class Crosswalk {
 
   @Override
   public String toString() {
-    return "[Crosswalk: "
-    + "factualId=" + factualId
-    + ", url=" + url
-    + ", namespace=" + namespace
-    + ", namespaceId=" + namespaceId
-    + "]";
+    return "[Crosswalk: " + "factualId=" + factualId + ", url=" + url
+        + ", namespace=" + namespace + ", namespaceId=" + namespaceId + "]";
   }
 
 }
