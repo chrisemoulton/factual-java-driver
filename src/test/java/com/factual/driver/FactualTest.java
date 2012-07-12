@@ -398,20 +398,6 @@ public class FactualTest {
   }
 
   @Test
-  @Deprecated
-  public void testCrosswalk_ex4() {
-    CrosswalkResponse resp = factual.fetch(
-        "places",
-        new CrosswalkQuery().namespace("foursquare")
-            .namespaceId("4ae4df6df964a520019f21e3").only("yelp"));
-    List<Crosswalk> crosswalks = resp.getCrosswalks();
-
-    assertOk(resp);
-    assertFalse(crosswalks.isEmpty());
-    assertNamespaceDeprecated(crosswalks, "yelp");
-  }
-
-  @Test
   public void testCrosswalk_limit() {
     ReadResponse resp = factual.fetch(
         "crosswalk",
@@ -430,7 +416,6 @@ public class FactualTest {
         new ResolveQuery().add("name", "McDonalds")
             .add("address", "10451 Santa Monica Blvd").add("region", "CA")
             .add("postcode", "90025"));
-
     assertOk(resp);
     assertNotEmpty(resp);
   }

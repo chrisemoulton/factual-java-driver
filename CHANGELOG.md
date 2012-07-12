@@ -1,3 +1,6 @@
+## 1.5.0
+ * Removes deprecated Crosswalk-related classes.  Use a table read on the Crosswalk table instead.
+
 ## 1.4.3
  * Crosswalk updates: deprecate old API and document usage of Crosswalk table read.
 
