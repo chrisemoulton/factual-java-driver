@@ -11,14 +11,12 @@ The driver is in Maven Central, so you can just add this to your Maven <tt>pom.x
     <dependency>
       <groupId>com.factual</groupId>
       <artifactId>factual-java-driver</artifactId>
-      <version>1.4.3-android</version>
+      <version>1.5.0-android</version>
     </dependency>
     
 ## Non Maven users
 
-You can download the individual driver jar, and view the pom.xml file, here:
-
-[Driver download folder](http://repo1.maven.org/maven2/com/factual/factual-java-driver/1.4.3-android/)
+You can download the individual driver jar, and view the pom.xml file, here: [Driver download folder](http://repo1.maven.org/maven2/com/factual/factual-java-driver/1.5.0-android/)
 
 The pom.xml tells you what dependencies you'll need to plug into your project to get the driver to work.
 

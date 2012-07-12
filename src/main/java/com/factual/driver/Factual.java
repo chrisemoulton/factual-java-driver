@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
-import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
@@ -34,7 +33,7 @@ import com.google.common.io.Closeables;
  * @author aaron
  */
 public class Factual {
-  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.4.3-android";
+  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.5.0-android";
   private static final String DEFAULT_HOST_HEADER = "api.v3.factual.com";
   private String factHome = "http://api.v3.factual.com/";
   private String host = DEFAULT_HOST_HEADER;
@@ -402,23 +401,6 @@ public class Factual {
   }
 
   /**
-   * Queue a crosswalk request for inclusion in the next multi request.
-   * 
-   * @deprecated Use a standard read query instead. For example:
-   *             factual.queueFetch("crosswalk", new Query())
-   * @param table
-   *          the name of the table you wish to use crosswalk against (e.g.,
-   *          "places")
-   * @param query
-   *          the crosswalk query to run against <tt>table</tt>.
-   */
-  @Deprecated
-  public void queueFetch(String table, CrosswalkQuery query) {
-    fetchQueue.add(new FullQuery(urlForCrosswalk(table), query.toUrlParams(),
-        FullQuery.ResponseType.CROSSWALK_RESPONSE));
-  }
-
-  /**
    * Queue a resolve request for inclusion in the next multi request.
    * 
    * @param table
@@ -493,36 +475,6 @@ public class Factual {
    */
   public ReadResponse monetize(Query query) {
     return new ReadResponse(get(urlForMonetize(), query.toUrlParams()));
-  }
-
-  /**
-   * Convenience method to return Crosswalks for the specific query.
-   * 
-   * @deprecated Use a standard read query instead. For example:
-   *             factual.fetch("crosswalk", new Query())
-   */
-  @Deprecated
-  public List<Crosswalk> crosswalks(String table, CrosswalkQuery query) {
-    return fetch(table, query).getCrosswalks();
-  }
-
-  /**
-   * Query's Factual for the Crosswalk data matching the specified
-   * <tt>query</tt>.
-   * 
-   * @deprecated Use a standard read query instead. For example:
-   *             factual.fetch("crosswalk", new Query())
-   * @param tableName
-   *          the name of the table to crosswalk.
-   * @param query
-   *          the Crosswalk query.
-   * @return Factual's response to the Crosswalk query.
-   */
-  @Deprecated
-  public CrosswalkResponse fetch(String tableName, CrosswalkQuery query) {
-    return new CrosswalkResponse(request(new FullQuery(
-        urlForCrosswalk(tableName), query.toUrlParams(),
-        FullQuery.ResponseType.CROSSWALK_RESPONSE)));
   }
 
   /**
@@ -712,7 +664,7 @@ public class Factual {
   protected static class FullQuery {
 
     public static enum ResponseType {
-      READ_RESPONSE, CROSSWALK_RESPONSE, FACET_RESPONSE, FLAG_RESPONSE, SCHEMA_RESPONSE, SUBMIT_RESPONSE, RAW_READ_RESPONSE
+      READ_RESPONSE, FACET_RESPONSE, FLAG_RESPONSE, SCHEMA_RESPONSE, SUBMIT_RESPONSE, RAW_READ_RESPONSE
     };
 
     private final Map<String, Object> params;
@@ -742,8 +694,6 @@ public class Factual {
       switch (responseType) {
       case READ_RESPONSE:
         return new ReadResponse(json);
-      case CROSSWALK_RESPONSE:
-        return new CrosswalkResponse(json);
       case FACET_RESPONSE:
         return new FacetResponse(json);
       case FLAG_RESPONSE:
