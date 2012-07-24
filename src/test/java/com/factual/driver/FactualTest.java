@@ -8,6 +8,7 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -272,6 +273,18 @@ public class FactualTest {
     Query q = new Query().field("region").in("CA", "NM", "FL");
     ReadResponse resp = factual.fetch("places", q);
 
+    assertOk(resp);
+    assertNotEmpty(resp);
+    assertIn(resp, "region", "CA", "NM", "FL");
+
+    q = new Query().field("region").in(new ArrayList() {
+      {
+        add("CA");
+        add("NM");
+        add("FL");
+      }
+    });
+    resp = factual.fetch("places", q);
     assertOk(resp);
     assertNotEmpty(resp);
     assertIn(resp, "region", "CA", "NM", "FL");
