@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
@@ -33,7 +34,7 @@ import com.google.common.io.Closeables;
  * @author aaron
  */
 public class Factual {
-  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.5.0-android";
+  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.5.1-android";
   private static final String DEFAULT_HOST_HEADER = "api.v3.factual.com";
   private String factHome = "http://api.v3.factual.com/";
   private String host = DEFAULT_HOST_HEADER;
@@ -42,7 +43,7 @@ public class Factual {
   private boolean debug = false;
   private StreamHandler debugHandler = null;
 
-  private final Queue<FullQuery> fetchQueue = Lists.newLinkedList();
+  private final Queue<RequestImpl> fetchQueue = Lists.newLinkedList();
 
   /**
    * Constructor. Represents your authenticated access to Factual.
@@ -345,32 +346,46 @@ public class Factual {
    * @return the response of running <tt>query</tt> against Factual.
    */
   public String get(String path, Map<String, Object> params) {
-    return request(new FullQuery(path, params,
-        FullQuery.ResponseType.RAW_READ_RESPONSE));
+    return request(new RawReadRequest(path, params));
   }
 
-  private String post(String path, Map<String, Object> params) {
-    return requestPost(new FullQuery(path, params,
-        FullQuery.ResponseType.RAW_READ_RESPONSE));
+  /**
+   * 
+   * Runs a "GET" request against the path specified using the parameter string
+   * specified and your Oauth token.
+   * 
+   * @param path
+   *          the path to run the request against
+   * @param params
+   *          the url-encoded parameter string to send with the request
+   * @return
+   */
+  public String get(String path, String params) {
+    return request(new SimpleGetRequest(path, params));
+  }
+
+  private String post(String path, Map<String, Object> params,
+      Map<String, String> postData) {
+    return requestPost(new RawReadRequest(path, params, postData));
   }
 
   private SubmitResponse submitCustom(String root, Submit submit,
       Metadata metadata) {
     Map<String, Object> params = Maps.newHashMap();
-    // TODO: Switch parameters to POST content when supported.
     params.putAll(metadata.toUrlParams());
     params.putAll(submit.toUrlParams());
-    String jsonResponse = post(root, params);
+    // Oauth library currently doesn't support POST body content.
+    String jsonResponse = post(root, params, new HashMap<String, String>());
     return new SubmitResponse(jsonResponse);
   }
 
   private FlagResponse flagCustom(String root, String flagType,
       Metadata metadata) {
     Map<String, Object> params = Maps.newHashMap();
-    // TODO: Switch parameters to POST content when supported.
     params.putAll(metadata.toUrlParams());
     params.put("problem", flagType);
-    String jsonResponse = post(root, params);
+    // Oauth library currently doesn't support POST body content.
+    String jsonResponse = post(root, params, new HashMap<String, String>());
     return new FlagResponse(jsonResponse);
   }
 
@@ -383,8 +398,7 @@ public class Factual {
    *          the parameters to send with the request
    */
   public void queueFetch(String path, Map<String, Object> params) {
-    fetchQueue.add(new FullQuery(path, params,
-        FullQuery.ResponseType.RAW_READ_RESPONSE));
+    fetchQueue.add(new RawReadRequest(path, params));
   }
 
   /**
@@ -396,8 +410,7 @@ public class Factual {
    *          the read query to run against <tt>table</tt>.
    */
   public void queueFetch(String table, Query query) {
-    fetchQueue.add(new FullQuery(urlForFetch(table), query.toUrlParams(),
-        FullQuery.ResponseType.READ_RESPONSE));
+    fetchQueue.add(new ReadQuery(urlForFetch(table), query.toUrlParams()));
   }
 
   /**
@@ -410,8 +423,7 @@ public class Factual {
    *          the resolve query to run against <tt>table</tt>.
    */
   public void queueFetch(String table, ResolveQuery query) {
-    fetchQueue.add(new FullQuery(urlForResolve(table), query.toUrlParams(),
-        FullQuery.ResponseType.READ_RESPONSE));
+    fetchQueue.add(new ReadQuery(urlForResolve(table), query.toUrlParams()));
   }
 
   /**
@@ -424,18 +436,15 @@ public class Factual {
    *          the facet query to run against <tt>table</tt>.
    */
   public void queueFetch(String table, FacetQuery query) {
-    fetchQueue.add(new FullQuery(urlForFacets(table), query.toUrlParams(),
-        FullQuery.ResponseType.FACET_RESPONSE));
+    fetchQueue.add(new FacetRequest(urlForFacets(table), query.toUrlParams()));
   }
 
   public void queueFetch(Geocode query) {
-    fetchQueue.add(new FullQuery(urlForGeocode(), query.toUrlParams(),
-        FullQuery.ResponseType.READ_RESPONSE));
+    fetchQueue.add(new ReadQuery(urlForGeocode(), query.toUrlParams()));
   }
 
   public void queueFetch(Geopulse query) {
-    fetchQueue.add(new FullQuery(urlForGeopulse(), query.toUrlParams(),
-        FullQuery.ResponseType.READ_RESPONSE));
+    fetchQueue.add(new ReadQuery(urlForGeopulse(), query.toUrlParams()));
   }
 
   /**
@@ -446,9 +455,9 @@ public class Factual {
   public MultiResponse sendRequests() {
     Map<String, String> multi = Maps.newHashMap();
     int i = 0;
-    Map<String, FullQuery> requestMapping = Maps.newLinkedHashMap();
+    Map<String, RequestImpl> requestMapping = Maps.newLinkedHashMap();
     while (!fetchQueue.isEmpty()) {
-      FullQuery fullQuery = fetchQueue.poll();
+      RequestImpl fullQuery = fetchQueue.poll();
       String url = "/" + fullQuery.toUrlString();
       if (url != null) {
         String multiKey = "q" + Integer.toString(i);
@@ -529,8 +538,8 @@ public class Factual {
    * @return the response from Factual for the Resolve request.
    */
   public ReadResponse fetch(String tableName, ResolveQuery query) {
-    return new ReadResponse(request(new FullQuery(urlForResolve(tableName),
-        query.toUrlParams(), FullQuery.ResponseType.READ_RESPONSE)));
+    return new ReadResponse(request(new ReadQuery(urlForResolve(tableName),
+        query.toUrlParams())));
   }
 
   public SchemaResponse schema(String tableName) {
@@ -542,35 +551,30 @@ public class Factual {
     return "t/" + tableName + "/schema";
   }
 
-  private String request(FullQuery query) {
+  private String request(Request query) {
     return request(query, true);
   }
 
-  private String request(FullQuery query, boolean useOAuth) {
+  private String request(Request query, boolean useOAuth) {
     return request(query, "GET", useOAuth);
   }
 
-  private String requestPost(FullQuery query) {
+  private String requestPost(Request query) {
     return requestPost(query, true);
   }
 
-  private String requestPost(FullQuery query, boolean useOAuth) {
+  private String requestPost(Request query, boolean useOAuth) {
     return request(query, "POST", useOAuth);
   }
 
-  private String request(FullQuery fullQuery, String requestMethod,
+  private String request(Request fullQuery, String requestMethod,
       boolean useOAuth) {
-    Map<String, Object> requestParams = fullQuery.getRequestParams();
     Map<String, String> postData = fullQuery.getPostData();
     String urlStr = factHome + fullQuery.toUrlString();
     GenericUrl url = new GenericUrl(urlStr);
 
     if (debug) {
-      System.out.println("=== " + urlStr + " ===");
-      System.out.println("Parameters:");
-      for (String key : requestParams.keySet()) {
-        System.out.println(key + ": " + requestParams.get(key));
-      }
+      fullQuery.printDebug();
       Logger logger = Logger.getLogger(HttpTransport.class.getName());
       logger.removeHandler(debugHandler);
       logger.setLevel(Level.ALL);
@@ -655,57 +659,155 @@ public class Factual {
     }
   }
 
+  protected static interface Request {
+
+    public String toUrlString();
+
+    public Map<String, String> getPostData();
+
+    public Response getResponse(String json);
+
+    public void printDebug();
+  }
+
+  protected static class ReadQuery extends RequestImpl {
+
+    public ReadQuery(String path, Map<String, Object> params) {
+      super(path, params);
+    }
+
+    @Override
+    public Response getResponse(String json) {
+      return new ReadResponse(json);
+    }
+
+  }
+
   /**
    * Represents a request against Factual given a path and parameters
    * 
    * @author brandon
    * 
    */
-  protected static class FullQuery {
-
-    public static enum ResponseType {
-      READ_RESPONSE, FACET_RESPONSE, FLAG_RESPONSE, SCHEMA_RESPONSE, SUBMIT_RESPONSE, RAW_READ_RESPONSE
-    };
+  protected static abstract class RequestImpl implements Request {
 
     private final Map<String, Object> params;
+    private final Map<String, String> postData;
     private final String path;
-    private final ResponseType responseType;
 
-    public FullQuery(String path, Map<String, Object> params,
-        ResponseType responseType) {
+    public RequestImpl(String path, Map<String, Object> params) {
+      this(path, params, new HashMap<String, String>());
+    }
+
+    public RequestImpl(String path, Map<String, Object> params,
+        Map<String, String> postData) {
       this.path = path;
       this.params = params;
-      this.responseType = responseType;
+      this.postData = postData;
     }
 
     public Map<String, Object> getRequestParams() {
       return params;
     }
 
+    @Override
     public String toUrlString() {
       return UrlUtil.toUrl(path, getRequestParams());
     }
 
+    @Override
     public Map<String, String> getPostData() {
-      return Maps.newHashMap();
+      return postData;
     }
 
-    public Response getResponse(String json) {
-      switch (responseType) {
-      case READ_RESPONSE:
-        return new ReadResponse(json);
-      case FACET_RESPONSE:
-        return new FacetResponse(json);
-      case FLAG_RESPONSE:
-        return new FlagResponse(json);
-      case SUBMIT_RESPONSE:
-        return new SubmitResponse(json);
-      case SCHEMA_RESPONSE:
-        return new SchemaResponse(json);
-      case RAW_READ_RESPONSE:
-        return new RawReadResponse(json);
+    @Override
+    public abstract Response getResponse(String json);
+
+    @Override
+    public void printDebug() {
+      System.out.println("=== " + path + " ===");
+      System.out.println("Parameters:");
+      if (params != null) {
+        for (String key : params.keySet()) {
+          System.out.println(key + ": " + params.get(key));
+        }
       }
+    }
+  }
+
+  protected static class FacetRequest extends RequestImpl {
+
+    public FacetRequest(String path, Map<String, Object> params) {
+      super(path, params);
+    }
+
+    @Override
+    public Response getResponse(String json) {
+      return new FacetResponse(json);
+    }
+
+  }
+
+  protected static class SchemaRequest extends RequestImpl {
+
+    public SchemaRequest(String path, Map<String, Object> params) {
+      super(path, params);
+    }
+
+    @Override
+    public Response getResponse(String json) {
+      return new SchemaResponse(json);
+    }
+
+  }
+
+  protected static class RawReadRequest extends RequestImpl {
+
+    public RawReadRequest(String path, Map<String, Object> params) {
+      super(path, params);
+    }
+
+    public RawReadRequest(String path, Map<String, Object> params,
+        Map<String, String> postData) {
+      super(path, params, postData);
+    }
+
+    @Override
+    public Response getResponse(String json) {
+      return new RawReadResponse(json);
+    }
+
+  }
+
+  protected static class SimpleGetRequest implements Request {
+    private final String path;
+    private final String params;
+
+    public SimpleGetRequest(String path, String params) {
+      this.path = path;
+      this.params = params;
+    }
+
+    @Override
+    public String toUrlString() {
+      return UrlUtil.toUrl(path, params);
+    }
+
+    @Override
+    public Map<String, String> getPostData() {
       return null;
+    }
+
+    @Override
+    public Response getResponse(String json) {
+      return new RawReadResponse(json);
+    }
+
+    @Override
+    public void printDebug() {
+      System.out.println("=== " + path + " ===");
+      System.out.println("Parameters:");
+      System.out.println(params);
     }
   }
 }

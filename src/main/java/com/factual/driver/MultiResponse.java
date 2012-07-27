@@ -7,7 +7,7 @@ import java.util.Map.Entry;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.factual.driver.Factual.FullQuery;
+import com.factual.driver.Factual.RequestImpl;
 import com.google.common.collect.Lists;
 
 /**
@@ -20,13 +20,13 @@ public class MultiResponse extends Response {
 	private String json = null;
 	private List<Response> data = Lists.newArrayList();
 
-	private Map<String, FullQuery> requestMapping = null;
+	private Map<String, RequestImpl> requestMapping = null;
 	
 	/**
 	 * 
 	 * @param requestMapping
 	 */
-	public MultiResponse(Map<String, FullQuery> requestMapping) {
+	public MultiResponse(Map<String, RequestImpl> requestMapping) {
 		this.requestMapping = requestMapping;
 	}
 
@@ -46,9 +46,9 @@ public class MultiResponse extends Response {
 	
 	private void parseResponse(JSONObject jo) throws JSONException {
 	   data.clear();
-	   for (Entry<String, FullQuery> entry : requestMapping.entrySet()) {
+	   for (Entry<String, RequestImpl> entry : requestMapping.entrySet()) {
 		   String responseJson = jo.getJSONObject(entry.getKey()).toString();
-		   FullQuery query = entry.getValue();	
+		   RequestImpl query = entry.getValue();	
 		   Response resp = query.getResponse(responseJson);
 		   if (resp != null)
 			   data.add(resp);

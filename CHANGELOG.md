@@ -1,3 +1,7 @@
+## 1.5.1-android
+ * Adds support for a raw get request using a path and url-encoded parameter string.
+ * Fixes bug with list-based filters not being sent as an array in the query string. 
+
 ## 1.5.0-android
  * Removes deprecated Crosswalk-related classes.  Use a table read on the Crosswalk table instead.
 
