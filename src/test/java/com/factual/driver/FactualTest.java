@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -521,6 +523,21 @@ public class FactualTest {
     assertTrue(respString != null && respString.length() > 0);
   }
 
+  @Test
+  @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+  public void testRawGet() {
+    String respRaw = factual.get(
+        "t/places",
+        "filters="
+            + UrlUtil.urlEncode("{\"name\" : {\"$eq\" : \"Starbucks\"} }"));
+    try {
+      JSONObject rootJsonObj = new JSONObject(respRaw);
+      assertEquals("ok", rootJsonObj.get("status"));
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+  }
+
   /**
    * And should not be used for geo queries. However, neither should it throw an
    * exception.
@@ -570,7 +587,7 @@ public class FactualTest {
   @Ignore("Until API supports it")
   public void testSubmitAdd() {
     Submit submit = new Submit().setValue("longitude", 100);
-    SubmitResponse resp = factual.submit("global", submit,
+    SubmitResponse resp = factual.submit("2EH4Pz", submit,
         new Metadata().user("test_driver_user"));
     assertOk(resp);
     assertTrue(resp.isNewEntity());
@@ -580,7 +597,7 @@ public class FactualTest {
   @Ignore("Until API supports it")
   public void testSubmitEdit() {
     Submit submit = new Submit().setValue("longitude", 100);
-    SubmitResponse resp = factual.submit("global",
+    SubmitResponse resp = factual.submit("2EH4Pz",
         "0545b03f-9413-44ed-8882-3a9a461848da", submit,
         new Metadata().user("test_driver_user"));
     assertOk(resp);
@@ -591,7 +608,7 @@ public class FactualTest {
   @Ignore("Until API supports it")
   public void testSubmitDelete() {
     Submit submit = new Submit().removeValue("longitude");
-    SubmitResponse resp = factual.submit("global",
+    SubmitResponse resp = factual.submit("2EH4Pz",
         "0545b03f-9413-44ed-8882-3a9a461848da", submit,
         new Metadata().user("test_driver_user"));
     assertOk(resp);
@@ -603,7 +620,7 @@ public class FactualTest {
     Submit submit = new Submit().removeValue("longitude");
     FactualApiException exception = null;
     try {
-      SubmitResponse resp = factual.submit("global", "randomwrongid", submit,
+      SubmitResponse resp = factual.submit("2EH4Pz", "randomwrongid", submit,
           new Metadata().user("test_driver_user"));
     } catch (FactualApiException e) {
       exception = e;
@@ -614,7 +631,7 @@ public class FactualTest {
   @Test
   @Ignore("Until API supports it")
   public void testFlagDuplicate() {
-    FlagResponse resp = factual.flagDuplicate("global",
+    FlagResponse resp = factual.flagDuplicate("2EH4Pz",
         "0545b03f-9413-44ed-8882-3a9a461848da",
         new Metadata().user("test_driver_user"));
     assertOk(resp);
@@ -623,7 +640,7 @@ public class FactualTest {
   @Test
   @Ignore("Until API supports it")
   public void testFlagInaccurate() {
-    FlagResponse resp = factual.flagInaccurate("global",
+    FlagResponse resp = factual.flagInaccurate("2EH4Pz",
         "0545b03f-9413-44ed-8882-3a9a461848da",
         new Metadata().user("test_driver_user"));
     assertOk(resp);
@@ -632,7 +649,7 @@ public class FactualTest {
   @Test
   @Ignore("Until API supports it")
   public void testFlagInappropriate() {
-    FlagResponse resp = factual.flagInappropriate("global",
+    FlagResponse resp = factual.flagInappropriate("2EH4Pz",
         "0545b03f-9413-44ed-8882-3a9a461848da",
         new Metadata().user("test_driver_user"));
     assertOk(resp);
@@ -641,7 +658,7 @@ public class FactualTest {
   @Test
   @Ignore("Until API supports it")
   public void testFlagNonExistent() {
-    FlagResponse resp = factual.flagNonExistent("global",
+    FlagResponse resp = factual.flagNonExistent("2EH4Pz",
         "0545b03f-9413-44ed-8882-3a9a461848da",
         new Metadata().user("test_driver_user"));
     assertOk(resp);
@@ -650,7 +667,7 @@ public class FactualTest {
   @Test
   @Ignore("Until API supports it")
   public void testFlagSpam() {
-    FlagResponse resp = factual.flagSpam("global",
+    FlagResponse resp = factual.flagSpam("2EH4Pz",
         "0545b03f-9413-44ed-8882-3a9a461848da",
         new Metadata().user("test_driver_user"));
     assertOk(resp);
@@ -659,7 +676,7 @@ public class FactualTest {
   @Test
   @Ignore("Until API supports it")
   public void testFlagOther() {
-    FlagResponse resp = factual.flagOther("global",
+    FlagResponse resp = factual.flagOther("2EH4Pz",
         "0545b03f-9413-44ed-8882-3a9a461848da",
         new Metadata().user("test_driver_user"));
     assertOk(resp);
