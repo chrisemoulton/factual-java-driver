@@ -16,7 +16,7 @@ The driver is in Maven Central, so you can just add this to your Maven <tt>pom.x
     
 ## Non Maven users
 
-Please see the wiki page, [Obtaining Library Dependencies Without Maven](wiki/Obtaining-Library-Dependencies-Without-Maven).
+Please see the wiki page, [Obtaining Library Dependencies Without Maven](https://github.com/Factual/factual-java-driver/wiki/Obtaining-Library-Dependencies-Without-Maven).
 
 # Basic Design
 
