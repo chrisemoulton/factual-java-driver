@@ -11,13 +11,13 @@ The driver is in Maven Central, so you can just add this to your Maven <tt>pom.x
     <dependency>
       <groupId>com.factual</groupId>
       <artifactId>factual-java-driver</artifactId>
-      <version>1.5.1</version>
+      <version>1.5.2</version>
     </dependency>
     
 ## Non Maven users
 
 You can download the individual driver jar, and view the pom.xml file, here:
-[Driver download folder](http://repo1.maven.org/maven2/com/factual/factual-java-driver/1.5.1/)
+[Driver download folder](http://repo1.maven.org/maven2/com/factual/factual-java-driver/1.5.2/)
 
 The pom.xml tells you what dependencies you'll need to plug into your project to get the driver to work (see the <dependencies> section).
 
@@ -616,6 +616,38 @@ The driver fully supports Factual's Monetize feature, which enables you to find 
 The <tt>monetize</tt> method fetches deals based on a specified query:
 
     ReadResponse resp = factual.monetize(new Query().field("place_locality").equal("Los Angeles"));
+
+# Diffs
+
+The driver supports Factual's experimental Diffs feature, which enables Factual data update downloads.
+
+## Simple Diffs Example
+
+The <tt>fetch</tt> method gives the diff data:
+
+	// Fetch a diffs response
+	DiffsQuery diffs = new DiffsQuery(1318890505254L);
+	DiffsResponse resp = factual.fetch("places", diffs);
+
+## All Top Level Diffs Parameters
+
+<table>
+  <tr>
+    <th>Parameter</th>
+    <th>Description</th>
+    <th>Example</th>
+  </tr>
+  <tr>
+    <td>before</td>
+    <td>The start time for a diff request</td>
+    <td><tt>d.before(long timestamp)</tt></td>
+  </tr>
+  <tr>
+    <td>after</td>
+    <td>The end time for a diff request</td>
+    <td><tt>d.after(long timestamp)</tt></td>
+  </tr>
+</table> 
 
 # Exception Handling
 

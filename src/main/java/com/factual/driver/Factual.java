@@ -34,7 +34,7 @@ import com.google.common.io.Closeables;
  * @author aaron
  */
 public class Factual {
-  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.5.1";
+  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.5.2";
   private static final String DEFAULT_HOST_HEADER = "api.v3.factual.com";
   private String factHome = "http://api.v3.factual.com/";
   private String host = DEFAULT_HOST_HEADER;
@@ -361,6 +361,11 @@ public class Factual {
   private String post(String path, Map<String, Object> params,
       Map<String, String> postData) {
     return requestPost(new RawReadRequest(path, params, postData));
+  }
+
+  public DiffsResponse fetch(String tableName, DiffsQuery diff) {
+    return new DiffsResponse(get(urlForFetch(tableName) + "/diffs",
+        diff.toUrlParams()));
   }
 
   private SubmitResponse submitCustom(String root, Submit submit,

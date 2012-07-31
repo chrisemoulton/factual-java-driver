@@ -584,6 +584,14 @@ public class FactualTest {
   }
 
   @Test
+  public void testDiffs() {
+    DiffsQuery diff = new DiffsQuery(1339123455775L);
+    diff.after(1339136968687L);
+    DiffsResponse resp = factual.fetch("2EH4Pz", diff);
+    assertTrue(resp.getData().size() == 695);
+  }
+
+  @Test
   @Ignore("Until API supports it")
   public void testSubmitAdd() {
     Submit submit = new Submit().setValue("longitude", 100);
@@ -598,7 +606,7 @@ public class FactualTest {
   public void testSubmitEdit() {
     Submit submit = new Submit().setValue("longitude", 100);
     SubmitResponse resp = factual.submit("2EH4Pz",
-        "0545b03f-9413-44ed-8882-3a9a461848da", submit,
+        "f33527e0-a8b4-4808-a820-2686f18cb00c", submit,
         new Metadata().user("test_driver_user"));
     assertOk(resp);
     assertFalse(resp.isNewEntity());
@@ -609,7 +617,7 @@ public class FactualTest {
   public void testSubmitDelete() {
     Submit submit = new Submit().removeValue("longitude");
     SubmitResponse resp = factual.submit("2EH4Pz",
-        "0545b03f-9413-44ed-8882-3a9a461848da", submit,
+        "f33527e0-a8b4-4808-a820-2686f18cb00c", submit,
         new Metadata().user("test_driver_user"));
     assertOk(resp);
     assertFalse(resp.isNewEntity());
@@ -632,7 +640,7 @@ public class FactualTest {
   @Ignore("Until API supports it")
   public void testFlagDuplicate() {
     FlagResponse resp = factual.flagDuplicate("2EH4Pz",
-        "0545b03f-9413-44ed-8882-3a9a461848da",
+        "f33527e0-a8b4-4808-a820-2686f18cb00c",
         new Metadata().user("test_driver_user"));
     assertOk(resp);
   }
@@ -641,7 +649,7 @@ public class FactualTest {
   @Ignore("Until API supports it")
   public void testFlagInaccurate() {
     FlagResponse resp = factual.flagInaccurate("2EH4Pz",
-        "0545b03f-9413-44ed-8882-3a9a461848da",
+        "f33527e0-a8b4-4808-a820-2686f18cb00c",
         new Metadata().user("test_driver_user"));
     assertOk(resp);
   }
@@ -650,7 +658,7 @@ public class FactualTest {
   @Ignore("Until API supports it")
   public void testFlagInappropriate() {
     FlagResponse resp = factual.flagInappropriate("2EH4Pz",
-        "0545b03f-9413-44ed-8882-3a9a461848da",
+        "f33527e0-a8b4-4808-a820-2686f18cb00c",
         new Metadata().user("test_driver_user"));
     assertOk(resp);
   }
@@ -659,7 +667,7 @@ public class FactualTest {
   @Ignore("Until API supports it")
   public void testFlagNonExistent() {
     FlagResponse resp = factual.flagNonExistent("2EH4Pz",
-        "0545b03f-9413-44ed-8882-3a9a461848da",
+        "f33527e0-a8b4-4808-a820-2686f18cb00c",
         new Metadata().user("test_driver_user"));
     assertOk(resp);
   }
@@ -668,7 +676,7 @@ public class FactualTest {
   @Ignore("Until API supports it")
   public void testFlagSpam() {
     FlagResponse resp = factual.flagSpam("2EH4Pz",
-        "0545b03f-9413-44ed-8882-3a9a461848da",
+        "f33527e0-a8b4-4808-a820-2686f18cb00c",
         new Metadata().user("test_driver_user"));
     assertOk(resp);
   }
@@ -677,7 +685,7 @@ public class FactualTest {
   @Ignore("Until API supports it")
   public void testFlagOther() {
     FlagResponse resp = factual.flagOther("2EH4Pz",
-        "0545b03f-9413-44ed-8882-3a9a461848da",
+        "f33527e0-a8b4-4808-a820-2686f18cb00c",
         new Metadata().user("test_driver_user"));
     assertOk(resp);
   }
@@ -885,12 +893,6 @@ public class FactualTest {
   private void assertNamespace(List<Map<String, Object>> crosswalks, String ns) {
     for (Map<String, Object> cw : crosswalks) {
       assertEquals(ns, cw.get("namespace"));
-    }
-  }
-
-  private void assertNamespaceDeprecated(List<Crosswalk> crosswalks, String ns) {
-    for (Crosswalk cw : crosswalks) {
-      assertEquals(ns, cw.getNamespace());
     }
   }
 
