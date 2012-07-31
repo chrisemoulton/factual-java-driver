@@ -426,13 +426,24 @@ public class FactualTest {
 
   @Test
   public void testResolve_ex1() {
-    ReadResponse resp = factual.fetch(
+    ResolveResponse resp = factual.fetch(
         "places",
         new ResolveQuery().add("name", "McDonalds")
             .add("address", "10451 Santa Monica Blvd").add("region", "CA")
             .add("postcode", "90025"));
     assertOk(resp);
     assertNotEmpty(resp);
+    assertTrue(resp.isResolved());
+    assertTrue(resp.getResolved().get("name").equals("McDonald's"));
+  }
+
+  @Test
+  public void matchTest() {
+    MatchQuery matchQuery = new MatchQuery().add("name", "McDonalds")
+        .add("address", "10451 Santa Monica Blvd").add("region", "CA")
+        .add("postcode", "90025");
+    String id = factual.match("places", matchQuery);
+    assertTrue("bd886f67-9d86-40c5-9217-f7bcd53cfc0e".equals(id));
   }
 
   @Test
