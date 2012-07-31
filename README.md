@@ -13,13 +13,10 @@ The driver is in Maven Central, so you can just add this to your Maven <tt>pom.x
       <artifactId>factual-java-driver</artifactId>
       <version>1.4.2</version>
     </dependency>
-    
+
 ## Non Maven users
 
-You can download the individual driver jar, and view the pom.xml file, here:
-[Driver download folder](http://repo1.maven.org/maven2/com/factual/factual-java-driver/1.4.2/)
-
-The pom.xml tells you what dependencies you'll need to plug into your project to get the driver to work (see the <dependencies> section).
+Please see the [Obtaining Library Dependencies Without Maven](wiki/Obtaining-Library-Dependencies-Without-Maven) wiki page.
 
 # Basic Design
 
@@ -33,13 +30,13 @@ Results are returned as the JSON returned by Factual. Optionally, there are JSON
 
     // Create an authenticated handle to Factual
     Factual factual = new Factual(MY_KEY, MY_SECRET);
-    
+
 # Simple Query Example
 
     // Print 3 random records from Factual's Places table:
     System.out.println(
       factual.fetch("places", new Query().limit(3)));
-	
+
 # Full Text Search
 
     // Print entities that match a full text search for Sushi in Santa Monica:
@@ -59,7 +56,7 @@ You can have Factual sort your query results for you, on a field by field basis.
 
     // Build a Query to find 10 random entities and sort them by name, ascending:
     new Query().limit(10).sortAsc("name");
-    
+
 You can specify more than one sort, and the results will be sorted with the first sort as primary, the second sort or secondary, and so on:
 
     // Build a Query to find 20 random entities, sorted ascending primarily by region, then by locality, then by name:
@@ -75,14 +72,14 @@ You can use limit and offset to support basic results paging. For example:
 
     // Build a Query with offset of 150, limiting the page size to 10:
     new Query().limit(10).offset(150);
-	
+
 # Field Selection
 
 By default your queries will return all fields in the table. You can use the only modifier to specify the exact set of fields returned. For example:
 
     // Build a Query that only gets the name, tel, and category fields:
     new Query().only("name", "tel", "category");
-    
+
 # All Top Level Query Parameters
 
 <table>
@@ -135,7 +132,7 @@ By default your queries will return all fields in the table. You can use the onl
     <td>The field (or secondary fields) to sort data on, as well as the direction of sort.  Supports $distance as a sort option if a geo-filter is specified.  Supports $relevance as a sort option if a full text search is specified either using the q parameter or using the $search operator in the filter parameter.  By default, any query with a full text search will be sorted by relevance.  Any query with a geo filter will be sorted by distance from the reference point.  If both a geo filter and full text search are present, the default will be relevance followed by distance.</td>
     <td><tt>q.sortAsc("name").sortDesc("$distance")</tt></td>
   </tr>
-</table>  
+</table>
 
 # Row Filters
 
@@ -242,7 +239,7 @@ Queries support logical AND'ing your row filters. For example:
       q.field("name").beginsWith("Coffee"),
       q.field("tel").blank()
     );
-    
+
 Note that all row filters set at the top level of the Query are implicitly AND'ed together, so you could also do this:
 
     new Query()
@@ -258,7 +255,7 @@ Queries support logical OR'ing your row filters. For example:
     q.or(
         q.field("name").beginsWith("Coffee"),
         q.field("tel").blank());
-	  
+
 ## Combined ANDs and ORs
 
 You can nest AND and OR logic to whatever level of complexity you need. For example:
@@ -345,7 +342,7 @@ NOTE: although these parameters are individually optional, at least one of the f
         new CrosswalkQuery()
           .namespace("foursquare")
           .namespaceId("4ae4df6df964a520019f21e3"));
-          
+
 # Resolve
 
 The driver fully supports Factual's Resolve feature, which lets you start with incomplete data you may have for an entity, and get potential entity matches back from Factual.
@@ -365,7 +362,7 @@ The <tt>resolves</tt> method gives you all possible matches:
       .add("name", "Buena Vista")
       .add("latitude", 34.06)
       .add("longitude", -118.40));
-      
+
 The <tt>resolve</tt> method gives you the one full match if there is one, or null:
 
     // Get the entity that is a full match, or null:
@@ -384,27 +381,27 @@ Factual may occasionally release a new API which is not immediately supported by
 
 ## Example Raw Read Queries
 
-Fetch only the name and category fields, including the row count in the response: 
-    
+Fetch only the name and category fields, including the row count in the response:
+
     Map<String, Object> params = new HashMap<String, Object>()
     params.put("select", "name,category")
     params.put("include_count", true);
     String respString = factual.get("t/places", params);
-    
+
 Fetch 10 items from the "t/places" table in California, New Mexico, or Florida:
 
     Map<String, Object> params = new HashMap<String, Object>()
     params.put("filters", JsonUtil.toJsonStr(
-    		new HashMap() {{  
-				put("region", new HashMap() {{
-					put("$in", new String[]{"CA", "NM", "FL"});
-				}});
-			}}
-		)
-	);
-	params.put("limit", 10);
+        new HashMap() {{
+        put("region", new HashMap() {{
+          put("$in", new String[]{"CA", "NM", "FL"});
+        }});
+      }}
+    )
+  );
+  params.put("limit", 10);
     String respString = factual.fetch("t/places", params);
-    
+
 Note that the above examples demonstrate the ability to construct read queries using the raw read feature.  However, in practice, the recommendation is to always use the convenience classes for features which are supported.  In the above cases, a Query object should be used instead.
 
 
@@ -413,14 +410,14 @@ Note that the above examples demonstrate the ability to construct read queries u
 To see a full trace of debug information for a request and response, turn debug mode on.  There are two ways to do so:<p>
 Use the <tt>Factual</tt> constructor to enable debug on a new instance:
 
-	Factual factual = new Factual(key, secret, true);
+  Factual factual = new Factual(key, secret, true);
 
 or modify an existing instance to toggle debug mode on and off for individual requests:
-	
-	factual.debug(true);
-	factual.fetch(…);
-	factual.debug(false);
-	
+
+  factual.debug(true);
+  factual.fetch(…);
+  factual.debug(false);
+
 Debug information will be printed to standard out, with detailed request and response information, including headers.
 
 # Facets
@@ -482,7 +479,7 @@ Not all fields are configured to return facet counts. To determine what fields y
       Find "sushi" and "santa" and "monica":<br><tt>f.search("sushi santa monica")</tt>
     </td>
   </tr>
-</table>  
+</table>
 
 # Flag
 
@@ -495,7 +492,7 @@ The driver fully supports Factual's Flag feature, which enables flagging problem
 The <tt>flag</tt> method flags a problematic row:
 
     // Flag a row as inaccurate
-	FlagResponse resp = factual.flagInaccurate("global", "0545b03f-9413-44ed-8882-3a9a461848da", new Metadata().user("my_username"));
+  FlagResponse resp = factual.flagInaccurate("global", "0545b03f-9413-44ed-8882-3a9a461848da", new Metadata().user("my_username"));
 
 ## All Top Level Flag Parameters
 
@@ -509,11 +506,11 @@ The <tt>flag</tt> method flags a problematic row:
     <td>problem</td>
     <td>One of: duplicate, inaccurate, inappropriate, nonexistent, spam, or other.</td>
     <td><tt>factual.flagDuplicate(table, factualId, metadata)</tt>
-	    <p><tt>factual.flagInaccurate(table, factualId, metadata)</tt>	    <p><tt>factual.flagInappropriate(table, factualId, metadata)</tt>
-	    <p><tt>factual.flagNonExistent(table, factualId, metadata)</tt>
-	    <p><tt>factual.flagSpam(table, factualId, metadata)</tt>
-	    <p><tt>factual.flagOther(table, factualId, metadata)</tt>
-	    </td>
+      <p><tt>factual.flagInaccurate(table, factualId, metadata)</tt>      <p><tt>factual.flagInappropriate(table, factualId, metadata)</tt>
+      <p><tt>factual.flagNonExistent(table, factualId, metadata)</tt>
+      <p><tt>factual.flagSpam(table, factualId, metadata)</tt>
+      <p><tt>factual.flagOther(table, factualId, metadata)</tt>
+      </td>
   </tr>
   <tr>
     <td>user</td>
@@ -530,7 +527,7 @@ The <tt>flag</tt> method flags a problematic row:
     <td>A reference to a URL, title, person, etc. that is the source of this data.</td>
     <td><tt>metadata.reference("http://...")</tt></td>
   </tr>
-</table>  
+</table>
 
 # Submit
 
@@ -542,23 +539,23 @@ The driver fully supports Factual's Submit feature, which enables you to submit 
 
 The <tt>submit</tt> method is a submission to edit an existing row or add a new row:
 
-	// Field-value mapping for an entity.
-	Map<String, Object> values = …;
-	Metadata metadata = new Metadata().user("my_username");
+  // Field-value mapping for an entity.
+  Map<String, Object> values = …;
+  Metadata metadata = new Metadata().user("my_username");
 
-	// Submit the addition of a new row
-	Submit submit = new Submit(values)
-	SubmitResponse resp = factual.submit("global", submit, metadata);
-	
+  // Submit the addition of a new row
+  Submit submit = new Submit(values)
+  SubmitResponse resp = factual.submit("global", submit, metadata);
+
     // Submit a field update
-	Submit submit = new Submit(values)
+  Submit submit = new Submit(values)
     .setValue("longitude", 100);
-	SubmitResponse resp = factual.submit("global", "0545b03f-9413-44ed-8882-3a9a461848da",submit, metadata);
+  SubmitResponse resp = factual.submit("global", "0545b03f-9413-44ed-8882-3a9a461848da",submit, metadata);
 
-	// Submit an update for a field to become blank
-	Submit submit = new Submit(values)
+  // Submit an update for a field to become blank
+  Submit submit = new Submit(values)
     .removeValue("longitude");
-	SubmitResponse resp = factual.submit("global", "0545b03f-9413-44ed-8882-3a9a461848da",submit, metadata);
+  SubmitResponse resp = factual.submit("global", "0545b03f-9413-44ed-8882-3a9a461848da",submit, metadata);
 
 ## All Top Level Submit Parameters
 
@@ -588,7 +585,7 @@ The <tt>submit</tt> method is a submission to edit an existing row or add a new 
     <td>A reference to a URL, title, person, etc. that is the source of this data.</td>
     <td><tt>metadata.reference("http://...")</tt></td>
   </tr>
-</table>	
+</table>
 
 # Multi
 
@@ -597,21 +594,21 @@ Queue responses using <tt>queueFetch</tt>, and send all queued reads using <tt>s
 
 ## Simple Multi Example
 
-	// Fetch a multi response
-	factual.queueFetch("places", new Query().field("region").equal("CA"));
-	factual.queueFetch("places", new Query().limit(1)); 
-	MultiResponse multi = factual.sendRequests();
+  // Fetch a multi response
+  factual.queueFetch("places", new Query().field("region").equal("CA"));
+  factual.queueFetch("places", new Query().limit(1));
+  MultiResponse multi = factual.sendRequests();
 
 # Geopulse
 
-The driver fully supports Factual's <a href="http://developer.factual.com/display/docs/Places+API+-+Geopulse">Geopulse</a> feature, which provides point-based access to geographic attributes: you provide a long/lat coordinate pair, we provide everything we can know about that geography. 
+The driver fully supports Factual's <a href="http://developer.factual.com/display/docs/Places+API+-+Geopulse">Geopulse</a> feature, which provides point-based access to geographic attributes: you provide a long/lat coordinate pair, we provide everything we can know about that geography.
 
 ## Simple Geopulse Example
 
 The <tt>geopulse</tt> method fetches results based on the given point:
 
-	ReadResponse resp = factual.geopulse(new Geopulse(new Point(latitude, longitude))
-												.only("commercial_density", "commercial_profile"));
+  ReadResponse resp = factual.geopulse(new Geopulse(new Point(latitude, longitude))
+                        .only("commercial_density", "commercial_profile"));
 
 
 ## All Top Level Geopulse Parameters
@@ -632,18 +629,18 @@ The <tt>geopulse</tt> method fetches results based on the given point:
     <td>What fields to include in the query results. Note that the order of fields will not necessarily be preserved in the resulting JSON response due to the nature of JSON hashes.</td>
     <td><tt>geopulse.only("commercial_density", "commercial_profile")</tt></td>
   </tr>
-</table>	
+</table>
 
 
 # Reverse Geocoder
 
-The driver fully supports Factual's <a href="http://developer.factual.com/display/docs/Places+API+-+Reverse+Geocoder">Reverse Geocoder</a> feature, which returns the nearest valid address given a longitude and latitude. 
+The driver fully supports Factual's <a href="http://developer.factual.com/display/docs/Places+API+-+Reverse+Geocoder">Reverse Geocoder</a> feature, which returns the nearest valid address given a longitude and latitude.
 
 ## Simple Reverse Geocoder Example
-	
+
 The <tt>reverseGeocode</tt> method fetches results based on the given point:
 
-	ReadResponse resp = factual.reverseGeocode(new Point(latitude, longitude));	
+  ReadResponse resp = factual.reverseGeocode(new Point(latitude, longitude));
 
 ## All Top Level Reverse Geocoder Parameters
 
@@ -665,7 +662,7 @@ The <tt>reverseGeocode</tt> method fetches results based on the given point:
 The driver fully supports Factual's Monetize feature, which enables you to find deals for places in Factual's Global Places database.  Use the Query object to specify filters on which to run the monetize request.
 
 ## Simple Monetize Example
-	
+
 The <tt>monetize</tt> method fetches deals based on a specified query:
 
     ReadResponse resp = factual.monetize(new Query().field("place_locality").equal("Los Angeles"));
@@ -684,8 +681,8 @@ Here is an example of catching a <tt>FactualApiException</tt> and inspecting it:
       System.out.println("Error Status Code: " + e.getResponse().statusCode);
       System.out.println("Error Response Message: " + e.getResponse().statusMessage);
     }
-    
-    
+
+
 # More Examples
 
 For more code examples:
