@@ -34,7 +34,7 @@ import com.google.common.io.Closeables;
  * @author aaron
  */
 public class Factual {
-  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.5.1-android";
+  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.5.2-android";
   private static final String DEFAULT_HOST_HEADER = "api.v3.factual.com";
   private String factHome = "http://api.v3.factual.com/";
   private String host = DEFAULT_HOST_HEADER;
@@ -369,6 +369,11 @@ public class Factual {
     return requestPost(new RawReadRequest(path, params, postData));
   }
 
+  public DiffsResponse fetch(String tableName, DiffsQuery diff) {
+    return new DiffsResponse(get(urlForFetch(tableName) + "/diffs",
+        diff.toUrlParams()));
+  }
+
   private SubmitResponse submitCustom(String root, Submit submit,
       Metadata metadata) {
     Map<String, Object> params = Maps.newHashMap();
@@ -497,8 +502,23 @@ public class Factual {
    *          the Resolve query to run against Factual's Places table.
    * @return the response from Factual for the Resolve request.
    */
-  public ReadResponse resolves(ResolveQuery query) {
-    return fetch("places", query);
+  public ResolveResponse resolves(ResolveQuery query) {
+    return resolves("places", query);
+  }
+
+  /**
+   * Asks Factual to resolve the entity for the attributes specified by
+   * <tt>query</tt>.
+   * <p>
+   * Returns the read response from a Factual Resolve request, which includes
+   * all records that are potential matches.
+   * 
+   * @param query
+   *          the Resolve query to run against Factual's Places table.
+   * @return the response from Factual for the Resolve request.
+   */
+  public ResolveResponse resolves(String tableId, ResolveQuery query) {
+    return fetch(tableId, query);
   }
 
   /**
@@ -514,7 +534,48 @@ public class Factual {
    *         was not resolved.
    */
   public Map<String, Object> resolve(ResolveQuery query) {
-    return resolves(query).first();
+    return resolve("places", query);
+  }
+
+  /**
+   * Asks Factual to resolve the entity for the attributes specified by
+   * <tt>query</tt>. Returns a record representing the resolved entity if
+   * Factual successfully identified the entity with full confidence, or null if
+   * the entity was not resolved.
+   * 
+   * @param query
+   *          a Resolve query with partial attributes for an entity.
+   * @return a record representing the resolved entity if Factual successfully
+   *         identified the entity with full confidence, or null if the entity
+   *         was not resolved.
+   */
+  public Map<String, Object> resolve(String tableId, ResolveQuery query) {
+    ResolveResponse resp = resolves(tableId, query);
+    if (resp.isResolved())
+      return resp.getResolved();
+    else
+      return null;
+  }
+
+  /**
+   * Asks Factual to resolve the entity for the attributes specified by
+   * <tt>query</tt>. Returns a factual id for the resolved entity if Factual
+   * successfully identified the entity with full confidence, or null if the
+   * entity was not resolved.
+   * 
+   * @param query
+   *          a Match query with partial attributes for an entity.
+   * @return a factual id for the resolved entity if Factual successfully
+   *         identified the entity with full confidence, or null if the entity
+   *         was not resolved.
+   */
+  public String match(String tableId, MatchQuery query) {
+    ResolveResponse resp = new ResolveResponse(request(new ReadQuery(
+        urlForResolve(tableId), query.toUrlParams())));
+    if (resp.isResolved())
+      return String.valueOf(resp.getResolved().get("factual_id"));
+    else
+      return null;
   }
 
   /**
@@ -537,8 +598,8 @@ public class Factual {
    *          a Resolve query with partial attributes for an entity.
    * @return the response from Factual for the Resolve request.
    */
-  public ReadResponse fetch(String tableName, ResolveQuery query) {
-    return new ReadResponse(request(new ReadQuery(urlForResolve(tableName),
+  public ResolveResponse fetch(String tableName, ResolveQuery query) {
+    return new ResolveResponse(request(new ReadQuery(urlForResolve(tableName),
         query.toUrlParams())));
   }
 

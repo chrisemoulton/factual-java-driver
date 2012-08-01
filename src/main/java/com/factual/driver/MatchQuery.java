@@ -2,14 +2,14 @@ package com.factual.driver;
 
 import java.util.Map;
 
-public class ResolveQuery {
+public class MatchQuery {
 
   /**
-   * Holds all parameters for this ResolveQuery.
+   * Holds all parameters.
    */
   private final Parameters queryParams = new Parameters();
 
-  public ResolveQuery add(String key, Object val) {
+  public MatchQuery add(String key, Object val) {
     queryParams.setJsonMapParam(Constants.RESOLVE_VALUES, key, val);
     return this;
   }
