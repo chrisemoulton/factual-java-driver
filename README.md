@@ -16,10 +16,7 @@ The driver is in Maven Central, so you can just add this to your Maven <tt>pom.x
     
 ## Non Maven users
 
-You can download the individual driver jar, and view the pom.xml file, here:
-[Driver download folder](http://repo1.maven.org/maven2/com/factual/factual-java-driver/1.5.1/)
-
-The pom.xml tells you what dependencies you'll need to plug into your project to get the driver to work (see the <dependencies> section).
+Please see the wiki page, [Obtaining Library Dependencies Without Maven](https://github.com/Factual/factual-java-driver/wiki/Obtaining-Library-Dependencies-Without-Maven).
 
 # Basic Design
 
