@@ -1,3 +1,8 @@
+## 1.5.2
+ * Adds diffs feature. 
+ * Adds match feature.
+ * Updates Resolve for new behavior which returns either a single resolved result, or none at all.
+
 ## 1.5.1
  * Adds support for a raw get request using a path and url-encoded parameter string.
  * Fixes bug with list-based filters not being sent as an array in the query string. 
