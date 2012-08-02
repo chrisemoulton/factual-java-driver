@@ -438,7 +438,7 @@ public class FactualTest {
   }
 
   @Test
-  public void matchTest() {
+  public void testMatch() {
     MatchQuery matchQuery = new MatchQuery().add("name", "McDonalds")
         .add("address", "10451 Santa Monica Blvd").add("region", "CA")
         .add("postcode", "90025");
