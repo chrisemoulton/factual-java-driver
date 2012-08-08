@@ -118,6 +118,10 @@ public class Factual {
     return tableName + "/resolve";
   }
 
+  protected static String urlForMatch(String tableName) {
+    return tableName + "/match";
+  }
+
   protected static String urlForFetch(String tableName) {
     return "t/" + tableName;
   }
@@ -565,9 +569,9 @@ public class Factual {
    */
   public String match(String tableId, MatchQuery query) {
     ResolveResponse resp = new ResolveResponse(request(new ReadQuery(
-        urlForResolve(tableId), query.toUrlParams())));
-    if (resp.isResolved())
-      return String.valueOf(resp.getResolved().get("factual_id"));
+        urlForMatch(tableId), query.toUrlParams())));
+    if (resp.getData().size() > 0)
+      return String.valueOf(resp.getData().get(0).get("factual_id"));
     else
       return null;
   }
