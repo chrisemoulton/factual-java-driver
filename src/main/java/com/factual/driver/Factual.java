@@ -34,7 +34,7 @@ import com.google.common.io.Closeables;
  * @author aaron
  */
 public class Factual {
-  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.5.2-android";
+  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.5.3-android";
   private static final String DEFAULT_HOST_HEADER = "api.v3.factual.com";
   private String factHome = "http://api.v3.factual.com/";
   private String host = DEFAULT_HOST_HEADER;
@@ -122,6 +122,10 @@ public class Factual {
 
   protected static String urlForResolve(String tableName) {
     return tableName + "/resolve";
+  }
+
+  protected static String urlForMatch(String tableName) {
+    return tableName + "/match";
   }
 
   protected static String urlForFetch(String tableName) {
@@ -571,9 +575,9 @@ public class Factual {
    */
   public String match(String tableId, MatchQuery query) {
     ResolveResponse resp = new ResolveResponse(request(new ReadQuery(
-        urlForResolve(tableId), query.toUrlParams())));
-    if (resp.isResolved())
-      return String.valueOf(resp.getResolved().get("factual_id"));
+        urlForMatch(tableId), query.toUrlParams())));
+    if (resp.getData().size() > 0)
+      return String.valueOf(resp.getData().get(0).get("factual_id"));
     else
       return null;
   }

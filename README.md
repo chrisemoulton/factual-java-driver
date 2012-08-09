@@ -11,10 +11,11 @@ The driver is in Maven Central, so you can just add this to your Maven <tt>pom.x
     <dependency>
       <groupId>com.factual</groupId>
       <artifactId>factual-java-driver</artifactId>
-      <version>1.5.2-android</version>
+      <version>1.5.3-android</version>
     </dependency>
 
 ## Non Maven users
+
 Please see the wiki page, [Obtaining Library Dependencies Without Maven](https://github.com/Factual/factual-java-driver/wiki/Obtaining-Library-Dependencies-Without-Maven).
 
 # Usage
