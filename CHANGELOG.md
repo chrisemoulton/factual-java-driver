@@ -1,6 +1,8 @@
+## 1.5.3
+ * Adds match feature.
+
 ## 1.5.2
  * Adds diffs feature. 
- * Adds match feature.
  * Updates Resolve for new behavior which returns either a single resolved result, or none at all.
 
 ## 1.5.1

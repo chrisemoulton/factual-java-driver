@@ -11,7 +11,7 @@ The driver is in Maven Central, so you can just add this to your Maven <tt>pom.x
     <dependency>
       <groupId>com.factual</groupId>
       <artifactId>factual-java-driver</artifactId>
-      <version>1.5.2</version>
+      <version>1.5.3</version>
     </dependency>
 
 ## Non Maven users
