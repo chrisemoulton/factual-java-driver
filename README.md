@@ -15,6 +15,7 @@ The driver is in Maven Central, so you can just add this to your Maven <tt>pom.x
     </dependency>
 
 ## Non Maven users
+
 Please see the wiki page, [Obtaining Library Dependencies Without Maven](https://github.com/Factual/factual-java-driver/wiki/Obtaining-Library-Dependencies-Without-Maven).
 
 # Basic Design
@@ -287,68 +288,8 @@ Crosswalk requests are treated as any other table read, as seen in the example b
 ## Simple Crosswalk Example
 
     // Get all Crosswalk data for a specific Places entity, using its Factual ID:
-<<<<<<< HEAD
-    ReadResponse resp = factual.fetch("crosswalk", new Query().field("factual_id").equal("97598010-433f-4946-8fd5-4a6dd1639d77"));    
-          
-=======
-    factual.fetch("places",
-      new CrosswalkQuery().factualId("97598010-433f-4946-8fd5-4a6dd1639d77"));
+    ReadResponse resp = factual.fetch("crosswalk", new Query().field("factual_id").equal("97598010-433f-4946-8fd5-4a6dd1639d77"));
 
-## Crosswalk Filter Parameters
-
-<table>
-  <tr>
-    <th>Filter</th>
-    <th>Description</th>
-    <th>Example</th>
-  </tr>
-  <tr>
-    <td>factualId</td>
-    <td>A Factual ID for an entity in the Factual places database</td>
-    <td><tt>q.factualId("97598010-433f-4946-8fd5-4a6dd1639d77")</tt></td>
-  </tr>
-  <tr>
-    <td>limit</td>
-    <td>A Factual ID for an entity in the Factual places database</td>
-    <td><tt>q.limit(100)</tt></td>
-  </tr>
-  <tr>
-    <td>namespace</td>
-    <td>The namespace to search for a third party ID within. A list of <b>currently supported</b> services is <a href="http://developer.factual.com/display/docs/Places+API+-+Supported+Crosswalk+Services">here</a>.</td>
-    <td><tt>q.namespace("foursquare")</tt></td>
-  </tr>
-  <tr>
-    <td>namespaceId</td>
-    <td>The id used by a third party to identify a place.</td>
-    <td><tt>q.namespaceId("443338")</tt></td>
-  </tr>
-  <tr>
-    <td>only</td>
-    <td>A Factual ID for an entity in the Factual places database</td>
-    <td><tt>q.only("foursquare", "yelp")</tt></td>
-  </tr>
-</table>
-
-NOTE: although these parameters are individually optional, at least one of the following parameter combinations is required:
-
-* factualId
-* namespace and namespaceId
-
-## More Crosswalk Examples
-
-    // Get Loopt's Crosswalk data for a specific Places entity, using its Factual ID:
-    CrosswalkResponse resp = factual.fetch("places",
-        new CrosswalkQuery()
-          .factualId("97598010-433f-4946-8fd5-4a6dd1639d77")
-          .only("loopt"));
-
-    // Get all Crosswalk data for a specific Places entity, using its Foursquare ID
-    CrosswalkResponse resp = factual.fetch("places",
-        new CrosswalkQuery()
-          .namespace("foursquare")
-          .namespaceId("4ae4df6df964a520019f21e3"));
-
->>>>>>> 8a0994411accdfa2e026e3c57a9b8ed7a048a226
 # Resolve
 
 The driver fully supports Factual's Resolve feature, which lets you start with incomplete data you may have for an entity, and get potential entity matches back from Factual.
@@ -489,6 +430,9 @@ Not all fields are configured to return facet counts. To determine what fields y
 
 # Flag
 
+NOTICE: _Server support for this feature is still under development._ You are getting a preview of how this driver will support the feature. If you try using this feature now, you may not get a successful response. We will remove this notice once the feature is fully supported.
+---
+
 The driver fully supports Factual's Flag feature, which enables flagging problematic rows in Factual tables. Use this feature if you are requesting for an entity to be deleted or merged into a duplicate record.
 
 *Note that the flag feature is new and may not yet be available in the Factual API.  If you experience any errors, please check back at a later time.
@@ -536,6 +480,9 @@ The <tt>flag</tt> method flags a problematic row:
 </table>
 
 # Submit
+
+NOTICE: _Server support for this feature is still under development._ You are getting a preview of how this driver will support the feature. If you try using this feature now, you may not get a successful response. We will remove this notice once the feature is fully supported.
+---
 
 The driver fully supports Factual's Submit feature, which enables you to submit edits to existing rows and/or submit new rows of data in Factual tables. For information on deleting records, see Flag.
 
@@ -675,15 +622,18 @@ The <tt>monetize</tt> method fetches deals based on a specified query:
 
 # Diffs
 
-The driver supports Factual's experimental Diffs feature, which enables Factual data update downloads.
+NOTICE: _Server support for this feature is still under development._ You are getting a preview of how this driver will support the feature. If you try using this feature now, you may not get a successful response. We will remove this notice once the feature is fully supported.
+---
+
+The driver supports Factual's Diffs feature, which enables Factual data update downloads.
 
 ## Simple Diffs Example
 
 The <tt>fetch</tt> method gives the diff data:
 
-	// Fetch a diffs response
-	DiffsQuery diffs = new DiffsQuery(1318890505254L);
-	DiffsResponse resp = factual.fetch("places", diffs);
+  // Fetch a diffs response
+  DiffsQuery diffs = new DiffsQuery(1318890505254L);
+  DiffsResponse resp = factual.fetch("places", diffs);
 
 ## All Top Level Diffs Parameters
 
@@ -703,7 +653,7 @@ The <tt>fetch</tt> method gives the diff data:
     <td>The end time for a diff request</td>
     <td><tt>d.after(long timestamp)</tt></td>
   </tr>
-</table> 
+</table>
 
 # Exception Handling
 
