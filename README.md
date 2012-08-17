@@ -31,6 +31,8 @@ Results are returned as the JSON returned by Factual. Optionally, there are JSON
     // Create an authenticated handle to Factual
     Factual factual = new Factual(MY_KEY, MY_SECRET);
 
+If you don't have a Factual API account yet, [it's free and easy to get one](https://www.factual.com/api-keys/request).
+
 # Simple Query Example
 
     // Print 3 random records from Factual's Places table:
