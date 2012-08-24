@@ -60,7 +60,7 @@ public class FactualTest {
 
     ColumnSchema nameSchema = schema.getColumnSchema("name");
     assertEquals("name", nameSchema.name);
-    assertEquals("string", nameSchema.datatype);
+    assertEquals("primitive.String", nameSchema.datatype);
   }
 
   /**
@@ -73,7 +73,7 @@ public class FactualTest {
         .equal("US"));
 
     assertOk(resp);
-    assertAll(resp, "country", "US");
+    assertAll(resp, "country", "us");
 
     Map<String, Object> params = Maps.newHashMap();
     params.put("filters", JsonUtil.toJsonStr(new HashMap() {
@@ -196,6 +196,22 @@ public class FactualTest {
 
   }
 
+  @Test
+  @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+  public void testEncoding() {
+    ReadResponse resp = factual.fetch("places", new Query().field("website")
+        .equal("http://www.papamurphys.com").limit(3));
+    assertNotEmpty(resp);
+    assertOk(resp);
+    Map<String, Object> params = Maps.newHashMap();
+    params.put("limit", 3);
+    params.put("filters", "{\"website\":{\"$eq\":\"http://www.papamurphys.com\"}}");
+
+    String respRaw = factual.get("t/places", params);
+    assertEquals(resp.getJson(), respRaw);
+
+  }
+  
   @Test
   @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
   public void testSort_byDistance() {
@@ -486,7 +502,7 @@ public class FactualTest {
 
     ReadResponse resp = factual.fetch("places", select);
     assertOk(resp);
-    assertAll(resp, "country", "US");
+    assertAll(resp, "country", "us");
 
     Map<String, Object> params = Maps.newHashMap();
     params.put("filters", JsonUtil.toJsonStr(new HashMap() {
@@ -519,6 +535,7 @@ public class FactualTest {
       }
     }));
     params.put("select", "address,country");
+
     String respString = factual.get("t/places", params);
 
     assertTrue(respString != null && respString.length() > 0);
@@ -548,6 +565,7 @@ public class FactualTest {
       e.printStackTrace();
     }
   }
+
 
   /**
    * And should not be used for geo queries. However, neither should it throw an
@@ -763,21 +781,19 @@ public class FactualTest {
 
   @Test
   public void testMulti() {
-    factual.queueFetch("places", new Query().field("region").equal("CA"));
-    factual.queueFetch("places", new Query().limit(1));
-    MultiResponse multi = factual.sendRequests();
-    List<Response> data = multi.getData();
+    MultiRequest multiRequest = new MultiRequest();
+    multiRequest.addQuery("q1", "places", new Query().field("region").equal("CA"));
+    multiRequest.addQuery("q2", "places", new Query().limit(1));
+    MultiResponse multi = factual.sendRequests(multiRequest);
+    Map<String, Response> data = multi.getData();
     assertTrue(data.size() == 2);
-    for (int i = 0; i < 2; i++) {
-      Response resp = data.get(i);
-      if (i == 0) {
-        assertTrue(resp.getIncludedRowCount() == 20);
-        assertOk(resp);
-      } else if (i == 1) {
-        assertTrue(resp.getIncludedRowCount() == 1);
-        assertOk(resp);
-      }
-    }
+    
+    Response resp = data.get("q1");
+    assertTrue(resp.getIncludedRowCount() == 20);
+    assertOk(resp);
+    resp = data.get("q2");
+    assertTrue(resp.getIncludedRowCount() == 1);
+    assertOk(resp);
   }
 
   @Test
@@ -793,21 +809,18 @@ public class FactualTest {
         });
       }
     }));
-    factual.queueFetch("places", new FacetQuery("region", "locality"));
-    factual.queueFetch("t/places", params);
-    MultiResponse multi = factual.sendRequests();
-    List<Response> data = multi.getData();
+    MultiRequest multiReq = new MultiRequest();
+    multiReq.addQuery("query1", "places", new FacetQuery("region", "locality"));
+    multiReq.addQuery("query2", "t/places", params);
+    MultiResponse multi = factual.sendRequests(multiReq);
+    Map<String, Response> data = multi.getData();
     assertTrue(data.size() == 2);
-    for (int i = 0; i < 2; i++) {
-      Response resp = data.get(i);
-      if (i == 0) {
-        assertTrue(resp instanceof FacetResponse);
-      } else {
-        assertTrue(resp instanceof RawReadResponse);
-        assertTrue(resp.getIncludedRowCount() == 20);
-      }
-      assertOk(resp);
-    }
+    Response resp = data.get("query1");
+    assertTrue(resp instanceof FacetResponse);
+    resp = data.get("query2");
+    assertTrue(resp instanceof RawReadResponse);
+    assertTrue(resp.getIncludedRowCount() == 20);
+    assertOk(resp);
   }
 
   @Test
@@ -839,63 +852,63 @@ public class FactualTest {
 
   @Test
   public void testMultiComplex() {
-    factual.queueFetch("places", new FacetQuery("region", "locality"));
-    factual.queueFetch("places", new Query().limit(1));
-    factual.queueFetch(
+    MultiRequest multiReq = new MultiRequest();
+    multiReq.addQuery("q1", "places", new FacetQuery("region", "locality"));
+    multiReq.addQuery("q2", "places", new Query().limit(1));
+    multiReq.addQuery("q3", 
         "places",
         new ResolveQuery().add("name", "McDonalds")
             .add("address", "10451 Santa Monica Blvd").add("region", "CA")
             .add("postcode", "90025"));
-    MultiResponse multi = factual.sendRequests();
-    List<Response> data = multi.getData();
+    MultiResponse multi = factual.sendRequests(multiReq);
+    Map<String, Response> data = multi.getData();
     assertTrue(data.size() == 3);
-    for (int i = 0; i < 3; i++) {
-      Response resp = data.get(i);
-      if (i == 0) {
-        assertTrue(resp instanceof FacetResponse);
-        assertOk(resp);
-      } else if (i == 1) {
-        assertTrue(resp instanceof ReadResponse);
-        assertOk(resp);
-        assertTrue(resp.getIncludedRowCount() == 1);
-      } else if (i == 2) {
-        assertTrue(resp instanceof ReadResponse);
-        assertOk(resp);
-      }
-    }
+    Response resp = data.get("q1");
+    assertTrue(resp instanceof FacetResponse);
+    assertOk(resp);
+    resp = data.get("q2");
+    assertTrue(resp instanceof ReadResponse);
+    assertOk(resp);
+    assertTrue(resp.getIncludedRowCount() == 1);
+    resp = data.get("q3");
+    assertTrue(resp instanceof ReadResponse);
+    assertOk(resp);
   }
 
   @Test
   public void testMultiCrosswalk() {
-    factual.queueFetch(
+    MultiRequest multiReq = new MultiRequest();
+    multiReq.addQuery("q", 
         "crosswalk",
         new Query().field("factual_id")
             .equal("97598010-433f-4946-8fd5-4a6dd1639d77").limit(1));
-    MultiResponse multi = factual.sendRequests();
-    for (Response resp : multi.getData()) {
+    MultiResponse multi = factual.sendRequests(multiReq);
+    for (Response resp : multi.getData().values()) {
       assertOk(resp);
     }
   }
 
   @Test
   public void testMultiGeopulseWithNearestAddress() {
-    factual.queueFetch(new Geocode(new Point(latitude, longitude)));
-    factual.queueFetch(new Geopulse(new Point(latitude, longitude)));
-    MultiResponse multi = factual.sendRequests();
+    MultiRequest multiReq = new MultiRequest();
+    multiReq.addQuery("q1", new Geocode(new Point(latitude, longitude)));
+    multiReq.addQuery("q2", new Geopulse(new Point(latitude, longitude)));
+    MultiResponse multi = factual.sendRequests(multiReq);
     assertTrue(multi.getData().size() == 2);
-    for (Response resp : multi.getData()) {
+    for (Response resp : multi.getData().values()) {
       assertOk(resp);
     }
   }
 
   @Test
   public void testMultiGeopulseWithNearestPlace() {
-    factual.queueFetch("global",
+    MultiRequest multiReq = new MultiRequest();
+    multiReq.addQuery("q1", "global",
         new Query().within(new Circle(latitude, longitude, meters)));
-    factual.queueFetch(new Geopulse(new Point(latitude, longitude)));
-    MultiResponse multi = factual.sendRequests();
+    multiReq.addQuery("q2", new Geopulse(new Point(latitude, longitude)));
+    MultiResponse multi = factual.sendRequests(multiReq);
     assertTrue(multi.getData().size() == 2);
-    for (Response resp : multi.getData()) {
+    for (Response resp : multi.getData().values()) {
       assertOk(resp);
     }
   }
@@ -924,7 +937,7 @@ public class FactualTest {
         .equal("US"));
     factual.debug(false);
     assertOk(resp);
-    assertAll(resp, "country", "US");
+    assertAll(resp, "country", "us");
   }
 
   private void assertFactualId(List<Map<String, Object>> crosswalks, String id) {

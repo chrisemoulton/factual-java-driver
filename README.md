@@ -21,10 +21,10 @@ The Factual API is supported at [http://support.factual.com/](http://support.fac
 *   [Crosswalk](http://developer.factual.com/display/docs/Places+API+-+Crosswalk): Get third-party URLs for Factual entities
 *   [Facets](http://developer.factual.com/display/docs/Core+API+-+Facets): Group and count entities by value
 *   [Multi](http://developer.factual.com/display/docs/Core+API+-+Multi): Make multiple queries in a single call
-*	[Geopulse](http://developer.factual.com/display/docs/Places+API+-+Geopulse): Low-latency geographic data for contextual geotargeting
-*	[Geocode](http://developer.factual.com/display/docs/Places+API+-+Reverse+Geocoder): Convert lat/lon coordinate pairs to addresses with reverse geocoding
-*	[Monetize](http://developer.factual.com/display/docs/Places+API+-+Monetize): Third-party offers and deals snapped to Factual Places
-*	[Submit](): Submit edits and new entities to Factual tables
-*	[Insert](): Insert edits and new entities to Factual tables
+*   [Geopulse](http://developer.factual.com/display/docs/Places+API+-+Geopulse): Low-latency geographic data for contextual geotargeting
+*   [Geocode](http://developer.factual.com/display/docs/Places+API+-+Reverse+Geocoder): Convert lat/lon coordinate pairs to addresses with reverse geocoding
+*   [Monetize](http://developer.factual.com/display/docs/Places+API+-+Monetize): Third-party offers and deals snapped to Factual Places
+*   [Submit](): Submit edits and new entities to Factual tables
+*   [Insert](): Insert edits and new entities to Factual tables
 *   [Flag](): Flag an entity for editorial attention
 *   [Diffs](): Keep local data implementations up-to-date with a feed of data deltas
