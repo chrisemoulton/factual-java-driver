@@ -942,14 +942,17 @@ public class FactualTest {
 
   
   @Test 
-  public void testBasicUnicode() {
+  public void testBasicUnicode() throws UnsupportedEncodingException {
     ReadResponse resp = factual.fetch("global", new Query().field("locality").equal("大阪市").limit(5)); //Osaka
     assertOk(resp);
     assertTrue(resp.getData().size() == 5);
+    assertTrue(Arrays.equals(((String)resp.first().get("locality")).getBytes(), 
+                             ("大阪市".getBytes("UTF-8"))));
+
   }
   
   @Test
-  public void testMultiUnicode() {
+  public void testMultiUnicode() throws UnsupportedEncodingException{
     Map<String, Object> params = Maps.newHashMap();
     params.put("filters", JsonUtil.toJsonStr(new HashMap() {
       {
@@ -962,13 +965,23 @@ public class FactualTest {
     }));
     MultiRequest multiReq = new MultiRequest();
     multiReq.addQuery("q1", "t/global", params);
-    multiReq.addQuery("q2", "global", new Query().search("麦当劳").limit(10)); //McDonald's in Simplified Chinese
+    multiReq.addQuery("q2", "global", new Query().field("locality").equal("München").limit(10));  //Munich, Germany
+    multiReq.addQuery("q3", "places", 
+        new ResolveQuery().add("name", "César E. Chávez Library")
+            .add("locality", "Oakland").add("region", "CA")
+            .add("address", "3301 E 12th St"));
     MultiResponse multi = factual.sendRequests(multiReq);
-    assertTrue(multi.getData().size() == 2);
+    assertTrue(multi.getData().size() == 3);
     Response resp =  multi.getData().get("q1");
     assertOk(resp);
     resp = multi.getData().get("q2");
     assertTrue(resp.getIncludedRowCount() == 10);
+    assertTrue(resp instanceof ReadResponse);
+    assertTrue(Arrays.equals(((String)((ReadResponse)resp).first().get("locality")).getBytes(),
+                             "München".getBytes("UTF-8")));
+    resp = multi.getData().get("q3");
+    assertTrue(resp instanceof ResolveResponse);
+    assertTrue(((ResolveResponse)resp).getResolved().get("tel").equals("(510) 535-5620"));
   }
   
   private void assertFactualId(List<Map<String, Object>> crosswalks, String id) {

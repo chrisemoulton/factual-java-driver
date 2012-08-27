@@ -588,7 +588,7 @@ public class Factual {
    *         was not resolved.
    */
   public String match(String tableId, MatchQuery query) {
-    ResolveResponse resp = new ResolveResponse(request(new ReadQuery(
+    ResolveResponse resp = new ResolveResponse(request(new ReadRequest(
         urlForMatch(tableId), query.toUrlParams())));
     if (resp.getData().size() > 0)
       return String.valueOf(resp.getData().get(0).get("factual_id"));
@@ -617,7 +617,7 @@ public class Factual {
    * @return the response from Factual for the Resolve request.
    */
   public ResolveResponse fetch(String tableName, ResolveQuery query) {
-    return new ResolveResponse(request(new ReadQuery(urlForResolve(tableName),
+    return new ResolveResponse(request(new ReadRequest(urlForResolve(tableName),
         query.toUrlParams())));
   }
 
@@ -741,9 +741,8 @@ public class Factual {
     public void printDebug();
   }
 
-  protected static class ReadQuery extends RequestImpl {
-
-    public ReadQuery(String path, Map<String, Object> params) {
+  protected static class ReadRequest extends RequestImpl {
+    public ReadRequest(String path, Map<String, Object> params) {
       super(path, params);
     }
 
@@ -753,7 +752,7 @@ public class Factual {
     }
 
   }
-
+  
   /**
    * Represents a request against Factual given a path and parameters
    * 
@@ -806,6 +805,17 @@ public class Factual {
     }
   }
 
+  protected static class ResolveRequest extends RequestImpl {
+    public ResolveRequest(String path, Map<String, Object> params) {
+      super(path, params);
+    }
+
+    @Override
+    public Response getResponse(String json) {
+      return new ResolveResponse(json);
+    }
+  }  
+  
   protected static class FacetRequest extends RequestImpl {
 
     public FacetRequest(String path, Map<String, Object> params) {

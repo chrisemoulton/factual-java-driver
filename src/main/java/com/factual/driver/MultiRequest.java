@@ -7,9 +7,9 @@ import java.util.Map.Entry;
 
 import com.factual.driver.Factual.FacetRequest;
 import com.factual.driver.Factual.RawReadRequest;
-import com.factual.driver.Factual.ReadQuery;
+import com.factual.driver.Factual.ReadRequest;
 import com.factual.driver.Factual.RequestImpl;
-
+import com.factual.driver.Factual.ResolveRequest;
 
 public class MultiRequest {
 
@@ -40,7 +40,7 @@ public class MultiRequest {
    *          the read query to run against <tt>table</tt>.
    */
   public void addQuery(String queryName, String table, Query query) {
-    queries.put(queryName, new ReadQuery(Factual.urlForFetch(table), query.toUrlParams()));
+    queries.put(queryName, new ReadRequest(Factual.urlForFetch(table), query.toUrlParams()));
   }
 
   /**
@@ -55,7 +55,7 @@ public class MultiRequest {
    *          the resolve query to run against <tt>table</tt>.
    */
   public void addQuery(String queryName, String table, ResolveQuery query) {
-    queries.put(queryName, new ReadQuery(Factual.urlForResolve(table), query.toUrlParams()));
+    queries.put(queryName, new ResolveRequest(Factual.urlForResolve(table), query.toUrlParams()));
   }
 
   /**
@@ -82,7 +82,7 @@ public class MultiRequest {
    *          the geocode query to run
    */
   public void addQuery(String queryName, Geocode query) {
-    queries.put(queryName, new ReadQuery(Factual.urlForGeocode(), query.toUrlParams()));
+    queries.put(queryName, new ReadRequest(Factual.urlForGeocode(), query.toUrlParams()));
   }
 
   /**
@@ -94,7 +94,7 @@ public class MultiRequest {
    *          the geopulse query to run
    */
   public void addQuery(String queryName, Geopulse query) {
-    queries.put(queryName, new ReadQuery(Factual.urlForGeopulse(), query.toUrlParams()));
+    queries.put(queryName, new ReadRequest(Factual.urlForGeopulse(), query.toUrlParams()));
   }
   
   /**
