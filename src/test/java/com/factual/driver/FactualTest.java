@@ -854,7 +854,7 @@ public class FactualTest {
   public void testMultiComplex() {
     MultiRequest multiReq = new MultiRequest();
     multiReq.addQuery("q1", "places", new FacetQuery("region", "locality"));
-    multiReq.addQuery("q2", "places", new Query().limit(1));
+    multiReq.addQuery("q2", "places", new Query().limit(10));
     multiReq.addQuery("q3", 
         "places",
         new ResolveQuery().add("name", "McDonalds")
@@ -869,7 +869,7 @@ public class FactualTest {
     resp = data.get("q2");
     assertTrue(resp instanceof ReadResponse);
     assertOk(resp);
-    assertTrue(resp.getIncludedRowCount() == 1);
+    assertTrue(resp.getIncludedRowCount() == 10);
     resp = data.get("q3");
     assertTrue(resp instanceof ReadResponse);
     assertOk(resp);
@@ -940,6 +940,37 @@ public class FactualTest {
     assertAll(resp, "country", "us");
   }
 
+  
+  @Test 
+  public void testBasicUnicode() {
+    ReadResponse resp = factual.fetch("global", new Query().field("locality").equal("大阪市").limit(5)); //Osaka
+    assertOk(resp);
+    assertTrue(resp.getData().size() == 5);
+  }
+  
+  @Test
+  public void testMultiUnicode() {
+    Map<String, Object> params = Maps.newHashMap();
+    params.put("filters", JsonUtil.toJsonStr(new HashMap() {
+      {
+        put("locality", new HashMap() {
+          {
+            put("$eq", "בית שמש"); //Locality in Israel
+          }
+        });
+      }
+    }));
+    MultiRequest multiReq = new MultiRequest();
+    multiReq.addQuery("q1", "t/global", params);
+    multiReq.addQuery("q2", "global", new Query().search("麦当劳").limit(10)); //McDonald's in Simplified Chinese
+    MultiResponse multi = factual.sendRequests(multiReq);
+    assertTrue(multi.getData().size() == 2);
+    Response resp =  multi.getData().get("q1");
+    assertOk(resp);
+    resp = multi.getData().get("q2");
+    assertTrue(resp.getIncludedRowCount() == 10);
+  }
+  
   private void assertFactualId(List<Map<String, Object>> crosswalks, String id) {
     for (Map<String, Object> cw : crosswalks) {
       assertEquals(id, cw.get("factual_id"));
