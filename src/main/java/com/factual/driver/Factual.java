@@ -34,7 +34,7 @@ import com.google.common.io.Closeables;
  * @author aaron
  */
 public class Factual {
-  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.5.3";
+  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.5.4";
   private static final String DEFAULT_HOST_HEADER = "api.v3.factual.com";
   private String factHome = "http://api.v3.factual.com/";
   private String host = DEFAULT_HOST_HEADER;
@@ -199,6 +199,47 @@ public class Factual {
   public SubmitResponse submit(String tableName, String factualId,
       Submit submit, Metadata metadata) {
     return submitCustom("t/" + tableName + "/" + factualId + "/submit", submit,
+        metadata);
+  }
+
+  /**
+   * Runs a <tt>insert</tt> to add a row against the specified Factual table.
+   * Insert is virtually identical to submit. The only difference between the
+   * two is that insert will not search for potential duplicate rows first.
+   * 
+   * @param tableName
+   *          the name of the table you wish to insert the add for (e.g.,
+   *          "places")
+   * @param insert
+   *          the insert parameters to run against <tt>table</tt>
+   * @param metadata
+   *          the metadata to send with information on this request
+   * @return the response of running <tt>insert</tt> against Factual.
+   */
+  public InsertResponse insert(String tableName, Insert insert,
+      Metadata metadata) {
+    return insertCustom("t/" + tableName + "/insert", insert, metadata);
+  }
+
+  /**
+   * Runs a <tt>insert</tt> against the specified Factual table. Insert is
+   * virtually identical to submit. The only difference between the two is that
+   * insert will not search for potential duplicate rows first.
+   * 
+   * @param tableName
+   *          the name of the table you wish to insert updates for (e.g.,
+   *          "places")
+   * @param factualId
+   *          the factual id on which the insert is run
+   * @param insert
+   *          the insert parameters to run against <tt>table</tt>
+   * @param metadata
+   *          the metadata to send with information on this request
+   * @return the response of running <tt>insert</tt> against Factual.
+   */
+  public InsertResponse insert(String tableName, String factualId,
+      Insert insert, Metadata metadata) {
+    return insertCustom("t/" + tableName + "/" + factualId + "/insert", insert,
         metadata);
   }
 
@@ -370,6 +411,16 @@ public class Factual {
   public DiffsResponse fetch(String tableName, DiffsQuery diff) {
     return new DiffsResponse(get(urlForFetch(tableName) + "/diffs",
         diff.toUrlParams()));
+  }
+
+  private InsertResponse insertCustom(String root, Insert insert,
+      Metadata metadata) {
+    Map<String, Object> params = Maps.newHashMap();
+    params.putAll(metadata.toUrlParams());
+    params.putAll(insert.toUrlParams());
+    // Oauth library currently doesn't support POST body content.
+    String jsonResponse = post(root, params, new HashMap<String, String>());
+    return new InsertResponse(jsonResponse);
   }
 
   private SubmitResponse submitCustom(String root, Submit submit,

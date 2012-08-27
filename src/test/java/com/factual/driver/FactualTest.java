@@ -635,6 +635,38 @@ public class FactualTest {
   }
 
   @Test
+  @Ignore("Until API supports it")
+  public void testInsertAdd() {
+    Insert insert = new Insert().setValue("longitude", 100);
+    InsertResponse resp = factual.insert("2EH4Pz", insert,
+        new Metadata().user("test_driver_user"));
+    assertOk(resp);
+    assertTrue(resp.isNewEntity());
+  }
+
+  @Test
+  @Ignore("Until API supports it")
+  public void testInsertEdit() {
+    Insert insert = new Insert().setValue("longitude", 100);
+    InsertResponse resp = factual.insert("2EH4Pz",
+        "f33527e0-a8b4-4808-a820-2686f18cb00c", insert,
+        new Metadata().user("test_driver_user"));
+    assertOk(resp);
+    assertFalse(resp.isNewEntity());
+  }
+
+  @Test
+  @Ignore("Until API supports it")
+  public void testInsertDelete() {
+    Insert insert = new Insert().removeValue("longitude");
+    InsertResponse resp = factual.insert("2EH4Pz",
+        "f33527e0-a8b4-4808-a820-2686f18cb00c", insert,
+        new Metadata().user("test_driver_user"));
+    assertOk(resp);
+    assertFalse(resp.isNewEntity());
+  }
+
+  @Test
   public void testSubmitError() {
     Submit submit = new Submit().removeValue("longitude");
     FactualApiException exception = null;

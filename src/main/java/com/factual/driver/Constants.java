@@ -80,4 +80,9 @@ public class Constants {
   protected static final String SUBMIT_FACTUAL_ID = "factual_id";
   protected static final String SUBMIT_NEW_ENTITY = "new_entity";
 
+  // Insert
+  protected static final String INSERT_VALUES = "values";
+  protected static final String INSERT_FACTUAL_ID = "factual_id";
+  protected static final String INSERT_NEW_ENTITY = "new_entity";
+
 }
