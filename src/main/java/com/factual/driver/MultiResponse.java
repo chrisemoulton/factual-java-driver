@@ -1,5 +1,6 @@
 package com.factual.driver;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -8,7 +9,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.factual.driver.Factual.RequestImpl;
-import com.google.common.collect.Lists;
 
 /**
  * Represents a Factual Multi response.
@@ -18,7 +18,7 @@ import com.google.common.collect.Lists;
  */
 public class MultiResponse extends Response {
 	private String json = null;
-	private List<Response> data = Lists.newArrayList();
+	private Map<String, Response> data = new HashMap<String, Response>();
 
 	private Map<String, RequestImpl> requestMapping = null;
 	
@@ -51,7 +51,7 @@ public class MultiResponse extends Response {
 		   RequestImpl query = entry.getValue();	
 		   Response resp = query.getResponse(responseJson);
 		   if (resp != null)
-			   data.add(resp);
+			   data.put(entry.getKey(), resp);
 	   }
 	}
 
@@ -60,7 +60,7 @@ public class MultiResponse extends Response {
      * 
      * @return the multi query data returned by Factual.
      */	
-	public List<Response> getData() {
+	public Map<String, Response> getData() {
 		return data;
 	}
 
