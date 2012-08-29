@@ -7,7 +7,6 @@ import java.security.GeneralSecurityException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
@@ -23,7 +22,6 @@ import com.google.api.client.http.HttpResponseException;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.UrlEncodedContent;
 import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Closeables;
 
@@ -35,7 +33,7 @@ import com.google.common.io.Closeables;
  * @author aaron
  */
 public class Factual {
-  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.5.4";
+  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.6.0";
   private static final String DEFAULT_HOST_HEADER = "api.v3.factual.com";
   private String factHome = "http://api.v3.factual.com/";
   private String host = DEFAULT_HOST_HEADER;
@@ -379,17 +377,17 @@ public class Factual {
    * returned by Factual.
    * <p>
    * The necessary URL base will be automatically prepended to <tt>path</tt>. If
-   * you need to change it, e.g. to make requests against a development instance of
-   * the Factual service, please see {@link #setFactHome(String)}.
+   * you need to change it, e.g. to make requests against a development instance
+   * of the Factual service, please see {@link #setFactHome(String)}.
    * 
    * @param path
    *          the endpoint path to run the request against. example: "t/places"
    * @param queryParams
-   *          the query string parameters to send with the request. do not encode
-   *          or escape these; that will be done automatically. 
+   *          the query string parameters to send with the request. do not
+   *          encode or escape these; that will be done automatically.
    * @return the response body from running this GET request against Factual.
    * @throws FactualApiException
-   *           if something goes wrong. 
+   *           if something goes wrong.
    */
   public String get(String path, Map<String, Object> queryParams) {
     return request(new RawReadRequest(path, queryParams));
@@ -409,7 +407,6 @@ public class Factual {
   public String get(String path, String params) {
     return request(new SimpleGetRequest(path, params));
   }
-  
 
   /**
    * Runs a POST request against the specified endpoint path, using the given
@@ -417,22 +414,22 @@ public class Factual {
    * returned by Factual.
    * <p>
    * The necessary URL base will be automatically prepended to <tt>path</tt>. If
-   * you need to change it, e.g. to make requests against a development instance of
-   * the Factual service, please see {@link #setFactHome(String)}.
+   * you need to change it, e.g. to make requests against a development instance
+   * of the Factual service, please see {@link #setFactHome(String)}.
    * 
    * @param path
    *          the endpoint path to run the request against. example: "t/places"
    * @param queryParams
-   *          the query parameters to send with the request. send null or empty to 
-   *          specify none. do not encode or escape these; that will be done
+   *          the query parameters to send with the request. send null or empty
+   *          to specify none. do not encode or escape these; that will be done
    *          automatically.
    * @param postContent
-   *          the POST content parameters to send with the request. do not encode or
-   *          escape these; that will be done automatically. 
+   *          the POST content parameters to send with the request. do not
+   *          encode or escape these; that will be done automatically.
    * @return the response body from running this POST request against Factual.
    * @throws FactualApiException
-   *           if something goes wrong.  
-   */  
+   *           if something goes wrong.
+   */
   public String post(String path, Map<String, Object> queryParams,
       Map<String, String> postContent) {
     return requestPost(new RawReadRequest(path, queryParams, postContent));
@@ -472,8 +469,6 @@ public class Factual {
     String jsonResponse = post(root, params, new HashMap<String, String>());
     return new FlagResponse(jsonResponse);
   }
-
-
 
   /**
    * Use this to send all queued reads as a multi request
@@ -617,8 +612,8 @@ public class Factual {
    * @return the response from Factual for the Resolve request.
    */
   public ResolveResponse fetch(String tableName, ResolveQuery query) {
-    return new ResolveResponse(request(new ReadRequest(urlForResolve(tableName),
-        query.toUrlParams())));
+    return new ResolveResponse(request(new ReadRequest(
+        urlForResolve(tableName), query.toUrlParams())));
   }
 
   public SchemaResponse schema(String tableName) {
@@ -752,7 +747,7 @@ public class Factual {
     }
 
   }
-  
+
   /**
    * Represents a request against Factual given a path and parameters
    * 
@@ -814,8 +809,8 @@ public class Factual {
     public Response getResponse(String json) {
       return new ResolveResponse(json);
     }
-  }  
-  
+  }
+
   protected static class FacetRequest extends RequestImpl {
 
     public FacetRequest(String path, Map<String, Object> params) {
