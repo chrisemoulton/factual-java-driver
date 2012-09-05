@@ -1,3 +1,7 @@
+## 1.6.1
+ * Remove jackson-core-lgpl dependency in favor of jackson-core-asl
+ * Add CPG tests
+
 ## 1.6.0
  * Make Factual class thread-safe.
  * Refactor Multi call: Remove queueFetch api. To use multi, create MultiRequest, add queries, and pass as arg to Factual class' sendRequests
