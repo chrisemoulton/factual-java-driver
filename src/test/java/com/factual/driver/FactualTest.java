@@ -470,8 +470,8 @@ public class FactualTest {
       badness.fetch("places", new Query().field("region").equal("CA"));
       fail("Expected to catch a FactualApiException");
     } catch (FactualApiException e) {
-      assertEquals(401, e.getResponse().getStatusCode());
-      assertEquals("Unauthorized", e.getResponse().getStatusMessage());
+      assertEquals(401, e.getStatusCode());
+      assertEquals("Unauthorized", e.getStatusMessage());
       assertTrue(e.getRequestUrl().startsWith(
           "http://api.v3.factual.com/t/places"));
     }
@@ -484,7 +484,7 @@ public class FactualTest {
       factual.fetch("places", select);
       fail("Expected to catch a FactualApiException");
     } catch (FactualApiException e) {
-      assertEquals(400, e.getResponse().getStatusCode());
+      assertEquals(400, e.getStatusCode());
       assertTrue(e.getRequestUrl().startsWith(
           "http://api.v3.factual.com/t/places"));
       // verify the message includes useful info from the API error

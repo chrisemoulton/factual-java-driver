@@ -1,6 +1,7 @@
 ## 1.6.1
  * Remove jackson-core-lgpl dependency in favor of jackson-core-asl
  * Add CPG tests
+ * Deprecate getResponse() in FactualApiException in favor of getStatusCode() and getStatusMessage()
 
 ## 1.6.0
  * Make Factual class thread-safe.
