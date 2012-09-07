@@ -78,6 +78,11 @@
       <version>4.4</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.yaml</groupId>
+      <artifactId>snakeyaml</artifactId>
+      <version>1.10</version>
+    </dependency>  
   </dependencies>
 
   <properties>

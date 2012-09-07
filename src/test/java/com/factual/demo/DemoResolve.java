@@ -1,6 +1,6 @@
 package com.factual.demo;
 
-import static com.factual.driver.FactualTest.read;
+import static com.factual.driver.FactualTest.factual;
 
 import java.util.Map;
 
@@ -12,9 +12,7 @@ import com.factual.driver.ResolveQuery;
 public class DemoResolve {
 
   public static void main(String[] args) {
-    String key = read("key.txt");
-    String secret = read("secret.txt");
-    Factual factual = new Factual(key, secret);
+    Factual factual = factual();
 
     // Get all entities that are possibly a match
     ReadResponse resp = factual.resolves(new ResolveQuery()

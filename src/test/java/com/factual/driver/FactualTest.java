@@ -7,6 +7,7 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,23 +21,29 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.yaml.snakeyaml.Yaml;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Maps;
+import com.google.common.io.Closeables;
+
 
 /**
  * Integration tests for the Factual Java driver. Expects your key and secret to
- * be in:
+ * be configured in ~/.factual/factual-auth.yaml
  * 
+ * factual-auth.yaml should look like:
  * <pre>
- * src/test/resources/key.txt
- * src/test/resources/secret.txt
+ * ---
+ * key: MY_KEY
+ * secret: MY_SECRET
  * </pre>
  * 
  * @author aaron
  */
 public class FactualTest {
   private static Factual factual;
+  private static final File AUTH = new File(new File(System.getProperty("user.home"), ".factual"), "factual-auth.yaml");
 
   final double latitude = 34.06018;
   final double longitude = -118.41835;
@@ -44,9 +51,7 @@ public class FactualTest {
 
   @Before
   public void setup() {
-    String key = read("key.txt");
-    String secret = read("secret.txt");
-    factual = new Factual(key, secret);
+    factual = factual();
   }
 
   @Test
@@ -175,7 +180,7 @@ public class FactualTest {
           {
             put("$center",
                 new String[] { Double.toString(latitude),
-                    Double.toString(longitude) });
+                Double.toString(longitude) });
             put("$meters", meters);
           }
         });
@@ -206,7 +211,7 @@ public class FactualTest {
     Map<String, Object> params = Maps.newHashMap();
     params.put("limit", 3);
     params.put("filters",
-        "{\"website\":{\"$eq\":\"http://www.papamurphys.com\"}}");
+    "{\"website\":{\"$eq\":\"http://www.papamurphys.com\"}}");
 
     String respRaw = factual.get("t/places", params);
     assertEquals(resp.getJson(), respRaw);
@@ -220,7 +225,7 @@ public class FactualTest {
     ReadResponse resp = factual.fetch(
         "places",
         new Query().within(new Circle(latitude, longitude, meters)).sortAsc(
-            "$distance"));
+        "$distance"));
 
     assertNotEmpty(resp);
     assertOk(resp);
@@ -233,7 +238,7 @@ public class FactualTest {
           {
             put("$center",
                 new String[] { Double.toString(latitude),
-                    Double.toString(longitude) });
+                Double.toString(longitude) });
             put("$meters", meters);
           }
         });
@@ -255,7 +260,7 @@ public class FactualTest {
   public void testRowFilters_2beginsWith() {
     ReadResponse resp = factual.fetch("places",
         new Query().field("name").beginsWith("McDonald's").field("category")
-            .beginsWith("Food & Beverage"));
+        .beginsWith("Food & Beverage"));
 
     assertOk(resp);
     assertStartsWith(resp, "name", "McDonald");
@@ -398,7 +403,7 @@ public class FactualTest {
     ReadResponse resp = factual.fetch(
         "crosswalk",
         new Query().field("factual_id").equal(
-            "97598010-433f-4946-8fd5-4a6dd1639d77"));
+        "97598010-433f-4946-8fd5-4a6dd1639d77"));
     assertOk(resp);
     List<Map<String, Object>> crosswalks = resp.getData();
     assertFalse(crosswalks.isEmpty());
@@ -410,8 +415,8 @@ public class FactualTest {
     ReadResponse resp = factual.fetch(
         "crosswalk",
         new Query().field("factual_id")
-            .equal("97598010-433f-4946-8fd5-4a6dd1639d77").field("namespace")
-            .equal("loopt"));
+        .equal("97598010-433f-4946-8fd5-4a6dd1639d77").field("namespace")
+        .equal("loopt"));
     List<Map<String, Object>> crosswalks = resp.getData();
     assertOk(resp);
     assertEquals(1, crosswalks.size());
@@ -423,7 +428,7 @@ public class FactualTest {
   public void testCrosswalk_ex3() {
     ReadResponse resp = factual.fetch("crosswalk",
         new Query().field("namespace").equal("foursquare")
-            .field("namespace_id").equal("4ae4df6df964a520019f21e3"));
+        .field("namespace_id").equal("4ae4df6df964a520019f21e3"));
     List<Map<String, Object>> crosswalks = resp.getData();
     assertOk(resp);
     assertFalse(crosswalks.isEmpty());
@@ -434,7 +439,7 @@ public class FactualTest {
     ReadResponse resp = factual.fetch(
         "crosswalk",
         new Query().field("factual_id")
-            .equal("97598010-433f-4946-8fd5-4a6dd1639d77").limit(1));
+        .equal("97598010-433f-4946-8fd5-4a6dd1639d77").limit(1));
     List<Map<String, Object>> crosswalks = resp.getData();
 
     assertOk(resp);
@@ -446,8 +451,8 @@ public class FactualTest {
     ResolveResponse resp = factual.fetch(
         "places",
         new ResolveQuery().add("name", "McDonalds")
-            .add("address", "10451 Santa Monica Blvd").add("region", "CA")
-            .add("postcode", "90025"));
+        .add("address", "10451 Santa Monica Blvd").add("region", "CA")
+        .add("postcode", "90025"));
     assertOk(resp);
     assertNotEmpty(resp);
     assertTrue(resp.isResolved());
@@ -457,8 +462,8 @@ public class FactualTest {
   @Test
   public void testMatch() {
     MatchQuery matchQuery = new MatchQuery().add("name", "McDonalds")
-        .add("address", "10451 Santa Monica Blvd").add("region", "CA")
-        .add("postcode", "90025");
+    .add("address", "10451 Santa Monica Blvd").add("region", "CA")
+    .add("postcode", "90025");
     String id = factual.match("places", matchQuery);
     assertTrue("bd886f67-9d86-40c5-9217-f7bcd53cfc0e".equals(id));
   }
@@ -473,7 +478,7 @@ public class FactualTest {
       assertEquals(401, e.getStatusCode());
       assertEquals("Unauthorized", e.getStatusMessage());
       assertTrue(e.getRequestUrl().startsWith(
-          "http://api.v3.factual.com/t/places"));
+      "http://api.v3.factual.com/t/places"));
     }
   }
 
@@ -486,7 +491,7 @@ public class FactualTest {
     } catch (FactualApiException e) {
       assertEquals(400, e.getStatusCode());
       assertTrue(e.getRequestUrl().startsWith(
-          "http://api.v3.factual.com/t/places"));
+      "http://api.v3.factual.com/t/places"));
       // verify the message includes useful info from the API error
       assertTrue(e.getMessage().contains("select"));
       assertTrue(e.getMessage().contains("unknown field"));
@@ -497,7 +502,7 @@ public class FactualTest {
   @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
   public void testSelect() {
     Query select = new Query().field("country").equal("US")
-        .only("address", "country");
+    .only("address", "country");
     assertEquals("[address, country]",
         Arrays.toString(select.getSelectFields()));
 
@@ -558,7 +563,7 @@ public class FactualTest {
     String respRaw = factual.get(
         "t/places",
         "filters="
-            + UrlUtil.urlEncode("{\"name\" : {\"$eq\" : \"Starbucks\"} }"));
+        + UrlUtil.urlEncode("{\"name\" : {\"$eq\" : \"Starbucks\"} }"));
     try {
       JSONObject rootJsonObj = new JSONObject(respRaw);
       assertEquals("ok", rootJsonObj.get("status"));
@@ -584,7 +589,7 @@ public class FactualTest {
   @Test
   public void testFacet() {
     FacetQuery facet = new FacetQuery("region", "locality").search("Starbucks")
-        .maxValuesPerFacet(20).minCountPerFacetValue(100).includeRowCount();
+    .maxValuesPerFacet(20).minCountPerFacetValue(100).includeRowCount();
 
     FacetResponse resp = factual.fetch("places", facet);
     assertOk(resp);
@@ -773,7 +778,7 @@ public class FactualTest {
     Query query = new Query().and(
         new Query().field("name").equal("philadelphia"),
         new Query().field("country").equal("us"), new Query()
-            .field("placetype").equal("locality"));
+        .field("placetype").equal("locality"));
     ReadResponse resp = factual.fetch("world-geographies", query);
     assertTrue(resp.getData().size() == 14);
     assertOk(resp);
@@ -794,7 +799,7 @@ public class FactualTest {
 
     // Same search as above, with added filter for products that are 12.6 oz.
     query = new Query().search("shampoo").field("brand").equal("pantene")
-        .field("size").search("12.6 oz");
+    .field("size").search("12.6 oz");
     resp = factual.fetch("products-cpg", query);
     assertOk(resp);
 
@@ -911,8 +916,8 @@ public class FactualTest {
         "q3",
         "places",
         new ResolveQuery().add("name", "McDonalds")
-            .add("address", "10451 Santa Monica Blvd").add("region", "CA")
-            .add("postcode", "90025"));
+        .add("address", "10451 Santa Monica Blvd").add("region", "CA")
+        .add("postcode", "90025"));
     MultiResponse multi = factual.sendRequests(multiReq);
     Map<String, Response> data = multi.getData();
     assertTrue(data.size() == 3);
@@ -935,7 +940,7 @@ public class FactualTest {
         "q",
         "crosswalk",
         new Query().field("factual_id")
-            .equal("97598010-433f-4946-8fd5-4a6dd1639d77").limit(1));
+        .equal("97598010-433f-4946-8fd5-4a6dd1639d77").limit(1));
     MultiResponse multi = factual.sendRequests(multiReq);
     for (Response resp : multi.getData().values()) {
       assertOk(resp);
@@ -1022,13 +1027,13 @@ public class FactualTest {
     multiReq.addQuery("q1", "t/global", params);
     multiReq.addQuery("q2", "global",
         new Query().field("locality").equal("München").limit(10)); // Munich,
-                                                                   // Germany
+    // Germany
     multiReq.addQuery(
         "q3",
         "places",
         new ResolveQuery().add("name", "César E. Chávez Library")
-            .add("locality", "Oakland").add("region", "CA")
-            .add("address", "3301 E 12th St"));
+        .add("locality", "Oakland").add("region", "CA")
+        .add("address", "3301 E 12th St"));
     MultiResponse multi = factual.sendRequests(multiReq);
     assertTrue(multi.getData().size() == 3);
     Response resp = multi.getData().get("q1");
@@ -1086,22 +1091,26 @@ public class FactualTest {
     }
   }
 
-  /**
-   * Reads value from named file in src/test/resources
-   */
-  public static String read(String name) {
+  private static Map loadMapFromYaml(File file) {
+    InputStream is = null;
     try {
-      File file = new File("src/test/resources/" + name);
-      if (file.exists()) {
-        return FileUtils.readFileToString(file).trim();
-      } else {
-        fail("You must provide " + file);
-        System.err.println("You must provide " + file);
-        throw new IllegalStateException("Could not find " + file);
-      }
+      is = FileUtils.openInputStream(file);
+      return (Map) (new Yaml()).load(is);
     } catch (IOException e) {
-      e.printStackTrace();
       throw new RuntimeException(e);
+    } finally {
+      Closeables.closeQuietly(is);
+    }
+  }
+
+  public static Factual factual() {
+    if (!AUTH.exists()) {
+      fail("You must provide " + AUTH);
+      System.err.println("You must provide " + AUTH);
+      throw new IllegalStateException("Could not find " + AUTH);
+    } else {
+      Map auth = loadMapFromYaml(AUTH);
+      return new Factual((String) auth.get("key"), (String) auth.get("secret"));
     }
   }
 

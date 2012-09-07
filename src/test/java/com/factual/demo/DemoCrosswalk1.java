@@ -1,6 +1,6 @@
 package com.factual.demo;
 
-import static com.factual.driver.FactualTest.read;
+import static com.factual.driver.FactualTest.factual;
 
 import java.util.Map;
 
@@ -9,9 +9,7 @@ import com.factual.driver.Query;
 import com.factual.driver.ReadResponse;
 
 public class DemoCrosswalk1 {
-  private static String key = read("key.txt");
-  private static String secret = read("secret.txt");
-  private static Factual factual = new Factual(key, secret);
+  private static Factual factual = factual();
 
   public static void main(String[] args) {
     // Get all Crosswalk data for a specific Places entity, using its on Factual
