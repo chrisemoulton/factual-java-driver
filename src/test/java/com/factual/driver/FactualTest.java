@@ -205,13 +205,14 @@ public class FactualTest {
     assertOk(resp);
     Map<String, Object> params = Maps.newHashMap();
     params.put("limit", 3);
-    params.put("filters", "{\"website\":{\"$eq\":\"http://www.papamurphys.com\"}}");
+    params.put("filters",
+        "{\"website\":{\"$eq\":\"http://www.papamurphys.com\"}}");
 
     String respRaw = factual.get("t/places", params);
     assertEquals(resp.getJson(), respRaw);
 
   }
-  
+
   @Test
   @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
   public void testSort_byDistance() {
@@ -469,8 +470,8 @@ public class FactualTest {
       badness.fetch("places", new Query().field("region").equal("CA"));
       fail("Expected to catch a FactualApiException");
     } catch (FactualApiException e) {
-      assertEquals(401, e.getResponse().getStatusCode());
-      assertEquals("Unauthorized", e.getResponse().getStatusMessage());
+      assertEquals(401, e.getStatusCode());
+      assertEquals("Unauthorized", e.getStatusMessage());
       assertTrue(e.getRequestUrl().startsWith(
           "http://api.v3.factual.com/t/places"));
     }
@@ -483,7 +484,7 @@ public class FactualTest {
       factual.fetch("places", select);
       fail("Expected to catch a FactualApiException");
     } catch (FactualApiException e) {
-      assertEquals(400, e.getResponse().getStatusCode());
+      assertEquals(400, e.getStatusCode());
       assertTrue(e.getRequestUrl().startsWith(
           "http://api.v3.factual.com/t/places"));
       // verify the message includes useful info from the API error
@@ -565,7 +566,6 @@ public class FactualTest {
       e.printStackTrace();
     }
   }
-
 
   /**
    * And should not be used for geo queries. However, neither should it throw an
@@ -780,14 +780,66 @@ public class FactualTest {
   }
 
   @Test
+  public void testCPG() {
+    // Search for products containing the word "shampoo"
+    Query query = new Query().search("shampoo");
+    ReadResponse resp = factual.fetch("products-cpg", query);
+    assertOk(resp);
+
+    // Same search as above, but filter the search results to include only the
+    // brand "pantene"
+    query = new Query().search("shampoo").field("brand").equal("pantene");
+    resp = factual.fetch("products-cpg", query);
+    assertOk(resp);
+
+    // Same search as above, with added filter for products that are 12.6 oz.
+    query = new Query().search("shampoo").field("brand").equal("pantene")
+        .field("size").search("12.6 oz");
+    resp = factual.fetch("products-cpg", query);
+    assertOk(resp);
+
+    // Search on UPC
+    query = new Query().field("upc").equal("052000131512");
+    resp = factual.fetch("products-cpg", query);
+    assertTrue(resp.getData().size() == 1);
+    assertOk(resp);
+
+    // Find all beverages (filter by category)
+    query = new Query().field("category").equal("beverages");
+    resp = factual.fetch("products-cpg", query);
+    assertOk(resp);
+
+    // Count all beverage products
+    query = new Query().field("category").equal("lip makeup").includeRowCount();
+    resp = factual.fetch("products-cpg", query);
+    assertOk(resp);
+  }
+
+  @Test
+  public void testCPGCrosswalk() {
+
+    // first, get the factual ID via UPC from the products table
+    Query query = new Query().field("upc").equal("037000138006");
+    ReadResponse resp = factual.fetch("products-cpg", query);
+    Object factualId = resp.getData().get(0).get("factual_id");
+    assertTrue(factualId != null);
+
+    // next, call the crosswalk table using the factual ID
+    query = new Query().field("factual_id").equal(factualId);
+    resp = factual.fetch("products-crosswalk", query);
+    assertTrue(resp.getData().size() > 0);
+  }
+
+  @Test
   public void testMulti() {
     MultiRequest multiRequest = new MultiRequest();
-    multiRequest.addQuery("q1", "places", new Query().field("region").equal("CA"));
+    multiRequest.addQuery("q1", "places",
+        new Query().field("region").equal("CA"));
     multiRequest.addQuery("q2", "places", new Query().limit(1));
     MultiResponse multi = factual.sendRequests(multiRequest);
     Map<String, Response> data = multi.getData();
     assertTrue(data.size() == 2);
-    
+
     Response resp = data.get("q1");
     assertTrue(resp.getIncludedRowCount() == 20);
     assertOk(resp);
@@ -855,7 +907,8 @@ public class FactualTest {
     MultiRequest multiReq = new MultiRequest();
     multiReq.addQuery("q1", "places", new FacetQuery("region", "locality"));
     multiReq.addQuery("q2", "places", new Query().limit(10));
-    multiReq.addQuery("q3", 
+    multiReq.addQuery(
+        "q3",
         "places",
         new ResolveQuery().add("name", "McDonalds")
             .add("address", "10451 Santa Monica Blvd").add("region", "CA")
@@ -878,7 +931,8 @@ public class FactualTest {
   @Test
   public void testMultiCrosswalk() {
     MultiRequest multiReq = new MultiRequest();
-    multiReq.addQuery("q", 
+    multiReq.addQuery(
+        "q",
         "crosswalk",
         new Query().field("factual_id")
             .equal("97598010-433f-4946-8fd5-4a6dd1639d77").limit(1));
@@ -940,50 +994,57 @@ public class FactualTest {
     assertAll(resp, "country", "us");
   }
 
-  
-  @Test 
+  @Test
   public void testBasicUnicode() throws UnsupportedEncodingException {
-    ReadResponse resp = factual.fetch("global", new Query().field("locality").equal("大阪市").limit(5)); //Osaka
+    ReadResponse resp = factual.fetch("global", new Query().field("locality")
+        .equal("大阪市").limit(5)); // Osaka
     assertOk(resp);
     assertTrue(resp.getData().size() == 5);
-    assertTrue(Arrays.equals(((String)resp.first().get("locality")).getBytes(), 
-                             ("大阪市".getBytes("UTF-8"))));
+    assertTrue(Arrays.equals(
+        ((String) resp.first().get("locality")).getBytes(),
+        ("大阪市".getBytes("UTF-8"))));
 
   }
-  
+
   @Test
-  public void testMultiUnicode() throws UnsupportedEncodingException{
+  public void testMultiUnicode() throws UnsupportedEncodingException {
     Map<String, Object> params = Maps.newHashMap();
     params.put("filters", JsonUtil.toJsonStr(new HashMap() {
       {
         put("locality", new HashMap() {
           {
-            put("$eq", "בית שמש"); //Locality in Israel
+            put("$eq", "בית שמש"); // Locality in Israel
           }
         });
       }
     }));
     MultiRequest multiReq = new MultiRequest();
     multiReq.addQuery("q1", "t/global", params);
-    multiReq.addQuery("q2", "global", new Query().field("locality").equal("München").limit(10));  //Munich, Germany
-    multiReq.addQuery("q3", "places", 
+    multiReq.addQuery("q2", "global",
+        new Query().field("locality").equal("München").limit(10)); // Munich,
+                                                                   // Germany
+    multiReq.addQuery(
+        "q3",
+        "places",
         new ResolveQuery().add("name", "César E. Chávez Library")
             .add("locality", "Oakland").add("region", "CA")
             .add("address", "3301 E 12th St"));
     MultiResponse multi = factual.sendRequests(multiReq);
     assertTrue(multi.getData().size() == 3);
-    Response resp =  multi.getData().get("q1");
+    Response resp = multi.getData().get("q1");
     assertOk(resp);
     resp = multi.getData().get("q2");
     assertTrue(resp.getIncludedRowCount() == 10);
     assertTrue(resp instanceof ReadResponse);
-    assertTrue(Arrays.equals(((String)((ReadResponse)resp).first().get("locality")).getBytes(),
-                             "München".getBytes("UTF-8")));
+    assertTrue(Arrays.equals(
+        ((String) ((ReadResponse) resp).first().get("locality")).getBytes(),
+        "München".getBytes("UTF-8")));
     resp = multi.getData().get("q3");
     assertTrue(resp instanceof ResolveResponse);
-    assertTrue(((ResolveResponse)resp).getResolved().get("tel").equals("(510) 535-5620"));
+    assertTrue(((ResolveResponse) resp).getResolved().get("tel")
+        .equals("(510) 535-5620"));
   }
-  
+
   private void assertFactualId(List<Map<String, Object>> crosswalks, String id) {
     for (Map<String, Object> cw : crosswalks) {
       assertEquals(id, cw.get("factual_id"));

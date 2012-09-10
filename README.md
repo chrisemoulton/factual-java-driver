@@ -30,6 +30,8 @@ This is the official Java driver for [Factual's API](http://developer.factual.co
 ### Using Specific Datasets
 
 * [World Geographies](https://github.com/Factual/factual-java-driver/wiki/World-Geographies)
+* [Global Products](https://github.com/Factual/factual-java-driver/wiki/Products)
+* [Products Crosswalk](https://github.com/Factual/factual-java-driver/wiki/Products-Crosswalk)
 
 ### Writing to Factual
 
