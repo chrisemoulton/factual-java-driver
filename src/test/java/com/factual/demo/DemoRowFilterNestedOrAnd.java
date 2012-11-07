@@ -1,6 +1,6 @@
 package com.factual.demo;
 
-import static com.factual.driver.FactualTest.read;
+import static com.factual.driver.FactualTest.factual;
 
 import com.factual.driver.Factual;
 import com.factual.driver.Query;
@@ -9,9 +9,7 @@ import com.factual.driver.Query;
 public class DemoRowFilterNestedOrAnd {
 
   public static void main(String[] args) {
-    String key = read("key.txt");
-    String secret = read("secret.txt");
-    Factual factual = new Factual(key, secret);
+    Factual factual = factual();
 
     // Build a query to find entities where:
     // (name begins with "Starbucks") OR (name begins with "Coffee")

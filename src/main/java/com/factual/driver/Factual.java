@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Queue;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
@@ -22,7 +22,6 @@ import com.google.api.client.http.HttpResponseException;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.UrlEncodedContent;
 import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Closeables;
 
@@ -34,16 +33,16 @@ import com.google.common.io.Closeables;
  * @author aaron
  */
 public class Factual {
-  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.5.3-android";
+  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.6.2-android";
   private static final String DEFAULT_HOST_HEADER = "api.v3.factual.com";
   private String factHome = "http://api.v3.factual.com/";
   private String host = DEFAULT_HOST_HEADER;
   private final String key;
   private final OAuthHmacSigner signer;
   private boolean debug = false;
+  private int readTimeout = -1;
+  private int connectionTimeout = -1;
   private StreamHandler debugHandler = null;
-
-  private final Queue<RequestImpl> fetchQueue = Lists.newLinkedList();
 
   /**
    * Constructor. Represents your authenticated access to Factual.
@@ -89,7 +88,7 @@ public class Factual {
    * @param urlBase
    *          the base URL at which to contact Factual's API.
    */
-  public void setFactHome(String urlBase) {
+  public synchronized void setFactHome(String urlBase) {
     this.factHome = urlBase;
   }
 
@@ -99,7 +98,7 @@ public class Factual {
    * @param host
    *          the host header value for a request to Factual's API.
    */
-  public void setRequestHost(String host) {
+  public synchronized void setRequestHost(String host) {
     this.host = host;
   }
 
@@ -205,6 +204,69 @@ public class Factual {
   public SubmitResponse submit(String tableName, String factualId,
       Submit submit, Metadata metadata) {
     return submitCustom("t/" + tableName + "/" + factualId + "/submit", submit,
+        metadata);
+  }
+
+  /**
+   * Runs a <tt>insert</tt> to add a row against the specified Factual table.
+   * Insert is virtually identical to submit. The only difference between the
+   * two is that insert will not search for potential duplicate rows first.
+   * 
+   * @param tableName
+   *          the name of the table you wish to insert the add for (e.g.,
+   *          "places")
+   * @param insert
+   *          the insert parameters to run against <tt>table</tt>
+   * @param metadata
+   *          the metadata to send with information on this request
+   * @return the response of running <tt>insert</tt> against Factual.
+   */
+  public InsertResponse insert(String tableName, Insert insert,
+      Metadata metadata) {
+    return insertCustom("t/" + tableName + "/insert", insert, metadata);
+  }
+
+  /**
+   * Runs a <tt>insert</tt> against the specified Factual table. Insert is
+   * virtually identical to submit. The only difference between the two is that
+   * insert will not search for potential duplicate rows first.
+   * 
+   * @param tableName
+   *          the name of the table you wish to insert updates for (e.g.,
+   *          "places")
+   * @param factualId
+   *          the factual id on which the insert is run
+   * @param insert
+   *          the insert parameters to run against <tt>table</tt>
+   * @param metadata
+   *          the metadata to send with information on this request
+   * @return the response of running <tt>insert</tt> against Factual.
+   */
+  public InsertResponse insert(String tableName, String factualId,
+      Insert insert, Metadata metadata) {
+    return insertCustom("t/" + tableName + "/" + factualId + "/insert", insert,
+        metadata);
+  }
+
+  /**
+   * Runs a <tt>clear</tt> against the specified Factual table. Insert is
+   * virtually identical to submit. The only difference between the two is that
+   * insert will not search for potential duplicate rows first.
+   * 
+   * @param tableName
+   *          the name of the table you wish to insert updates for (e.g.,
+   *          "places")
+   * @param factualId
+   *          the factual id on which the insert is run
+   * @param insert
+   *          the insert parameters to run against <tt>table</tt>
+   * @param metadata
+   *          the metadata to send with information on this request
+   * @return the response of running <tt>insert</tt> against Factual.
+   */
+  public ClearResponse clear(String tableName, String factualId, Clear clear,
+      Metadata metadata) {
+    return clearCustom("t/" + tableName + "/" + factualId + "/clear", clear,
         metadata);
   }
 
@@ -340,17 +402,25 @@ public class Factual {
   }
 
   /**
-   * Runs a "GET" request against the path specified using the parameters
-   * specified and your Oauth token.
+   * Runs a GET request against the specified endpoint path, using the given
+   * parameters and your OAuth credentials. Returns the raw response body
+   * returned by Factual.
+   * <p>
+   * The necessary URL base will be automatically prepended to <tt>path</tt>. If
+   * you need to change it, e.g. to make requests against a development instance
+   * of the Factual service, please see {@link #setFactHome(String)}.
    * 
    * @param path
-   *          the path to run the request against
-   * @param params
-   *          the parameters to send with the request
-   * @return the response of running <tt>query</tt> against Factual.
+   *          the endpoint path to run the request against. example: "t/places"
+   * @param queryParams
+   *          the query string parameters to send with the request. do not
+   *          encode or escape these; that will be done automatically.
+   * @return the response body from running this GET request against Factual.
+   * @throws FactualApiException
+   *           if something goes wrong.
    */
-  public String get(String path, Map<String, Object> params) {
-    return request(new RawReadRequest(path, params));
+  public String get(String path, Map<String, Object> queryParams) {
+    return request(new RawReadRequest(path, queryParams));
   }
 
   /**
@@ -368,14 +438,55 @@ public class Factual {
     return request(new SimpleGetRequest(path, params));
   }
 
-  private String post(String path, Map<String, Object> params,
-      Map<String, String> postData) {
-    return requestPost(new RawReadRequest(path, params, postData));
+  /**
+   * Runs a POST request against the specified endpoint path, using the given
+   * parameters and your OAuth credentials. Returns the raw response body
+   * returned by Factual.
+   * <p>
+   * The necessary URL base will be automatically prepended to <tt>path</tt>. If
+   * you need to change it, e.g. to make requests against a development instance
+   * of the Factual service, please see {@link #setFactHome(String)}.
+   * 
+   * @param path
+   *          the endpoint path to run the request against. example: "t/places"
+   * @param queryParams
+   *          the query parameters to send with the request. send null or empty
+   *          to specify none. do not encode or escape these; that will be done
+   *          automatically.
+   * @param postContent
+   *          the POST content parameters to send with the request. do not
+   *          encode or escape these; that will be done automatically.
+   * @return the response body from running this POST request against Factual.
+   * @throws FactualApiException
+   *           if something goes wrong.
+   */
+  public String post(String path, Map<String, Object> queryParams,
+      Map<String, String> postContent) {
+    return requestPost(new RawReadRequest(path, queryParams, postContent));
   }
 
   public DiffsResponse fetch(String tableName, DiffsQuery diff) {
     return new DiffsResponse(get(urlForFetch(tableName) + "/diffs",
         diff.toUrlParams()));
+  }
+
+  private ClearResponse clearCustom(String root, Clear clear, Metadata metadata) {
+    Map<String, Object> params = Maps.newHashMap();
+    params.putAll(metadata.toUrlParams());
+    params.putAll(clear.toUrlParams());
+    // Oauth library currently doesn't support POST body content.
+    String jsonResponse = post(root, params, new HashMap<String, String>());
+    return new ClearResponse(jsonResponse);
+  }
+
+  private InsertResponse insertCustom(String root, Insert insert,
+      Metadata metadata) {
+    Map<String, Object> params = Maps.newHashMap();
+    params.putAll(metadata.toUrlParams());
+    params.putAll(insert.toUrlParams());
+    // Oauth library currently doesn't support POST body content.
+    String jsonResponse = post(root, params, new HashMap<String, String>());
+    return new InsertResponse(jsonResponse);
   }
 
   private SubmitResponse submitCustom(String root, Submit submit,
@@ -399,87 +510,24 @@ public class Factual {
   }
 
   /**
-   * Queue a raw read request for inclusion in the next multi request.
-   * 
-   * @param path
-   *          the path to run the request against
-   * @param params
-   *          the parameters to send with the request
-   */
-  public void queueFetch(String path, Map<String, Object> params) {
-    fetchQueue.add(new RawReadRequest(path, params));
-  }
-
-  /**
-   * Queue a read request for inclusion in the next multi request.
-   * 
-   * @param table
-   *          the name of the table you wish to query (e.g., "places")
-   * @param query
-   *          the read query to run against <tt>table</tt>.
-   */
-  public void queueFetch(String table, Query query) {
-    fetchQueue.add(new ReadQuery(urlForFetch(table), query.toUrlParams()));
-  }
-
-  /**
-   * Queue a resolve request for inclusion in the next multi request.
-   * 
-   * @param table
-   *          the name of the table you wish to use resolve against (e.g.,
-   *          "places")
-   * @param query
-   *          the resolve query to run against <tt>table</tt>.
-   */
-  public void queueFetch(String table, ResolveQuery query) {
-    fetchQueue.add(new ReadQuery(urlForResolve(table), query.toUrlParams()));
-  }
-
-  /**
-   * Queue a facet request for inclusion in the next multi request.
-   * 
-   * @param table
-   *          the name of the table you wish to use a facet request against
-   *          (e.g., "places")
-   * @param query
-   *          the facet query to run against <tt>table</tt>.
-   */
-  public void queueFetch(String table, FacetQuery query) {
-    fetchQueue.add(new FacetRequest(urlForFacets(table), query.toUrlParams()));
-  }
-
-  public void queueFetch(Geocode query) {
-    fetchQueue.add(new ReadQuery(urlForGeocode(), query.toUrlParams()));
-  }
-
-  public void queueFetch(Geopulse query) {
-    fetchQueue.add(new ReadQuery(urlForGeopulse(), query.toUrlParams()));
-  }
-
-  /**
    * Use this to send all queued reads as a multi request
    * 
    * @return response for a multi request
    */
-  public MultiResponse sendRequests() {
+  public MultiResponse sendRequests(MultiRequest multiRequest) {
     Map<String, String> multi = Maps.newHashMap();
-    int i = 0;
-    Map<String, RequestImpl> requestMapping = Maps.newLinkedHashMap();
-    while (!fetchQueue.isEmpty()) {
-      RequestImpl fullQuery = fetchQueue.poll();
+    Map<String, RequestImpl> queries = multiRequest.getQueries();
+    for (Entry<String, RequestImpl> entry : queries.entrySet()) {
+      RequestImpl fullQuery = entry.getValue();
       String url = "/" + fullQuery.toUrlString();
-      if (url != null) {
-        String multiKey = "q" + Integer.toString(i);
-        multi.put(multiKey, url);
-        requestMapping.put(multiKey, fullQuery);
-        i++;
-      }
+      multi.put(entry.getKey(), url);
     }
+
     String json = JsonUtil.toJsonStr(multi);
     Map<String, Object> params = Maps.newHashMap();
     params.put("queries", json);
     String jsonResponse = get("multi", params);
-    MultiResponse resp = new MultiResponse(requestMapping);
+    MultiResponse resp = new MultiResponse(queries);
     resp.setJson(jsonResponse);
     return resp;
   }
@@ -574,7 +622,7 @@ public class Factual {
    *         was not resolved.
    */
   public String match(String tableId, MatchQuery query) {
-    ResolveResponse resp = new ResolveResponse(request(new ReadQuery(
+    ResolveResponse resp = new ResolveResponse(request(new ReadRequest(
         urlForMatch(tableId), query.toUrlParams())));
     if (resp.getData().size() > 0)
       return String.valueOf(resp.getData().get(0).get("factual_id"));
@@ -603,8 +651,8 @@ public class Factual {
    * @return the response from Factual for the Resolve request.
    */
   public ResolveResponse fetch(String tableName, ResolveQuery query) {
-    return new ResolveResponse(request(new ReadQuery(urlForResolve(tableName),
-        query.toUrlParams())));
+    return new ResolveResponse(request(new ReadRequest(
+        urlForResolve(tableName), query.toUrlParams())));
   }
 
   public SchemaResponse schema(String tableName) {
@@ -674,6 +722,12 @@ public class Factual {
           request = f.buildPostRequest(url, new UrlEncodedContent(postData));
       else
         request = f.buildGetRequest(url);
+
+      if (readTimeout != -1)
+        request.setReadTimeout(readTimeout);
+      if (connectionTimeout != -1)
+        request.setConnectTimeout(connectionTimeout);
+
       HttpHeaders headers = new HttpHeaders();
       headers.set("X-Factual-Lib", DRIVER_HEADER_TAG);
       headers.set("Host", host);
@@ -699,7 +753,7 @@ public class Factual {
 
     } catch (HttpResponseException e) {
       throw new FactualApiException(e).requestUrl(urlStr)
-          .requestMethod(requestMethod).response(e.getResponse());
+      .requestMethod(requestMethod).response(e.getResponse());
     } catch (IOException e) {
       throw new FactualApiException(e).requestUrl(urlStr).requestMethod(
           requestMethod);
@@ -716,12 +770,36 @@ public class Factual {
    * @param debug
    *          whether or not this is in debug mode
    */
-  public void debug(boolean debug) {
+  public synchronized void debug(boolean debug) {
     this.debug = debug;
     if (debug && debugHandler == null) {
       debugHandler = new StreamHandler(System.out, new SimpleFormatter());
       debugHandler.setLevel(Level.ALL);
     }
+  }
+
+  /**
+   * Sets the timeout in milliseconds to establish a connection or {@code 0} for
+   * an infinite timeout.
+   * 
+   * <p>
+   * By default it is 20000 (20 seconds).
+   * </p>
+   */
+  public void setConnectionTimeout(int connectionTimeout) {
+    this.connectionTimeout = connectionTimeout;
+  }
+
+  /**
+   * Sets the timeout in milliseconds to read data from an established
+   * connection or {@code 0} for an infinite timeout.
+   * 
+   * <p>
+   * By default it is 20000 (20 seconds).
+   * </p>
+   */
+  public void setReadTimeout(int readTimeout) {
+    this.readTimeout = readTimeout;
   }
 
   protected static interface Request {
@@ -735,9 +813,8 @@ public class Factual {
     public void printDebug();
   }
 
-  protected static class ReadQuery extends RequestImpl {
-
-    public ReadQuery(String path, Map<String, Object> params) {
+  protected static class ReadRequest extends RequestImpl {
+    public ReadRequest(String path, Map<String, Object> params) {
       super(path, params);
     }
 
@@ -797,6 +874,17 @@ public class Factual {
           System.out.println(key + ": " + params.get(key));
         }
       }
+    }
+  }
+
+  protected static class ResolveRequest extends RequestImpl {
+    public ResolveRequest(String path, Map<String, Object> params) {
+      super(path, params);
+    }
+
+    @Override
+    public Response getResponse(String json) {
+      return new ResolveResponse(json);
     }
   }
 

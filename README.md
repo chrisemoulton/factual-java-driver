@@ -1,27 +1,16 @@
-# About
-
 This is the Factual-supported Java driver for [Factual's public API](http://developer.factual.com) on Android.
-
-# Installation
-
-## Maven users
-
-The driver is in Maven Central, so you can just add this to your Maven <tt>pom.xml</tt>:
-
-    <dependency>
-      <groupId>com.factual</groupId>
-      <artifactId>factual-java-driver</artifactId>
-      <version>1.5.3-android</version>
-    </dependency>
-
-## Non Maven users
-
-Please see the wiki page, [Obtaining Library Dependencies Without Maven](https://github.com/Factual/factual-java-driver/wiki/Obtaining-Library-Dependencies-Without-Maven).
-
+    
 # Usage
 
 For a description of all the features available in the driver, please refer to the 
 [Non-Android Java driver](https://github.com/Factual/factual-java-driver) documentation.  For a sample Android project using the Java driver, refer to [Factual Android SDK Demo](https://github.com/Factual/factual-android-sdk-demo)
+Note if using Maven that the version for Android is as follows:
+
+    <dependency>
+      <groupId>com.factual</groupId>
+      <artifactId>factual-java-driver</artifactId>
+      <version>1.6.2-android</version>
+    </dependency>
 
 ## Tips
 

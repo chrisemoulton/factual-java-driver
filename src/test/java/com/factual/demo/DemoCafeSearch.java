@@ -1,6 +1,6 @@
 package com.factual.demo;
 
-import static com.factual.driver.FactualTest.read;
+import static com.factual.driver.FactualTest.factual;
 
 import java.util.Map;
 
@@ -13,10 +13,7 @@ import com.factual.driver.ReadResponse;
 public class DemoCafeSearch {
 
   public static void main(String[] args) {
-    String key = read("key.txt");
-    String secret = read("secret.txt");
-    Factual factual = new Factual(key, secret);
-
+Factual factual = factual();
     Query q = new Query()
     .only("name", "address")
     .search("cafe")

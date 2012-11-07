@@ -1,5 +1,6 @@
 package com.factual.driver;
 
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -22,6 +23,43 @@ public class DiffsQuery {
   }
 
   /**
+   * Constructor. Create a request to find diffs on a Factual table between two
+   * times.
+   * 
+   * @param before
+   *          the before date to create this diff against.
+   */
+  public DiffsQuery(Date before) {
+    before(before);
+  }
+
+  private boolean isValidTimestamp(long timestamp) {
+    return (timestamp > 1325376000000L);
+  }
+
+  /**
+   * The before date to create this diff against.
+   * 
+   * @param date
+   *          before date for this diff.
+   * @return this DiffsQuery
+   */
+  public DiffsQuery before(Date date) {
+    return before(date.getTime());
+  }
+
+  /**
+   * The after date to create this diff against.
+   * 
+   * @param date
+   *          after date for this diff.
+   * @return this DiffsQuery
+   */
+  public DiffsQuery after(Date date) {
+    return after(date.getTime());
+  }
+
+  /**
    * The before time to create this diff against.
    * 
    * @param timestamp
@@ -29,6 +67,9 @@ public class DiffsQuery {
    * @return this DiffsQuery
    */
   public DiffsQuery before(long timestamp) {
+    if (!isValidTimestamp(timestamp))
+      throw new RuntimeException(
+          "Invalid timestamp.  Please use milliseconds for a date later than Jan 1, 2012 (1325376000000 ms).");
     addParam(Constants.DIFFS_START_DATE, timestamp);
     return this;
   }
@@ -41,6 +82,9 @@ public class DiffsQuery {
    * @return this DiffsQuery
    */
   public DiffsQuery after(long timestamp) {
+    if (!isValidTimestamp(timestamp))
+      throw new RuntimeException(
+          "Invalid timestamp.  Please use milliseconds for a date later than Jan 1, 2012 (1325376000000 ms).");
     addParam(Constants.DIFFS_END_DATE, timestamp);
     return this;
   }

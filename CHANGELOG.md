@@ -1,3 +1,15 @@
+## 1.6.2-android
+
+ * Updated demos and tests now expect auth in ~/.factual/factual-auth.yaml
+ * Adds support for clear
+ * Adds Date support for diffs
+ * Adds read and connection timeout
+ * Remove jackson-core-lgpl dependency in favor of jackson-core-asl
+ * Add CPG tests
+ * Deprecate getResponse() in FactualApiException in favor of getStatusCode() and getStatusMessage()
+ * Make Factual class thread-safe.
+ * Refactor Multi call: Remove queueFetch api. To use multi, create MultiRequest, add queries, and pass as arg to Factual class' sendRequests
+  
 ## 1.5.3-android
  * Adds match feature.
 

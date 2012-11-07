@@ -4,7 +4,7 @@
 
   <groupId>com.factual</groupId>
   <artifactId>factual-java-driver</artifactId>
-  <version>1.5.3-android</version>
+  <version>1.6.2-android</version>
   <packaging>jar</packaging>
 
   <name>factual-java-driver</name>
@@ -86,18 +86,12 @@
     <dependency>
       <groupId>org.codehaus.jackson</groupId>
       <artifactId>jackson-core-asl</artifactId>
-      <version>1.9.1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.jackson</groupId>
-      <artifactId>jackson-core-lgpl</artifactId>
-      <version>1.9.1</version>
-      <scope>provided</scope>
+      <version>1.9.9</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.jackson</groupId>
       <artifactId>jackson-mapper-asl</artifactId>
-      <version>1.9.1</version>
+      <version>1.9.9</version>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
@@ -116,6 +110,11 @@
       <version>4.4</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.yaml</groupId>
+      <artifactId>snakeyaml</artifactId>
+      <version>1.10</version>
+    </dependency>  
   </dependencies>
 
   <properties>
