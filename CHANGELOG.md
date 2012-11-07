@@ -1,6 +1,9 @@
-## Unreleased
+## 1.6.2
 
  * Updated demos and tests now expect auth in ~/.factual/factual-auth.yaml
+ * Adds support for clear
+ * Adds Date support for diffs
+ * Adds read and connection timeout
 
 ## 1.6.1
 

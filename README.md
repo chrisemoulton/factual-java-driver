@@ -1,4 +1,4 @@
-This is the official Java driver for [Factual's API](http://developer.factual.com):
+This is the official [Java driver](https://github.com/Factual/factual-java-driver) for [Factual's API](http://developer.factual.com):
 
 ## Driver Documentation
 
@@ -36,6 +36,7 @@ This is the official Java driver for [Factual's API](http://developer.factual.co
 ### Writing to Factual
 
 * [Submit](https://github.com/Factual/factual-java-driver/wiki/Submit) and [Insert](https://github.com/Factual/factual-java-driver/wiki/Insert)<br/>
+* [Clear](https://github.com/Factual/factual-java-driver/wiki/Clear)<br/>
 * [Flag an Entity](https://github.com/Factual/factual-java-driver/wiki/Flag)<br/>
 
 ### Other Items & Miscellany
@@ -43,6 +44,7 @@ This is the official Java driver for [Factual's API](http://developer.factual.co
 * [Raw Requests](https://github.com/Factual/factual-java-driver/wiki/Raw-Requests)
 * [Multi Queries](https://github.com/Factual/factual-java-driver/wiki/Multi-Queries)
 * [Diffs](https://github.com/Factual/factual-java-driver/wiki/Diffs)
+* [Set Request Timeout](https://github.com/Factual/factual-java-driver/wiki/Request-Timeout)
 
 ## API Documentation
 

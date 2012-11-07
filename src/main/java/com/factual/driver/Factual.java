@@ -33,13 +33,15 @@ import com.google.common.io.Closeables;
  * @author aaron
  */
 public class Factual {
-  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.6.1";
+  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.6.2";
   private static final String DEFAULT_HOST_HEADER = "api.v3.factual.com";
   private String factHome = "http://api.v3.factual.com/";
   private String host = DEFAULT_HOST_HEADER;
   private final String key;
   private final OAuthHmacSigner signer;
   private boolean debug = false;
+  private int readTimeout = -1;
+  private int connectionTimeout = -1;
   private StreamHandler debugHandler = null;
 
   /**
@@ -241,6 +243,28 @@ public class Factual {
   }
 
   /**
+   * Runs a <tt>clear</tt> against the specified Factual table. Insert is
+   * virtually identical to submit. The only difference between the two is that
+   * insert will not search for potential duplicate rows first.
+   * 
+   * @param tableName
+   *          the name of the table you wish to insert updates for (e.g.,
+   *          "places")
+   * @param factualId
+   *          the factual id on which the insert is run
+   * @param insert
+   *          the insert parameters to run against <tt>table</tt>
+   * @param metadata
+   *          the metadata to send with information on this request
+   * @return the response of running <tt>insert</tt> against Factual.
+   */
+  public ClearResponse clear(String tableName, String factualId, Clear clear,
+      Metadata metadata) {
+    return clearCustom("t/" + tableName + "/" + factualId + "/clear", clear,
+        metadata);
+  }
+
+  /**
    * Runs a <tt>submit</tt> to add a row against the specified Factual table.
    * 
    * @param tableName
@@ -438,6 +462,15 @@ public class Factual {
   public DiffsResponse fetch(String tableName, DiffsQuery diff) {
     return new DiffsResponse(get(urlForFetch(tableName) + "/diffs",
         diff.toUrlParams()));
+  }
+
+  private ClearResponse clearCustom(String root, Clear clear, Metadata metadata) {
+    Map<String, Object> params = Maps.newHashMap();
+    params.putAll(metadata.toUrlParams());
+    params.putAll(clear.toUrlParams());
+    // Oauth library currently doesn't support POST body content.
+    String jsonResponse = post(root, params, new HashMap<String, String>());
+    return new ClearResponse(jsonResponse);
   }
 
   private InsertResponse insertCustom(String root, Insert insert,
@@ -683,6 +716,12 @@ public class Factual {
           request = f.buildPostRequest(url, new UrlEncodedContent(postData));
       else
         request = f.buildGetRequest(url);
+
+      if (readTimeout != -1)
+        request.setReadTimeout(readTimeout);
+      if (connectionTimeout != -1)
+        request.setConnectTimeout(connectionTimeout);
+
       HttpHeaders headers = new HttpHeaders();
       headers.set("X-Factual-Lib", DRIVER_HEADER_TAG);
       headers.set("Host", host);
@@ -723,6 +762,30 @@ public class Factual {
       debugHandler = new StreamHandler(System.out, new SimpleFormatter());
       debugHandler.setLevel(Level.ALL);
     }
+  }
+
+  /**
+   * Sets the timeout in milliseconds to establish a connection or {@code 0} for
+   * an infinite timeout.
+   * 
+   * <p>
+   * By default it is 20000 (20 seconds).
+   * </p>
+   */
+  public void setConnectionTimeout(int connectionTimeout) {
+    this.connectionTimeout = connectionTimeout;
+  }
+
+  /**
+   * Sets the timeout in milliseconds to read data from an established
+   * connection or {@code 0} for an infinite timeout.
+   * 
+   * <p>
+   * By default it is 20000 (20 seconds).
+   * </p>
+   */
+  public void setReadTimeout(int readTimeout) {
+    this.readTimeout = readTimeout;
   }
 
   protected static interface Request {
