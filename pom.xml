@@ -4,7 +4,7 @@
 
   <groupId>com.factual</groupId>
   <artifactId>factual-java-driver</artifactId>
-  <version>1.6.1</version>
+  <version>1.6.2</version>
   <packaging>jar</packaging>
 
   <name>factual-java-driver</name>
@@ -78,6 +78,11 @@
       <version>4.4</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.yaml</groupId>
+      <artifactId>snakeyaml</artifactId>
+      <version>1.10</version>
+    </dependency>  
   </dependencies>
 
   <properties>
