@@ -459,9 +459,15 @@ public class Factual {
     return requestPost(new RawReadRequest(path, queryParams, postContent));
   }
 
+  public FactualStream stream(String tableName, DiffsQuery diff, DiffsCallback cb) {
+    return stream(new DiffsRequest(urlForFetch(tableName) + "/diffs", diff.toUrlParams(), cb), "GET", true);
+  }
+
   public DiffsResponse fetch(String tableName, DiffsQuery diff) {
-    return new DiffsResponse(get(urlForFetch(tableName) + "/diffs",
-        diff.toUrlParams()));
+    DiffsResponse resp = new DiffsResponse();
+    FactualStream stream = stream(tableName, diff, resp);
+    stream.start();
+    return resp;
   }
 
   private ClearResponse clearCustom(String root, Clear clear, Metadata metadata) {
@@ -676,10 +682,64 @@ public class Factual {
 
   private String request(Request fullQuery, String requestMethod,
       boolean useOAuth) {
-    Map<String, String> postData = fullQuery.getPostData();
     String urlStr = factHome + fullQuery.toUrlString();
-    GenericUrl url = new GenericUrl(urlStr);
 
+    BufferedReader br = null;
+    try {
+      HttpRequest request = createRequest(urlStr, fullQuery, requestMethod, useOAuth);
+      // get the response
+      br = new BufferedReader(new InputStreamReader(request.execute()
+          .getContent()));
+      String line = null;
+      StringBuffer sb = new StringBuffer();
+      LineCallback cb = fullQuery.getLineCallback();
+      while ((line = br.readLine()) != null) {
+        if (cb != null)
+          cb.onLine(line);
+        sb.append(line);
+      }
+      return sb.toString();
+
+    } catch (HttpResponseException e) {
+      throw new FactualApiException(e).requestUrl(urlStr)
+      .requestMethod(requestMethod).response(e.getResponse());
+    } catch (IOException e) {
+      throw new FactualApiException(e).requestUrl(urlStr).requestMethod(
+          requestMethod);
+    } catch (GeneralSecurityException e) {
+      throw new RuntimeException(e);
+    } finally {
+      Closeables.closeQuietly(br);
+    }
+  }
+
+  private FactualStream stream(Request fullQuery, String requestMethod,
+      boolean useOAuth) {
+    String urlStr = factHome + fullQuery.toUrlString();
+
+    BufferedReader br = null;
+    try {
+      HttpRequest request = createRequest(urlStr, fullQuery, requestMethod, useOAuth);
+
+      // get the response
+      br = new BufferedReader(new InputStreamReader(request.execute()
+          .getContent()));
+      return new FactualStream(br, fullQuery.getLineCallback());
+    } catch (HttpResponseException e) {
+      throw new FactualApiException(e).requestUrl(urlStr)
+      .requestMethod(requestMethod).response(e.getResponse());
+    } catch (IOException e) {
+      throw new FactualApiException(e).requestUrl(urlStr).requestMethod(
+          requestMethod);
+    } catch (GeneralSecurityException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private HttpRequest createRequest(String urlStr, Request fullQuery, String requestMethod,
+      boolean useOAuth) throws GeneralSecurityException, IOException {
+    Map<String, String> postData = fullQuery.getPostData();
+    GenericUrl url = new GenericUrl(urlStr);
     if (debug) {
       fullQuery.printDebug();
       Logger logger = Logger.getLogger(HttpTransport.class.getName());
@@ -695,59 +755,36 @@ public class Factual {
     params.computeTimestamp();
     params.signer = signer;
 
-    BufferedReader br = null;
-    try {
-      // generate the signature
-      params.computeSignature(requestMethod, url);
+    // generate the signature
+    params.computeSignature(requestMethod, url);
 
-      // make the request
-      HttpTransport transport = new NetHttpTransport();
-      HttpRequestFactory f = null;
-      if (useOAuth) {
-        f = transport.createRequestFactory(params);
-      } else {
-        f = transport.createRequestFactory();
-      }
-      HttpRequest request = null;
-      if ("POST".equals(requestMethod))
-        if (postData == null)
-          request = f.buildPostRequest(url, null);
-        else
-          request = f.buildPostRequest(url, new UrlEncodedContent(postData));
-      else
-        request = f.buildGetRequest(url);
-
-      if (readTimeout != -1)
-        request.setReadTimeout(readTimeout);
-      if (connectionTimeout != -1)
-        request.setConnectTimeout(connectionTimeout);
-
-      HttpHeaders headers = new HttpHeaders();
-      headers.set("X-Factual-Lib", DRIVER_HEADER_TAG);
-      headers.set("Host", host);
-      request.setHeaders(headers);
-
-      // get the response
-      br = new BufferedReader(new InputStreamReader(request.execute()
-          .getContent()));
-      String line = null;
-      StringBuffer sb = new StringBuffer();
-      while ((line = br.readLine()) != null) {
-        sb.append(line);
-      }
-      return sb.toString();
-
-    } catch (HttpResponseException e) {
-      throw new FactualApiException(e).requestUrl(urlStr)
-          .requestMethod(requestMethod).response(e.getResponse());
-    } catch (IOException e) {
-      throw new FactualApiException(e).requestUrl(urlStr).requestMethod(
-          requestMethod);
-    } catch (GeneralSecurityException e) {
-      throw new RuntimeException(e);
-    } finally {
-      Closeables.closeQuietly(br);
+    // make the request
+    HttpTransport transport = new NetHttpTransport();
+    HttpRequestFactory f = null;
+    if (useOAuth) {
+      f = transport.createRequestFactory(params);
+    } else {
+      f = transport.createRequestFactory();
     }
+    HttpRequest request = null;
+    if ("POST".equals(requestMethod))
+      if (postData == null)
+        request = f.buildPostRequest(url, null);
+      else
+        request = f.buildPostRequest(url, new UrlEncodedContent(postData));
+    else
+      request = f.buildGetRequest(url);
+
+    if (readTimeout != -1)
+      request.setReadTimeout(readTimeout);
+    if (connectionTimeout != -1)
+      request.setConnectTimeout(connectionTimeout);
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.set("X-Factual-Lib", DRIVER_HEADER_TAG);
+    headers.set("Host", host);
+    request.setHeaders(headers);
+    return request;
   }
 
   /**
@@ -797,6 +834,8 @@ public class Factual {
     public Response getResponse(String json);
 
     public void printDebug();
+
+    public LineCallback getLineCallback();
   }
 
   protected static class ReadRequest extends RequestImpl {
@@ -822,6 +861,7 @@ public class Factual {
     private final Map<String, Object> params;
     private final Map<String, String> postData;
     private final String path;
+    protected LineCallback cb;
 
     public RequestImpl(String path, Map<String, Object> params) {
       this(path, params, new HashMap<String, String>());
@@ -861,6 +901,12 @@ public class Factual {
         }
       }
     }
+
+    @Override
+    public LineCallback getLineCallback() {
+      return cb;
+    }
+
   }
 
   protected static class ResolveRequest extends RequestImpl {
@@ -896,6 +942,25 @@ public class Factual {
     @Override
     public Response getResponse(String json) {
       return new SchemaResponse(json);
+    }
+
+  }
+
+  protected static class DiffsRequest extends RequestImpl {
+
+    public DiffsRequest(String path, Map<String, Object> params, final DiffsCallback cb) {
+      super(path, params);
+      this.cb = new LineCallback() {
+        @Override
+        public void onLine(String line) {
+          cb.onDiff(line);
+        }
+      };
+    }
+
+    @Override
+    public Response getResponse(String json) {
+      return new RawReadResponse(json);
     }
 
   }
@@ -947,6 +1012,11 @@ public class Factual {
       System.out.println("=== " + path + " ===");
       System.out.println("Parameters:");
       System.out.println(params);
+    }
+
+    @Override
+    public LineCallback getLineCallback() {
+      return null;
     }
   }
 }

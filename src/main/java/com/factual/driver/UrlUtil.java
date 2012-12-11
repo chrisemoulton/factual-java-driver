@@ -32,7 +32,11 @@ public class UrlUtil {
   }
 
   public static String toUrl(String root, String parameters) {
-    return root + "?" + parameters;
+
+    if (parameters != null && parameters.length() > 0)
+      return root + "?" + parameters;
+    else
+      return root;
   }
 
   /**
@@ -53,9 +57,9 @@ public class UrlUtil {
   private static String urlPair(Object name, Object val, boolean urlEncode) {
     if (val != null) {
       return name
-          + "="
-          + ((urlEncode && val instanceof String) ? UrlUtil.urlEncode(val
-              .toString()) : val);
+      + "="
+      + ((urlEncode && val instanceof String) ? UrlUtil.urlEncode(val
+          .toString()) : val);
     } else {
       return null;
     }
