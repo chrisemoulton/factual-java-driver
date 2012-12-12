@@ -9,7 +9,7 @@ Note if using Maven that the version for Android is as follows:
     <dependency>
       <groupId>com.factual</groupId>
       <artifactId>factual-java-driver</artifactId>
-      <version>1.6.2-android</version>
+      <version>1.7.0-android</version>
     </dependency>
 
 ## Tips
