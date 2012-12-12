@@ -16,48 +16,15 @@ import com.google.common.collect.Maps;
  * @author brandon
  * 
  */
-public class DiffsResponse extends Response {
+public class DiffsResponse extends Response implements DiffsCallback {
 
-  private String json = null;
+  private String json = "";
   private final List<Map<String, Object>> data = new ArrayList<Map<String, Object>>();
 
-  public DiffsResponse(String json) {
-    this.json = json;
-    try {
-      parseJson(json);
-    } catch (JSONException e) {
-      throw new RuntimeException(e);
-    }
+  public DiffsResponse() {
   }
 
-  private void parseJson(String json) throws JSONException {
-    if (json == null || "".equals(json))
-      return;
-    boolean started = false;
-    int braceCount = 0;
-    int beginIdx = 0;
-    int endIdx = 0;
-    for (int i = 0; i < json.length(); i++) {
-      if (json.charAt(i) == '{') {
-        if (!started) {
-          started = true;
-          beginIdx = i;
-        }
-        braceCount++;
-      } else if (json.charAt(i) == '}') {
-        braceCount--;
-      }
-      if (started && braceCount == 0) {
-        endIdx = i + 1;
-        String jsonObj = json.substring(beginIdx, endIdx);
-        Map<String, Object> itemMap = parseItem(jsonObj);
-        data.add(itemMap);
-        started = false;
-      }
-    }
-  }
-
-  private Map<String, Object> parseItem(String jsonObj) throws JSONException {
+  protected static Map<String, Object> parseItem(String jsonObj) throws JSONException {
     JSONObject jsonItem = new JSONObject(jsonObj);
     Iterator<?> iter = jsonItem.keys();
     Map<String, Object> itemMap = Maps.newHashMap();
@@ -82,4 +49,16 @@ public class DiffsResponse extends Response {
   public String getJson() {
     return json;
   }
+
+  @Override
+  public void onDiff(String line) {
+    json += line;
+    json += System.getProperty("line.separator");
+    try {
+      data.add(parseItem(line));
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+  }
+
 }

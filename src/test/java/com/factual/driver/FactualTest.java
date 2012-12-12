@@ -44,9 +44,10 @@ import com.google.common.io.Closeables;
  * @author aaron
  */
 public class FactualTest {
-  private static String PLACES = "places";
-  private static String TABLE = "places-v3";
+  private static String TABLE = "places";
   private static String FULL_TABLE = "t/" + TABLE;
+  private static String PLACES_V3 = "places-v3";
+  private static String SANDBOX_TABLE = "us-sandbox";
   private static Factual factual;
   private static final File AUTH = new File(new File(
       System.getProperty("user.home"), ".factual"), "factual-auth.yaml");
@@ -178,7 +179,7 @@ public class FactualTest {
     ReadResponse resp = factual.fetch(
         TABLE,
         new Query().field("name").equal("Factual")
-            .within(new Circle(latitude, longitude, meters)));
+        .within(new Circle(latitude, longitude, meters)));
     assertNotEmpty(resp);
     assertOk(resp);
 
@@ -189,7 +190,7 @@ public class FactualTest {
           {
             put("$center",
                 new String[] { Double.toString(latitude),
-                    Double.toString(longitude) });
+                Double.toString(longitude) });
             put("$meters", meters);
           }
         });
@@ -220,7 +221,7 @@ public class FactualTest {
     Map<String, Object> params = Maps.newHashMap();
     params.put("limit", 3);
     params.put("filters",
-        "{\"website\":{\"$eq\":\"http://www.papamurphys.com\"}}");
+    "{\"website\":{\"$eq\":\"http://www.papamurphys.com\"}}");
 
     String respRaw = factual.get(FULL_TABLE, params);
     assertEquals(resp.getJson(), respRaw);
@@ -234,7 +235,7 @@ public class FactualTest {
     ReadResponse resp = factual.fetch(
         TABLE,
         new Query().within(new Circle(latitude, longitude, meters)).sortAsc(
-            "$distance"));
+        "$distance"));
 
     assertNotEmpty(resp);
     assertOk(resp);
@@ -247,7 +248,7 @@ public class FactualTest {
           {
             put("$center",
                 new String[] { Double.toString(latitude),
-                    Double.toString(longitude) });
+                Double.toString(longitude) });
             put("$meters", meters);
           }
         });
@@ -269,10 +270,10 @@ public class FactualTest {
   public void testRowFilters_2beginsWith() {
     ReadResponse resp = factual.fetch(TABLE,
         new Query().field("name").beginsWith("McDonald's").field("category")
-            .beginsWith("Food & Beverage"));
+        .beginsWith("Food & Beverage"));
 
     assertOk(resp);
-    assertStartsWith(resp, "name", "McDonald");
+    assertStartsWith(resp, "name", "Mc");
     assertStartsWith(resp, "category", "Food & Beverage");
 
     Map<String, Object> params = Maps.newHashMap();
@@ -412,7 +413,7 @@ public class FactualTest {
     ReadResponse resp = factual.fetch(
         "crosswalk",
         new Query().field("factual_id").equal(
-            "97598010-433f-4946-8fd5-4a6dd1639d77"));
+        "97598010-433f-4946-8fd5-4a6dd1639d77"));
     assertOk(resp);
     List<Map<String, Object>> crosswalks = resp.getData();
     assertFalse(crosswalks.isEmpty());
@@ -424,8 +425,8 @@ public class FactualTest {
     ReadResponse resp = factual.fetch(
         "crosswalk",
         new Query().field("factual_id")
-            .equal("97598010-433f-4946-8fd5-4a6dd1639d77").field("namespace")
-            .equal("loopt"));
+        .equal("97598010-433f-4946-8fd5-4a6dd1639d77").field("namespace")
+        .equal("loopt"));
     List<Map<String, Object>> crosswalks = resp.getData();
     assertOk(resp);
     assertEquals(1, crosswalks.size());
@@ -437,7 +438,7 @@ public class FactualTest {
   public void testCrosswalk_ex3() {
     ReadResponse resp = factual.fetch("crosswalk",
         new Query().field("namespace").equal("foursquare")
-            .field("namespace_id").equal("4ae4df6df964a520019f21e3"));
+        .field("namespace_id").equal("4ae4df6df964a520019f21e3"));
     List<Map<String, Object>> crosswalks = resp.getData();
     assertOk(resp);
     assertFalse(crosswalks.isEmpty());
@@ -448,7 +449,7 @@ public class FactualTest {
     ReadResponse resp = factual.fetch(
         "crosswalk",
         new Query().field("factual_id")
-            .equal("97598010-433f-4946-8fd5-4a6dd1639d77").limit(1));
+        .equal("97598010-433f-4946-8fd5-4a6dd1639d77").limit(1));
     List<Map<String, Object>> crosswalks = resp.getData();
 
     assertOk(resp);
@@ -458,10 +459,10 @@ public class FactualTest {
   @Test
   public void testResolve_ex1() {
     ResolveResponse resp = factual.fetch(
-        PLACES,
+        TABLE,
         new ResolveQuery().add("name", "McDonalds")
-            .add("address", "10451 Santa Monica Blvd").add("region", "CA")
-            .add("postcode", "90025"));
+        .add("address", "10451 Santa Monica Blvd").add("region", "CA")
+        .add("postcode", "90025"));
     assertOk(resp);
     assertNotEmpty(resp);
     assertTrue(resp.isResolved());
@@ -471,9 +472,9 @@ public class FactualTest {
   @Test
   public void testMatch() {
     MatchQuery matchQuery = new MatchQuery().add("name", "McDonalds")
-        .add("address", "10451 Santa Monica Blvd").add("region", "CA")
-        .add("postcode", "90025");
-    String id = factual.match(PLACES, matchQuery);
+    .add("address", "10451 Santa Monica Blvd").add("region", "CA")
+    .add("postcode", "90025");
+    String id = factual.match(TABLE, matchQuery);
     assertTrue("bd886f67-9d86-40c5-9217-f7bcd53cfc0e".equals(id));
   }
 
@@ -487,7 +488,7 @@ public class FactualTest {
       assertEquals(401, e.getStatusCode());
       assertEquals("Unauthorized", e.getStatusMessage());
       assertTrue(e.getRequestUrl().startsWith(
-          "http://api.v3.factual.com/t/places-v3"));
+      "http://api.v3.factual.com/t/places"));
     }
   }
 
@@ -500,7 +501,7 @@ public class FactualTest {
     } catch (FactualApiException e) {
       assertEquals(400, e.getStatusCode());
       assertTrue(e.getRequestUrl().startsWith(
-          "http://api.v3.factual.com/t/places-v3"));
+      "http://api.v3.factual.com/t/places"));
       // verify the message includes useful info from the API error
       assertTrue(e.getMessage().contains("select"));
       assertTrue(e.getMessage().contains("unknown field"));
@@ -511,7 +512,7 @@ public class FactualTest {
   @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
   public void testSelect() {
     Query select = new Query().field("country").equal("US")
-        .only("address", "country");
+    .only("address", "country");
     assertEquals("[address, country]",
         Arrays.toString(select.getSelectFields()));
 
@@ -572,7 +573,7 @@ public class FactualTest {
     String respRaw = factual.get(
         FULL_TABLE,
         "filters="
-            + UrlUtil.urlEncode("{\"name\" : {\"$eq\" : \"Starbucks\"} }"));
+        + UrlUtil.urlEncode("{\"name\" : {\"$eq\" : \"Starbucks\"} }"));
     try {
       JSONObject rootJsonObj = new JSONObject(respRaw);
       assertEquals("ok", rootJsonObj.get("status"));
@@ -598,7 +599,7 @@ public class FactualTest {
   @Test
   public void testFacet() {
     FacetQuery facet = new FacetQuery("region", "locality").search("Starbucks")
-        .maxValuesPerFacet(20).minCountPerFacetValue(100).includeRowCount();
+    .maxValuesPerFacet(20).minCountPerFacetValue(100).includeRowCount();
 
     FacetResponse resp = factual.fetch(TABLE, facet);
     assertOk(resp);
@@ -619,7 +620,7 @@ public class FactualTest {
 
   @Test
   public void testFacetGeo() {
-    FacetQuery facet = new FacetQuery("category").within(new Circle(latitude,
+    FacetQuery facet = new FacetQuery("locality").within(new Circle(latitude,
         longitude, meters));
     FacetResponse resp = factual.fetch(TABLE, facet);
     assertOk(resp);
@@ -630,86 +631,137 @@ public class FactualTest {
   public void testDiffs() {
     factual.setReadTimeout(1000 * 60);
     DiffsQuery diff = new DiffsQuery(1351728000000L);
-    diff.after(1351900800000L);
-    DiffsResponse resp = factual.fetch(TABLE, diff);
+    diff.before(1351900800000L);
+    DiffsResponse resp = factual.fetch(PLACES_V3, diff);
     assertTrue(resp.getData().size() == 1620);
+  }
+
+  @Test
+  public void testDiffsStreamOnlyStart() {
+    factual.setReadTimeout(1000 * 5);
+    DiffsQuery diff = new DiffsQuery();
+    diff.after(1351728000000L);
+    final FactualStream stream = factual.stream(PLACES_V3, diff, new DiffsCallback() {
+      @Override
+      public void onDiff(String line) {
+        System.out.println(line);
+      }
+    });
+    new Thread(new Runnable() {
+      @Override
+      public void run() {
+        stream.start();
+      }
+    }).start();
+    try {
+      Thread.sleep(3000);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+    stream.end();
+  }
+
+  @Test
+  public void testDiffsStreamOnlyEnd() {
+    factual.setReadTimeout(1000 * 5);
+    DiffsQuery diff = new DiffsQuery();
+    diff.before(1348619300964L);
+
+    class DiffTestCb implements DiffsCallback {
+      int count = 0;
+      @Override
+      public void onDiff(String line) {
+        count++;
+      }
+
+      public int getCount() {
+        return count;
+      }
+    }
+    DiffTestCb cb = new DiffTestCb();
+    FactualStream stream = factual.stream(PLACES_V3, diff, cb);
+    stream.start();
+    assertTrue(cb.getCount() == 1);
   }
 
   @Test
   public void testDiffsDate() {
     factual.setReadTimeout(1000 * 60);
-    Calendar before = new GregorianCalendar();
-    before.set(2012, 10, 1, 0, 0, 0);
-    DiffsQuery diff = new DiffsQuery(before.getTime());
-    Calendar after = new GregorianCalendar();
-    after.set(2012, 10, 2, 0, 0, 0);
-    diff.after(after.getTime());
-    DiffsResponse resp = factual.fetch(TABLE, diff);
+    Calendar start = new GregorianCalendar();
+    start.set(2012, 10, 1, 0, 0, 0);
+    DiffsQuery diff = new DiffsQuery(start.getTime());
+    Calendar end = new GregorianCalendar();
+    end.set(2012, 10, 2, 0, 0, 0);
+    diff.before(end.getTime());
+    DiffsResponse resp = factual.fetch(PLACES_V3, diff);
     assertTrue(resp.getData().size() == 20);
   }
 
   @Test
-  @Ignore("Until API supports it")
   public void testSubmitAdd() {
-    Submit submit = new Submit().setValue("longitude", 100);
-    SubmitResponse resp = factual.submit("us-sandbox", submit,
+    Submit submit = new Submit()
+    .setValue("longitude", 100)
+    .setValue("name", "Test Location");
+    SubmitResponse resp = factual.submit(SANDBOX_TABLE, submit,
         new Metadata().user("test_driver_user"));
     assertOk(resp);
     assertTrue(resp.isNewEntity());
+    System.out.println("Commit id: "+resp.getCommitId());
   }
 
   @Test
-  @Ignore("Until API supports it")
   public void testSubmitEdit() {
     Submit submit = new Submit().setValue("longitude", 100);
-    SubmitResponse resp = factual.submit("us-sandbox",
+    SubmitResponse resp = factual.submit(SANDBOX_TABLE,
         "f33527e0-a8b4-4808-a820-2686f18cb00c", submit,
         new Metadata().user("test_driver_user"));
     assertOk(resp);
     assertFalse(resp.isNewEntity());
+    System.out.println("Commit id: "+resp.getCommitId());
   }
 
   @Test
-  @Ignore("Until API supports it")
   public void testSubmitDelete() {
     Submit submit = new Submit().removeValue("longitude");
-    SubmitResponse resp = factual.submit("us-sandbox",
+    SubmitResponse resp = factual.submit(SANDBOX_TABLE,
         "f33527e0-a8b4-4808-a820-2686f18cb00c", submit,
         new Metadata().user("test_driver_user"));
     assertOk(resp);
     assertFalse(resp.isNewEntity());
+    System.out.println("Commit id: "+resp.getCommitId());
   }
 
   @Test
-  @Ignore("Until API supports it")
   public void testInsertAdd() {
     Insert insert = new Insert().setValue("longitude", 100);
-    InsertResponse resp = factual.insert("us-sandbox", insert,
+    InsertResponse resp = factual.insert(SANDBOX_TABLE, insert,
         new Metadata().user("test_driver_user"));
     assertOk(resp);
     assertTrue(resp.isNewEntity());
+    System.out.println("Commit id: "+resp.getCommitId());
   }
 
   @Test
-  @Ignore("Until API supports it")
   public void testInsertEdit() {
     Insert insert = new Insert().setValue("longitude", 100);
-    InsertResponse resp = factual.insert("us-sandbox",
+    InsertResponse resp = factual.insert(SANDBOX_TABLE,
         "f33527e0-a8b4-4808-a820-2686f18cb00c", insert,
         new Metadata().user("test_driver_user"));
     assertOk(resp);
     assertFalse(resp.isNewEntity());
+    System.out.println("Commit id: "+resp.getCommitId());
   }
 
   @Test
   @Ignore("Until API supports it")
   public void testInsertDelete() {
     Insert insert = new Insert().removeValue("longitude");
-    InsertResponse resp = factual.insert("us-sandbox",
+    InsertResponse resp = factual.insert(SANDBOX_TABLE,
         "f33527e0-a8b4-4808-a820-2686f18cb00c", insert,
         new Metadata().user("test_driver_user"));
     assertOk(resp);
     assertFalse(resp.isNewEntity());
+    System.out.println("Commit id: "+resp.getCommitId());
   }
 
   @Test
@@ -718,15 +770,16 @@ public class FactualTest {
     Clear clear = new Clear();
     clear.addField("longitude");
     clear.addField("latitude");
-    ClearResponse resp = factual.clear("us-sandbox", factualId, clear,
+    ClearResponse resp = factual.clear(SANDBOX_TABLE, factualId, clear,
         new Metadata().user("test_driver_user"));
     assertOk(resp);
     assertEquals(factualId, resp.getFactualId());
+    System.out.println("Commit id: "+resp.getCommitId());
   }
 
   @Test
   public void testFlagDuplicate() {
-    FlagResponse resp = factual.flagDuplicate("us-sandbox",
+    FlagResponse resp = factual.flagDuplicate(SANDBOX_TABLE,
         "158294f8-3300-4841-9e49-c23d5d670d07",
         new Metadata().user("test_driver_user"));
     System.out.println(resp);
@@ -734,45 +787,40 @@ public class FactualTest {
   }
 
   @Test
-  @Ignore("Until API supports it")
   public void testFlagInaccurate() {
-    FlagResponse resp = factual.flagInaccurate("us-sandbox",
+    FlagResponse resp = factual.flagInaccurate(SANDBOX_TABLE,
         "f33527e0-a8b4-4808-a820-2686f18cb00c",
         new Metadata().user("test_driver_user"));
     assertOk(resp);
   }
 
   @Test
-  @Ignore("Until API supports it")
   public void testFlagInappropriate() {
-    FlagResponse resp = factual.flagInappropriate("us-sandbox",
+    FlagResponse resp = factual.flagInappropriate(SANDBOX_TABLE,
         "f33527e0-a8b4-4808-a820-2686f18cb00c",
         new Metadata().user("test_driver_user"));
     assertOk(resp);
   }
 
   @Test
-  @Ignore("Until API supports it")
   public void testFlagNonExistent() {
-    FlagResponse resp = factual.flagNonExistent("us-sandbox",
+    FlagResponse resp = factual.flagNonExistent(SANDBOX_TABLE,
         "f33527e0-a8b4-4808-a820-2686f18cb00c",
         new Metadata().user("test_driver_user"));
     assertOk(resp);
   }
 
   @Test
-  @Ignore("Until API supports it")
   public void testFlagSpam() {
-    FlagResponse resp = factual.flagSpam("us-sandbox",
+    FlagResponse resp = factual.flagSpam(SANDBOX_TABLE,
         "f33527e0-a8b4-4808-a820-2686f18cb00c",
         new Metadata().user("test_driver_user"));
     assertOk(resp);
   }
 
   @Test
-  @Ignore("Until API supports it")
   public void testFlagOther() {
-    FlagResponse resp = factual.flagOther("us-sandbox",
+    FlagResponse resp = factual.flagOther(SANDBOX_TABLE,
         "f33527e0-a8b4-4808-a820-2686f18cb00c",
         new Metadata().user("test_driver_user"));
     assertOk(resp);
@@ -800,7 +848,7 @@ public class FactualTest {
     Query query = new Query().and(
         new Query().field("name").equal("philadelphia"),
         new Query().field("country").equal("us"), new Query()
-            .field("placetype").equal("locality"));
+        .field("placetype").equal("locality"));
     ReadResponse resp = factual.fetch("world-geographies", query);
     assertTrue(resp.getData().size() == 14);
     assertOk(resp);
@@ -821,7 +869,7 @@ public class FactualTest {
 
     // Same search as above, with added filter for products that are 12.6 oz.
     query = new Query().search("shampoo").field("brand").equal("pantene")
-        .field("size").search("12.6 oz");
+    .field("size").search("12.6 oz");
     resp = factual.fetch("products-cpg", query);
     assertOk(resp);
 
@@ -935,10 +983,10 @@ public class FactualTest {
     multiReq.addQuery("q2", TABLE, new Query().limit(10));
     multiReq.addQuery(
         "q3",
-        PLACES,
+        TABLE,
         new ResolveQuery().add("name", "McDonalds")
-            .add("address", "10451 Santa Monica Blvd").add("region", "CA")
-            .add("postcode", "90025"));
+        .add("address", "10451 Santa Monica Blvd").add("region", "CA")
+        .add("postcode", "90025"));
     MultiResponse multi = factual.sendRequests(multiReq);
     Map<String, Response> data = multi.getData();
     assertTrue(data.size() == 3);
@@ -961,7 +1009,7 @@ public class FactualTest {
         "q",
         "crosswalk",
         new Query().field("factual_id")
-            .equal("97598010-433f-4946-8fd5-4a6dd1639d77").limit(1));
+        .equal("97598010-433f-4946-8fd5-4a6dd1639d77").limit(1));
     MultiResponse multi = factual.sendRequests(multiReq);
     for (Response resp : multi.getData().values()) {
       assertOk(resp);
@@ -1045,16 +1093,16 @@ public class FactualTest {
       }
     }));
     MultiRequest multiReq = new MultiRequest();
-    multiReq.addQuery("q1", "t/global", params);
-    multiReq.addQuery("q2", "global",
+    multiReq.addQuery("q1", FULL_TABLE, params);
+    multiReq.addQuery("q2", TABLE,
         new Query().field("locality").equal("München").limit(10)); // Munich,
     // Germany
     multiReq.addQuery(
         "q3",
-        PLACES,
+        TABLE,
         new ResolveQuery().add("name", "César E. Chávez Library")
-            .add("locality", "Oakland").add("region", "CA")
-            .add("address", "3301 E 12th St"));
+        .add("locality", "Oakland").add("region", "CA")
+        .add("address", "3301 E 12th St"));
     MultiResponse multi = factual.sendRequests(multiReq);
     assertTrue(multi.getData().size() == 3);
     Response resp = multi.getData().get("q1");

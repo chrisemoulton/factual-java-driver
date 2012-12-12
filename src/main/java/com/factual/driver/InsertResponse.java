@@ -11,6 +11,7 @@ import org.json.JSONObject;
 public class InsertResponse extends Response {
   private String json = null;
   private String factualId;
+  private String commitId;
   private boolean newEntity;
 
   /**
@@ -33,6 +34,7 @@ public class InsertResponse extends Response {
   private void parseResponse(JSONObject jo) throws JSONException {
     factualId = jo.getString(Constants.INSERT_FACTUAL_ID);
     newEntity = jo.getBoolean(Constants.INSERT_NEW_ENTITY);
+    commitId = jo.getString(Constants.INSERT_COMMIT_ID);
   }
 
   /**
@@ -48,6 +50,13 @@ public class InsertResponse extends Response {
    */
   public boolean isNewEntity() {
     return newEntity;
+  }
+
+  /**
+   * @return the commit id associated with this insert
+   */
+  public String getCommitId() {
+    return commitId;
   }
 
   @Override

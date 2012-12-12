@@ -11,6 +11,7 @@ import org.json.JSONObject;
 public class ClearResponse extends Response {
   private String json = null;
   private String factualId;
+  private String commitId;
 
   /**
    * Constructor, parses from a JSON response String.
@@ -31,6 +32,7 @@ public class ClearResponse extends Response {
 
   private void parseResponse(JSONObject jo) throws JSONException {
     factualId = jo.getString(Constants.CLEAR_FACTUAL_ID);
+    commitId = jo.getString(Constants.CLEAR_COMMIT_ID);
   }
 
   /**
@@ -38,6 +40,13 @@ public class ClearResponse extends Response {
    */
   public String getFactualId() {
     return factualId;
+  }
+
+  /**
+   * @return the commit id associated with this clear
+   */
+  public String getCommitId() {
+    return commitId;
   }
 
   @Override

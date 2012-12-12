@@ -78,15 +78,18 @@ public class Constants {
   // Submit
   protected static final String SUBMIT_VALUES = "values";
   protected static final String SUBMIT_FACTUAL_ID = "factual_id";
+  protected static final String SUBMIT_COMMIT_ID = "commit_id";
   protected static final String SUBMIT_NEW_ENTITY = "new_entity";
 
   // Insert
   protected static final String INSERT_VALUES = "values";
   protected static final String INSERT_FACTUAL_ID = "factual_id";
+  protected static final String INSERT_COMMIT_ID = "commit_id";
   protected static final String INSERT_NEW_ENTITY = "new_entity";
 
   // Clear
   protected static final String CLEAR_FIELDS = "fields";
+  protected static final String CLEAR_COMMIT_ID = "commit_id";
   protected static final String CLEAR_FACTUAL_ID = "factual_id";
 
 }
