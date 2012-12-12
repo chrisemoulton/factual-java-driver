@@ -11,26 +11,28 @@ import java.util.Map;
  */
 public class DiffsQuery {
 
-  /**
-   * Constructor. Create a request to find diffs on a Factual table between two
-   * times.
-   * 
-   * @param before
-   *          the before time to create this diff against.
-   */
-  public DiffsQuery(long before) {
-    before(before);
+  public DiffsQuery() {
+
   }
 
   /**
-   * Constructor. Create a request to find diffs on a Factual table between two
-   * times.
+   * Constructor. Create a request to find diffs on a Factual table.
    * 
-   * @param before
-   *          the before date to create this diff against.
+   * @param after
+   *          diffs returned which were generated after the given time.
    */
-  public DiffsQuery(Date before) {
-    before(before);
+  public DiffsQuery(long after) {
+    after(after);
+  }
+
+  /**
+   * Constructor. Create a request to find diffs on a Factual table.
+   * 
+   * @param after
+   *          diffs returned which were generated after the given time.
+   */
+  public DiffsQuery(Date after) {
+    after(after);
   }
 
   private boolean isValidTimestamp(long timestamp) {
@@ -38,10 +40,10 @@ public class DiffsQuery {
   }
 
   /**
-   * The before date to create this diff against.
+   * Diffs returned which were generated before the given date
    * 
    * @param date
-   *          before date for this diff.
+   *          diffs returned which were generated before the given date.
    * @return this DiffsQuery
    */
   public DiffsQuery before(Date date) {
@@ -49,10 +51,10 @@ public class DiffsQuery {
   }
 
   /**
-   * The after date to create this diff against.
+   * Diffs returned which were generated after the given date
    * 
    * @param date
-   *          after date for this diff.
+   *          diffs returned which were generated after the given date.
    * @return this DiffsQuery
    */
   public DiffsQuery after(Date date) {
@@ -60,32 +62,32 @@ public class DiffsQuery {
   }
 
   /**
-   * The before time to create this diff against.
+   * Diffs returned which were generated before the given timestamp
    * 
    * @param timestamp
-   *          before time for this diff.
+   *          diffs returned which were generated before the given timestamp.
    * @return this DiffsQuery
    */
   public DiffsQuery before(long timestamp) {
     if (!isValidTimestamp(timestamp))
       throw new RuntimeException(
-          "Invalid timestamp.  Please use milliseconds for a date later than Jan 1, 2012 (1325376000000 ms).");
-    addParam(Constants.DIFFS_START_DATE, timestamp);
+      "Invalid timestamp.  Please use milliseconds for a date later than Jan 1, 2012 (1325376000000 ms).");
+    addParam(Constants.DIFFS_END_DATE, timestamp);
     return this;
   }
 
   /**
-   * The after time to create this diff against.
+   * Diffs returned which were generated after the given timestamp
    * 
    * @param timestamp
-   *          after time for this diff.
+   *          diffs returned which were generated after the given timestamp.
    * @return this DiffsQuery
    */
   public DiffsQuery after(long timestamp) {
     if (!isValidTimestamp(timestamp))
       throw new RuntimeException(
-          "Invalid timestamp.  Please use milliseconds for a date later than Jan 1, 2012 (1325376000000 ms).");
-    addParam(Constants.DIFFS_END_DATE, timestamp);
+      "Invalid timestamp.  Please use milliseconds for a date later than Jan 1, 2012 (1325376000000 ms).");
+    addParam(Constants.DIFFS_START_DATE, timestamp);
     return this;
   }
 

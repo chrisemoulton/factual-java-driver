@@ -1,3 +1,7 @@
+## 1.7.0
+ * Flip diffs query methods so that before(…) indicates diffs are returned before the given time, and after indicates after the given time
+ * Add support for streaming diffs requests for line-by-line processing
+
 ## 1.6.2
 
  * Updated demos and tests now expect auth in ~/.factual/factual-auth.yaml
