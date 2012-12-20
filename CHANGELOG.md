@@ -1,3 +1,7 @@
+## 1.7.1
+ * Deprecate .equal and add .isEqual for building query filters
+ * Fix bug in setting offset/limit to 0
+ 
 ## 1.7.0
  * Flip diffs query methods so that before(…) indicates diffs are returned before the given time, and after indicates after the given time
  * Add support for streaming diffs requests for line-by-line processing
