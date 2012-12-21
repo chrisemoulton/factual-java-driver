@@ -18,7 +18,7 @@ public class QueryTest {
   @Test
   public void testFilter_shorthand_eq_1() throws UnsupportedEncodingException {
     Query query = new Query()
-    .field("first_name").equal("Bradley");
+    .field("first_name").isEqual("Bradley");
 
     String queryStr = query.toUrlQuery();
     String decoded = URLDecoder.decode(queryStr, "UTF-8");
@@ -30,9 +30,9 @@ public class QueryTest {
   @Test
   public void testFilter_shorthand_eq_3() throws UnsupportedEncodingException {
     Query query = new Query()
-    .field("first_name").equal("Bradley")
-    .field("region").equal("CA")
-    .field("locality").equal("Los Angeles");
+    .field("first_name").isEqual("Bradley")
+    .field("region").isEqual("CA")
+    .field("locality").isEqual("Los Angeles");
 
     String queryStr = query.toUrlQuery();
     String decoded = URLDecoder.decode(queryStr, "UTF-8");
@@ -58,8 +58,8 @@ public class QueryTest {
     .field("region").in("MA", "VT", "NH");
 
     q.or(
-        q.field("first_name").equal("Chun"),
-        q.field("last_name").equal("Kok")
+        q.field("first_name").isEqual("Chun"),
+        q.field("last_name").isEqual("Kok")
     );
 
     String queryStr = q.toUrlQuery();
@@ -74,12 +74,12 @@ public class QueryTest {
     Query q = new Query();
     q.or(
         q.or(
-            q.field("first_name").equal("Chun"),
-            q.field("last_name").equal("Kok")
+            q.field("first_name").isEqual("Chun"),
+            q.field("last_name").isEqual("Kok")
         ),
         q.and(
-            q.field("score").equal("38"),
-            q.field("city").equal("Los Angeles")
+            q.field("score").isEqual("38"),
+            q.field("city").isEqual("Los Angeles")
         )
     );
 

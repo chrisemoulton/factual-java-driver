@@ -32,7 +32,15 @@ public class QueryBuilder<T extends Filterable> {
     return addFilter("$search", arg);
   }
 
+  /**
+   * @deprecated use {@link #isEqual(Object)}
+   */
+  @Deprecated
   public T equal(Object arg) {
+    return addFilter("$eq", arg);
+  }
+
+  public T isEqual(Object arg) {
     return addFilter("$eq", arg);
   }
 
@@ -100,4 +108,12 @@ public class QueryBuilder<T extends Filterable> {
     query.add(new FieldFilter(op, fieldName, arg));
     return query;
   }
+
+  @Override
+  public boolean equals(Object e){
+    System.err.println("WARNING: this does not act as an equality filter.  If you intend to do this, use .isEqual(Object) instead.");
+    return super.equals(e);
+  }
+
+
 }

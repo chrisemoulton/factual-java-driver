@@ -18,8 +18,8 @@ public class DemoCrosswalk2 {
     ReadResponse resp = factual.fetch(
         "crosswalk",
         new Query().field("factual_id")
-            .equal("97598010-433f-4946-8fd5-4a6dd1639d77").field("namespace")
-            .equal("loopt"));
+        .isEqual("97598010-433f-4946-8fd5-4a6dd1639d77").field("namespace")
+        .isEqual("loopt"));
 
     // Print out the Crosswalk results:
     for (Map<String, Object> cw : resp.getData()) {

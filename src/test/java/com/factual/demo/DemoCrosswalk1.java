@@ -16,8 +16,8 @@ public class DemoCrosswalk1 {
     // ID:
     ReadResponse resp = factual.fetch(
         "crosswalk",
-        new Query().field("factual_id").equal(
-            "97598010-433f-4946-8fd5-4a6dd1639d77"));
+        new Query().field("factual_id").isEqual(
+        "97598010-433f-4946-8fd5-4a6dd1639d77"));
 
     for (Map<String, Object> cw : resp.getData()) {
       System.out.println(cw);
