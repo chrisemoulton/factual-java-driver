@@ -1,3 +1,6 @@
+## 1.7.2
+ * Update resolve and match paths to use the latest API.
+
 ## 1.7.1
  * Deprecate .equal and add .isEqual for building query filters
  * Fix bug in setting offset/limit to 0
