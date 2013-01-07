@@ -109,16 +109,12 @@ public class Factual {
     return new ReadResponse(get(urlForFetch(tableName), query.toUrlParams()));
   }
 
-  protected static String urlForCrosswalk(String tableName) {
-    return tableName + "/crosswalk";
-  }
-
   protected static String urlForResolve(String tableName) {
-    return tableName + "/resolve";
+    return "t/" + tableName + "/resolve";
   }
 
   protected static String urlForMatch(String tableName) {
-    return tableName + "/match";
+    return "t/" + tableName + "/match";
   }
 
   protected static String urlForFetch(String tableName) {
