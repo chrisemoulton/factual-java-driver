@@ -459,7 +459,7 @@ public class FactualTest {
   @Test
   public void testResolve_ex1() {
     ResolveResponse resp = factual.fetch(
-        TABLE,
+        PLACES_V3,
         new ResolveQuery().add("name", "McDonalds")
         .add("address", "10451 Santa Monica Blvd").add("region", "CA")
         .add("postcode", "90025"));
@@ -474,8 +474,8 @@ public class FactualTest {
     MatchQuery matchQuery = new MatchQuery().add("name", "McDonalds")
     .add("address", "10451 Santa Monica Blvd").add("region", "CA")
     .add("postcode", "90025");
-    String id = factual.match(TABLE, matchQuery);
-    assertTrue("bd886f67-9d86-40c5-9217-f7bcd53cfc0e".equals(id));
+    String id = factual.match(PLACES_V3, matchQuery);
+    assertTrue("c730d193-ba4d-4e98-8620-29c672f2f117".equals(id));
   }
 
   @Test
@@ -983,7 +983,7 @@ public class FactualTest {
     multiReq.addQuery("q2", TABLE, new Query().limit(10));
     multiReq.addQuery(
         "q3",
-        TABLE,
+        PLACES_V3,
         new ResolveQuery().add("name", "McDonalds")
         .add("address", "10451 Santa Monica Blvd").add("region", "CA")
         .add("postcode", "90025"));
@@ -1099,7 +1099,7 @@ public class FactualTest {
     // Germany
     multiReq.addQuery(
         "q3",
-        TABLE,
+        PLACES_V3,
         new ResolveQuery().add("name", "César E. Chávez Library")
         .add("locality", "Oakland").add("region", "CA")
         .add("address", "3301 E 12th St"));

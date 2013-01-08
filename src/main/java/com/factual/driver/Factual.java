@@ -33,7 +33,7 @@ import com.google.common.io.Closeables;
  * @author aaron
  */
 public class Factual {
-  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.7.1";
+  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.7.2";
   private static final String DEFAULT_HOST_HEADER = "api.v3.factual.com";
   private String factHome = "http://api.v3.factual.com/";
   private String host = DEFAULT_HOST_HEADER;
@@ -109,16 +109,12 @@ public class Factual {
     return new ReadResponse(get(urlForFetch(tableName), query.toUrlParams()));
   }
 
-  protected static String urlForCrosswalk(String tableName) {
-    return tableName + "/crosswalk";
-  }
-
   protected static String urlForResolve(String tableName) {
-    return tableName + "/resolve";
+    return "t/" + tableName + "/resolve";
   }
 
   protected static String urlForMatch(String tableName) {
-    return tableName + "/match";
+    return "t/" + tableName + "/match";
   }
 
   protected static String urlForFetch(String tableName) {
