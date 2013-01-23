@@ -82,7 +82,7 @@ public class FactualTest {
   @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
   public void testCoreExample1() {
     ReadResponse resp = factual.fetch(TABLE, new Query().field("country")
-        .equal("US"));
+        .isEqual("US"));
 
     assertOk(resp);
     assertAll(resp, "country", "us");
@@ -178,7 +178,7 @@ public class FactualTest {
   public void testCoreExample5() {
     ReadResponse resp = factual.fetch(
         TABLE,
-        new Query().field("name").equal("Factual")
+        new Query().field("name").isEqual("Factual")
         .within(new Circle(latitude, longitude, meters)));
     assertNotEmpty(resp);
     assertOk(resp);
@@ -215,7 +215,7 @@ public class FactualTest {
   @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
   public void testEncoding() {
     ReadResponse resp = factual.fetch(TABLE, new Query().field("website")
-        .equal("http://www.papamurphys.com").limit(3));
+        .isEqual("http://www.papamurphys.com").limit(3));
     assertNotEmpty(resp);
     assertOk(resp);
     Map<String, Object> params = Maps.newHashMap();
@@ -412,7 +412,7 @@ public class FactualTest {
   public void testCrosswalk_ex1() {
     ReadResponse resp = factual.fetch(
         "crosswalk",
-        new Query().field("factual_id").equal(
+        new Query().field("factual_id").isEqual(
         "97598010-433f-4946-8fd5-4a6dd1639d77"));
     assertOk(resp);
     List<Map<String, Object>> crosswalks = resp.getData();
@@ -425,8 +425,8 @@ public class FactualTest {
     ReadResponse resp = factual.fetch(
         "crosswalk",
         new Query().field("factual_id")
-        .equal("97598010-433f-4946-8fd5-4a6dd1639d77").field("namespace")
-        .equal("loopt"));
+        .isEqual("97598010-433f-4946-8fd5-4a6dd1639d77").field("namespace")
+        .isEqual("loopt"));
     List<Map<String, Object>> crosswalks = resp.getData();
     assertOk(resp);
     assertEquals(1, crosswalks.size());
@@ -437,8 +437,8 @@ public class FactualTest {
   @Test
   public void testCrosswalk_ex3() {
     ReadResponse resp = factual.fetch("crosswalk",
-        new Query().field("namespace").equal("foursquare")
-        .field("namespace_id").equal("4ae4df6df964a520019f21e3"));
+        new Query().field("namespace").isEqual("foursquare")
+        .field("namespace_id").isEqual("4ae4df6df964a520019f21e3"));
     List<Map<String, Object>> crosswalks = resp.getData();
     assertOk(resp);
     assertFalse(crosswalks.isEmpty());
@@ -449,7 +449,7 @@ public class FactualTest {
     ReadResponse resp = factual.fetch(
         "crosswalk",
         new Query().field("factual_id")
-        .equal("97598010-433f-4946-8fd5-4a6dd1639d77").limit(1));
+        .isEqual("97598010-433f-4946-8fd5-4a6dd1639d77").limit(1));
     List<Map<String, Object>> crosswalks = resp.getData();
 
     assertOk(resp);
@@ -459,7 +459,7 @@ public class FactualTest {
   @Test
   public void testResolve_ex1() {
     ResolveResponse resp = factual.fetch(
-        TABLE,
+        PLACES_V3,
         new ResolveQuery().add("name", "McDonalds")
         .add("address", "10451 Santa Monica Blvd").add("region", "CA")
         .add("postcode", "90025"));
@@ -474,15 +474,15 @@ public class FactualTest {
     MatchQuery matchQuery = new MatchQuery().add("name", "McDonalds")
     .add("address", "10451 Santa Monica Blvd").add("region", "CA")
     .add("postcode", "90025");
-    String id = factual.match(TABLE, matchQuery);
-    assertTrue("bd886f67-9d86-40c5-9217-f7bcd53cfc0e".equals(id));
+    String id = factual.match(PLACES_V3, matchQuery);
+    assertTrue("c730d193-ba4d-4e98-8620-29c672f2f117".equals(id));
   }
 
   @Test
   public void testApiException_BadAuth() {
     Factual badness = new Factual("badkey", "badsecret");
     try {
-      badness.fetch(TABLE, new Query().field("region").equal("CA"));
+      badness.fetch(TABLE, new Query().field("region").isEqual("CA"));
       fail("Expected to catch a FactualApiException");
     } catch (FactualApiException e) {
       assertEquals(401, e.getStatusCode());
@@ -495,7 +495,7 @@ public class FactualTest {
   @Test
   public void testApiException_BadSelectField() {
     try {
-      Query select = new Query().field("country").equal("US").only("hours");
+      Query select = new Query().field("country").isEqual("US").only("hours");
       factual.fetch(TABLE, select);
       fail("Expected to catch a FactualApiException");
     } catch (FactualApiException e) {
@@ -511,7 +511,7 @@ public class FactualTest {
   @Test
   @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
   public void testSelect() {
-    Query select = new Query().field("country").equal("US")
+    Query select = new Query().field("country").isEqual("US")
     .only("address", "country");
     assertEquals("[address, country]",
         Arrays.toString(select.getSelectFields()));
@@ -846,9 +846,9 @@ public class FactualTest {
   @Test
   public void testWorldGeographies() {
     Query query = new Query().and(
-        new Query().field("name").equal("philadelphia"),
-        new Query().field("country").equal("us"), new Query()
-        .field("placetype").equal("locality"));
+        new Query().field("name").isEqual("philadelphia"),
+        new Query().field("country").isEqual("us"), new Query()
+        .field("placetype").isEqual("locality"));
     ReadResponse resp = factual.fetch("world-geographies", query);
     assertTrue(resp.getData().size() == 14);
     assertOk(resp);
@@ -863,29 +863,29 @@ public class FactualTest {
 
     // Same search as above, but filter the search results to include only the
     // brand "pantene"
-    query = new Query().search("shampoo").field("brand").equal("pantene");
+    query = new Query().search("shampoo").field("brand").isEqual("pantene");
     resp = factual.fetch("products-cpg", query);
     assertOk(resp);
 
     // Same search as above, with added filter for products that are 12.6 oz.
-    query = new Query().search("shampoo").field("brand").equal("pantene")
+    query = new Query().search("shampoo").field("brand").isEqual("pantene")
     .field("size").search("12.6 oz");
     resp = factual.fetch("products-cpg", query);
     assertOk(resp);
 
     // Search on UPC
-    query = new Query().field("upc").equal("052000131512");
+    query = new Query().field("upc").isEqual("052000131512");
     resp = factual.fetch("products-cpg", query);
     assertTrue(resp.getData().size() == 1);
     assertOk(resp);
 
     // Find all beverages (filter by category)
-    query = new Query().field("category").equal("beverages");
+    query = new Query().field("category").isEqual("beverages");
     resp = factual.fetch("products-cpg", query);
     assertOk(resp);
 
     // Count all beverage products
-    query = new Query().field("category").equal("lip makeup").includeRowCount();
+    query = new Query().field("category").isEqual("lip makeup").includeRowCount();
     resp = factual.fetch("products-cpg", query);
     assertOk(resp);
   }
@@ -894,13 +894,13 @@ public class FactualTest {
   public void testCPGCrosswalk() {
 
     // first, get the factual ID via UPC from the products table
-    Query query = new Query().field("upc").equal("037000138006");
+    Query query = new Query().field("upc").isEqual("037000138006");
     ReadResponse resp = factual.fetch("products-cpg", query);
     Object factualId = resp.getData().get(0).get("factual_id");
     assertTrue(factualId != null);
 
     // next, call the crosswalk table using the factual ID
-    query = new Query().field("factual_id").equal(factualId);
+    query = new Query().field("factual_id").isEqual(factualId);
     resp = factual.fetch("products-crosswalk", query);
     assertTrue(resp.getData().size() > 0);
   }
@@ -908,7 +908,7 @@ public class FactualTest {
   @Test
   public void testMulti() {
     MultiRequest multiRequest = new MultiRequest();
-    multiRequest.addQuery("q1", TABLE, new Query().field("region").equal("CA"));
+    multiRequest.addQuery("q1", TABLE, new Query().field("region").isEqual("CA"));
     multiRequest.addQuery("q2", TABLE, new Query().limit(1));
     MultiResponse multi = factual.sendRequests(multiRequest);
     Map<String, Response> data = multi.getData();
@@ -983,7 +983,7 @@ public class FactualTest {
     multiReq.addQuery("q2", TABLE, new Query().limit(10));
     multiReq.addQuery(
         "q3",
-        TABLE,
+        PLACES_V3,
         new ResolveQuery().add("name", "McDonalds")
         .add("address", "10451 Santa Monica Blvd").add("region", "CA")
         .add("postcode", "90025"));
@@ -1009,7 +1009,7 @@ public class FactualTest {
         "q",
         "crosswalk",
         new Query().field("factual_id")
-        .equal("97598010-433f-4946-8fd5-4a6dd1639d77").limit(1));
+        .isEqual("97598010-433f-4946-8fd5-4a6dd1639d77").limit(1));
     MultiResponse multi = factual.sendRequests(multiReq);
     for (Response resp : multi.getData().values()) {
       assertOk(resp);
@@ -1044,14 +1044,14 @@ public class FactualTest {
   @Test
   public void testMonetize() {
     ReadResponse resp = factual.monetize(new Query().field("place_locality")
-        .equal("Los Angeles"));
+        .isEqual("Los Angeles"));
     assertOk(resp);
   }
 
   @Test
   public void testMonetizeByBusiness() {
     ReadResponse resp = factual.monetize(new Query().field("place_factual_id")
-        .equal("3226fac0-2f85-49d7-bc67-288fb2fc52ee"));
+        .isEqual("3226fac0-2f85-49d7-bc67-288fb2fc52ee"));
     assertOk(resp);
   }
 
@@ -1062,7 +1062,7 @@ public class FactualTest {
   public void testDebug() {
     factual.debug(true);
     ReadResponse resp = factual.fetch(TABLE, new Query().field("country")
-        .equal("US"));
+        .isEqual("US"));
     factual.debug(false);
     assertOk(resp);
     assertAll(resp, "country", "us");
@@ -1071,7 +1071,7 @@ public class FactualTest {
   @Test
   public void testBasicUnicode() throws UnsupportedEncodingException {
     ReadResponse resp = factual.fetch("global", new Query().field("locality")
-        .equal("大阪市").limit(5)); // Osaka
+        .isEqual("大阪市").limit(5)); // Osaka
     assertOk(resp);
     assertTrue(resp.getData().size() == 5);
     assertTrue(Arrays.equals(
@@ -1095,11 +1095,11 @@ public class FactualTest {
     MultiRequest multiReq = new MultiRequest();
     multiReq.addQuery("q1", FULL_TABLE, params);
     multiReq.addQuery("q2", TABLE,
-        new Query().field("locality").equal("München").limit(10)); // Munich,
+        new Query().field("locality").isEqual("München").limit(10)); // Munich,
     // Germany
     multiReq.addQuery(
         "q3",
-        TABLE,
+        PLACES_V3,
         new ResolveQuery().add("name", "César E. Chávez Library")
         .add("locality", "Oakland").add("region", "CA")
         .add("address", "3301 E 12th St"));
@@ -1117,6 +1117,14 @@ public class FactualTest {
     assertTrue(resp instanceof ResolveResponse);
     assertTrue(((ResolveResponse) resp).getResolved().get("tel")
         .equals("(510) 535-5620"));
+  }
+
+  @Test
+  public void testOffsetZero() {
+    Query query = new Query();
+    query.limit(50).offset(0);
+    ReadResponse r = factual.fetch("monetize-data", query);
+    assertOk(r);
   }
 
   private void assertFactualId(List<Map<String, Object>> crosswalks, String id) {

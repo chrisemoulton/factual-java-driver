@@ -41,7 +41,10 @@ public class Query implements Filterable {
    * @return this Query
    */
   public Query limit(long limit) {
-    addParam(Constants.QUERY_LIMIT, (limit > 0 ? limit : null));
+    if (limit >= 0)
+      addParam(Constants.QUERY_LIMIT, limit);
+    else
+      throw new RuntimeException("Limit must be >= 0");
     return this;
   }
 
@@ -100,7 +103,10 @@ public class Query implements Filterable {
    * @return this Query
    */
   public Query offset(long offset) {
-    addParam(Constants.QUERY_OFFSET, (offset > 0 ? offset : null));
+    if (offset >= 0)
+      addParam(Constants.QUERY_OFFSET, offset);
+    else
+      throw new RuntimeException("Offset must be >= 0");
     return this;
   }
 
