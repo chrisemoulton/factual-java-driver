@@ -33,7 +33,7 @@ import com.google.common.io.Closeables;
  * @author aaron
  */
 public class Factual {
-  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.7.2";
+  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.7.3";
   private static final String DEFAULT_HOST_HEADER = "api.v3.factual.com";
   private String factHome = "http://api.v3.factual.com/";
   private String host = DEFAULT_HOST_HEADER;
@@ -43,6 +43,7 @@ public class Factual {
   private int readTimeout = -1;
   private int connectionTimeout = -1;
   private StreamHandler debugHandler = null;
+  private Logger logger = null;
 
   /**
    * Constructor. Represents your authenticated access to Factual.
@@ -738,7 +739,7 @@ public class Factual {
     GenericUrl url = new GenericUrl(urlStr);
     if (debug) {
       fullQuery.printDebug();
-      Logger logger = Logger.getLogger(HttpTransport.class.getName());
+      logger = Logger.getLogger(HttpTransport.class.getName());
       logger.removeHandler(debugHandler);
       logger.setLevel(Level.ALL);
       logger.addHandler(debugHandler);

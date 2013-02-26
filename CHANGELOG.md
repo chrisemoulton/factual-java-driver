@@ -1,3 +1,6 @@
+## 1.7.3
+ * Fix debugging print output.
+
 ## 1.7.2
  * Update resolve and match paths to use the latest API.
 
