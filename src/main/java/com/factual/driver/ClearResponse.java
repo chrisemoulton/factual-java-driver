@@ -9,9 +9,9 @@ import org.json.JSONObject;
  * @author brandon
  */
 public class ClearResponse extends Response {
-  private String json = null;
   private String factualId;
   private String commitId;
+  private InternalResponse resp = null;
 
   /**
    * Constructor, parses from a JSON response String.
@@ -19,10 +19,10 @@ public class ClearResponse extends Response {
    * @param json
    *          the JSON response String returned by Factual.
    */
-  public ClearResponse(String json) {
-    this.json = json;
+  public ClearResponse(InternalResponse resp) {
+    this.resp = resp;
     try {
-      JSONObject rootJsonObj = new JSONObject(json);
+      JSONObject rootJsonObj = new JSONObject(resp.getContent());
       Response.withMeta(this, rootJsonObj);
       parseResponse(rootJsonObj.getJSONObject(Constants.RESPONSE));
     } catch (JSONException e) {
@@ -51,6 +51,6 @@ public class ClearResponse extends Response {
 
   @Override
   public String getJson() {
-    return json;
+    return resp.getContent();
   }
 }

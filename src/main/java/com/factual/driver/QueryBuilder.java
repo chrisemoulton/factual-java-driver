@@ -48,6 +48,14 @@ public class QueryBuilder<T extends Filterable> {
     return addFilter("$neq", arg);
   }
 
+  public T includes(List<Object> args) {
+    return addFilter("$includes", args);
+  }
+
+  public T includes(Object... args) {
+    return addFilter("$includes", args);
+  }
+
   public T in(List<Object> args) {
     return addFilter("$in", args);
   }

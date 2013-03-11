@@ -9,25 +9,25 @@ import org.json.JSONObject;
  * @author brandon
  */
 public class FlagResponse extends Response {
-	private String json = null;
+  private InternalResponse resp = null;
 
-	/**
-	 * Constructor, parses from a JSON response String.
-	 * 
-	 * @param json the JSON response String returned by Factual.
-	 */
-	public FlagResponse(String json) {
-		this.json = json;
-		try {
-			JSONObject rootJsonObj = new JSONObject(json);
-			Response.withMeta(this, rootJsonObj);
-		} catch (JSONException e) {
-			throw new RuntimeException(e);
-		}
-	}
+  /**
+   * Constructor, parses from a JSON response String.
+   * 
+   * @param json the JSON response String returned by Factual.
+   */
+  public FlagResponse(InternalResponse resp) {
+    this.resp = resp;
+    try {
+      JSONObject rootJsonObj = new JSONObject(resp.getContent());
+      Response.withMeta(this, rootJsonObj);
+    } catch (JSONException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
-	@Override
-	public String getJson() {
-		return json;
-	}
+  @Override
+  public String getJson() {
+    return resp.getContent();
+  }
 }

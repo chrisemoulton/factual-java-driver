@@ -18,6 +18,7 @@ import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestFactory;
+import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.HttpResponseException;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.UrlEncodedContent;
@@ -107,7 +108,35 @@ public class Factual {
    * @return the response of running <tt>query</tt> against Factual.
    */
   public ReadResponse fetch(String tableName, Query query) {
-    return new ReadResponse(get(urlForFetch(tableName), query.toUrlParams()));
+    return new ReadResponse(getInternal(urlForFetch(tableName), query.toUrlParams()));
+  }
+
+  /**
+   * Runs a read <tt>query</tt> against the specified Factual table.
+   * 
+   * @param tableName
+   *          the name of the table you wish to query (e.g., "places")
+   * @param factualId
+   *          the factual id
+   * @param query
+   *          the read query to run against <tt>table</tt>.
+   * @return the response of running <tt>query</tt> against Factual.
+   */
+  public RowResponse fetchRow(String tableName, String factualId, RowQuery query) {
+    return new RowResponse(getInternal(urlForFetchRow(tableName, factualId), query.toUrlParams()));
+  }
+
+  /**
+   * Runs a read <tt>query</tt> against the specified Factual table.
+   * 
+   * @param tableName
+   *          the name of the table you wish to query (e.g., "places")
+   * @param factualId
+   *          the factual id
+   * @return the response of running <tt>query</tt> against Factual.
+   */
+  public RowResponse fetchRow(String tableName, String factualId) {
+    return fetchRow(tableName, factualId, new RowQuery());
   }
 
   protected static String urlForResolve(String tableName) {
@@ -120,6 +149,10 @@ public class Factual {
 
   protected static String urlForFetch(String tableName) {
     return "t/" + tableName;
+  }
+
+  protected static String urlForFetchRow(String tableName, String factualId) {
+    return "t/" + tableName + "/" + factualId;
   }
 
   protected static String urlForMonetize() {
@@ -146,7 +179,7 @@ public class Factual {
    * @return the response of running <tt>geopulse</tt> against Factual.
    */
   public ReadResponse geopulse(Geopulse geopulse) {
-    return new ReadResponse(get(urlForGeopulse(), geopulse.toUrlParams()));
+    return new ReadResponse(getInternal(urlForGeopulse(), geopulse.toUrlParams()));
   }
 
   /**
@@ -159,7 +192,7 @@ public class Factual {
    *         against Factual.
    */
   public ReadResponse reverseGeocode(Point point) {
-    return new ReadResponse(get(urlForGeocode(),
+    return new ReadResponse(getInternal(urlForGeocode(),
         new Geocode(point).toUrlParams()));
   }
 
@@ -175,7 +208,7 @@ public class Factual {
    * @return the response of running <tt>facet</tt> against Factual.
    */
   public FacetResponse fetch(String tableName, FacetQuery facet) {
-    return new FacetResponse(get(urlForFacets(tableName), facet.toUrlParams()));
+    return new FacetResponse(getInternal(urlForFacets(tableName), facet.toUrlParams()));
   }
 
   /**
@@ -411,6 +444,10 @@ public class Factual {
    *           if something goes wrong.
    */
   public String get(String path, Map<String, Object> queryParams) {
+    return getInternal(path, queryParams).getContent();
+  }
+
+  private InternalResponse getInternal(String path, Map<String, Object> queryParams) {
     return request(new RawReadRequest(path, queryParams));
   }
 
@@ -426,7 +463,7 @@ public class Factual {
    * @return
    */
   public String get(String path, String params) {
-    return request(new SimpleGetRequest(path, params));
+    return request(new SimpleGetRequest(path, params)).getContent();
   }
 
   /**
@@ -453,6 +490,11 @@ public class Factual {
    */
   public String post(String path, Map<String, Object> queryParams,
       Map<String, String> postContent) {
+    return postInternal(path, queryParams, postContent).getContent();
+  }
+
+  private InternalResponse postInternal(String path, Map<String, Object> queryParams,
+      Map<String, String> postContent) {
     return requestPost(new RawReadRequest(path, queryParams, postContent));
   }
 
@@ -472,8 +514,8 @@ public class Factual {
     params.putAll(metadata.toUrlParams());
     params.putAll(clear.toUrlParams());
     // Oauth library currently doesn't support POST body content.
-    String jsonResponse = post(root, params, new HashMap<String, String>());
-    return new ClearResponse(jsonResponse);
+    InternalResponse resp = postInternal(root, params, new HashMap<String, String>());
+    return new ClearResponse(resp);
   }
 
   private InsertResponse insertCustom(String root, Insert insert,
@@ -482,8 +524,8 @@ public class Factual {
     params.putAll(metadata.toUrlParams());
     params.putAll(insert.toUrlParams());
     // Oauth library currently doesn't support POST body content.
-    String jsonResponse = post(root, params, new HashMap<String, String>());
-    return new InsertResponse(jsonResponse);
+    InternalResponse resp = postInternal(root, params, new HashMap<String, String>());
+    return new InsertResponse(resp);
   }
 
   private SubmitResponse submitCustom(String root, Submit submit,
@@ -492,8 +534,8 @@ public class Factual {
     params.putAll(metadata.toUrlParams());
     params.putAll(submit.toUrlParams());
     // Oauth library currently doesn't support POST body content.
-    String jsonResponse = post(root, params, new HashMap<String, String>());
-    return new SubmitResponse(jsonResponse);
+    InternalResponse resp = postInternal(root, params, new HashMap<String, String>());
+    return new SubmitResponse(resp);
   }
 
   private FlagResponse flagCustom(String root, String flagType,
@@ -502,8 +544,8 @@ public class Factual {
     params.putAll(metadata.toUrlParams());
     params.put("problem", flagType);
     // Oauth library currently doesn't support POST body content.
-    String jsonResponse = post(root, params, new HashMap<String, String>());
-    return new FlagResponse(jsonResponse);
+    InternalResponse resp = postInternal(root, params, new HashMap<String, String>());
+    return new FlagResponse(resp);
   }
 
   /**
@@ -523,9 +565,9 @@ public class Factual {
     String json = JsonUtil.toJsonStr(multi);
     Map<String, Object> params = Maps.newHashMap();
     params.put("queries", json);
-    String jsonResponse = get("multi", params);
+    InternalResponse internalResp = getInternal("multi", params);
     MultiResponse resp = new MultiResponse(queries);
-    resp.setJson(jsonResponse);
+    resp.setJson(internalResp.getContent());
     return resp;
   }
 
@@ -537,7 +579,7 @@ public class Factual {
    * @return the response of running <tt>query</tt> against Factual.
    */
   public ReadResponse monetize(Query query) {
-    return new ReadResponse(get(urlForMonetize(), query.toUrlParams()));
+    return new ReadResponse(getInternal(urlForMonetize(), query.toUrlParams()));
   }
 
   /**
@@ -654,30 +696,30 @@ public class Factual {
 
   public SchemaResponse schema(String tableName) {
     Map<String, Object> params = Maps.newHashMap();
-    return new SchemaResponse(get(urlForSchema(tableName), params));
+    return new SchemaResponse(getInternal(urlForSchema(tableName), params));
   }
 
   private String urlForSchema(String tableName) {
     return "t/" + tableName + "/schema";
   }
 
-  private String request(Request query) {
+  private InternalResponse request(Request query) {
     return request(query, true);
   }
 
-  private String request(Request query, boolean useOAuth) {
+  private InternalResponse request(Request query, boolean useOAuth) {
     return request(query, "GET", useOAuth);
   }
 
-  private String requestPost(Request query) {
+  private InternalResponse requestPost(Request query) {
     return requestPost(query, true);
   }
 
-  private String requestPost(Request query, boolean useOAuth) {
+  private InternalResponse requestPost(Request query, boolean useOAuth) {
     return request(query, "POST", useOAuth);
   }
 
-  private String request(Request fullQuery, String requestMethod,
+  private InternalResponse request(Request fullQuery, String requestMethod,
       boolean useOAuth) {
     String urlStr = factHome + fullQuery.toUrlString();
 
@@ -685,7 +727,11 @@ public class Factual {
     try {
       HttpRequest request = createRequest(urlStr, fullQuery, requestMethod, useOAuth);
       // get the response
-      br = new BufferedReader(new InputStreamReader(request.execute()
+      HttpResponse resp = request.execute();
+
+      InternalResponse internalResponse = new InternalResponse(resp, fullQuery.getLineCallback());
+      /*
+      br = new BufferedReader(new InputStreamReader(resp
           .getContent()));
       String line = null;
       StringBuffer sb = new StringBuffer();
@@ -696,7 +742,8 @@ public class Factual {
         sb.append(line);
       }
       return sb.toString();
-
+       */
+      return internalResponse;
     } catch (HttpResponseException e) {
       throw new FactualApiException(e).requestUrl(urlStr)
       .requestMethod(requestMethod).response(e.getResponse());
@@ -828,7 +875,7 @@ public class Factual {
 
     public Map<String, String> getPostData();
 
-    public Response getResponse(String json);
+    public Response getResponse(InternalResponse resp);
 
     public void printDebug();
 
@@ -841,8 +888,8 @@ public class Factual {
     }
 
     @Override
-    public Response getResponse(String json) {
-      return new ReadResponse(json);
+    public Response getResponse(InternalResponse resp) {
+      return new ReadResponse(resp);
     }
 
   }
@@ -886,7 +933,7 @@ public class Factual {
     }
 
     @Override
-    public abstract Response getResponse(String json);
+    public abstract Response getResponse(InternalResponse resp);
 
     @Override
     public void printDebug() {
@@ -912,8 +959,8 @@ public class Factual {
     }
 
     @Override
-    public Response getResponse(String json) {
-      return new ResolveResponse(json);
+    public Response getResponse(InternalResponse resp) {
+      return new ResolveResponse(resp);
     }
   }
 
@@ -924,8 +971,8 @@ public class Factual {
     }
 
     @Override
-    public Response getResponse(String json) {
-      return new FacetResponse(json);
+    public Response getResponse(InternalResponse resp) {
+      return new FacetResponse(resp);
     }
 
   }
@@ -937,8 +984,8 @@ public class Factual {
     }
 
     @Override
-    public Response getResponse(String json) {
-      return new SchemaResponse(json);
+    public Response getResponse(InternalResponse resp) {
+      return new SchemaResponse(resp);
     }
 
   }
@@ -956,8 +1003,8 @@ public class Factual {
     }
 
     @Override
-    public Response getResponse(String json) {
-      return new RawReadResponse(json);
+    public Response getResponse(InternalResponse resp) {
+      return new RawReadResponse(resp);
     }
 
   }
@@ -974,8 +1021,8 @@ public class Factual {
     }
 
     @Override
-    public Response getResponse(String json) {
-      return new RawReadResponse(json);
+    public Response getResponse(InternalResponse resp) {
+      return new RawReadResponse(resp);
     }
 
   }
@@ -1000,8 +1047,8 @@ public class Factual {
     }
 
     @Override
-    public Response getResponse(String json) {
-      return new RawReadResponse(json);
+    public Response getResponse(InternalResponse resp) {
+      return new RawReadResponse(resp);
     }
 
     @Override

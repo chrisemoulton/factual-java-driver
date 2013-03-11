@@ -4,18 +4,18 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class RawReadResponse extends Response {
-  
-	private final String json;
+
+  private final InternalResponse resp;
 
   /**
    * Constructor, parses from a JSON response String.
    * 
    * @param json the JSON response String returned by Factual.
    */
-  public RawReadResponse(String json) {
-    this.json = json;
+  public RawReadResponse(InternalResponse resp) {
+    this.resp = resp;
     try{
-      JSONObject rootJsonObj = new JSONObject(json);
+      JSONObject rootJsonObj = new JSONObject(resp.getContent());
       Response.withMeta(this, rootJsonObj);
     } catch (JSONException e) {
       throw new RuntimeException(e);
@@ -24,7 +24,7 @@ public class RawReadResponse extends Response {
 
   @Override
   public String getJson() {
-	return json;
+    return resp.getContent();
   }
 
 }

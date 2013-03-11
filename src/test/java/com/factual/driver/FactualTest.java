@@ -1127,6 +1127,44 @@ public class FactualTest {
     assertOk(r);
   }
 
+  @Test
+  public void testFetchRow1() {
+    String factualId = "0000022c-4ab3-4f5d-8e67-6a6ff1826a93";
+    RowResponse resp = factual.fetchRow("places", factualId, new RowQuery());
+    assertOk(resp);
+    assertTrue(factualId.equals(resp.getRowData().get("factual_id")));
+    assertFalse(resp.isDeprected());
+  }
+
+  @Test
+  public void testFetchRow2() {
+    String factualId = "0000022c-4ab3-4f5d-8e67-6a6ff1826a93";
+    RowResponse resp = factual.fetchRow("places", factualId, new RowQuery().only("name"));
+    assertOk(resp);
+    assertTrue("Icbm".equals(resp.getRowData().get("name")));
+    assertFalse(resp.isDeprected());
+  }
+
+  @Test
+  public void testIncludes1() {
+    Query q = new Query().field("category_ids").in(10);
+    ReadResponse resp = factual.fetch(TABLE, q);
+    assertOk(resp);
+    for (Map<String, Object> data : resp.getData()) {
+      assertTrue("[10]".equals(data.get("category_ids").toString()));
+    }
+  }
+
+  @Test
+  public void testIncludes2() {
+    Query q = new Query().field("category_ids").in(10, 120);
+    ReadResponse resp = factual.fetch(TABLE, q);
+    assertOk(resp);
+    for (Map<String, Object> data : resp.getData()) {
+      assertTrue("[10]".equals(data.get("category_ids").toString()) || "[120]".equals(data.get("category_ids").toString()));
+    }
+  }
+
   private void assertFactualId(List<Map<String, Object>> crosswalks, String id) {
     for (Map<String, Object> cw : crosswalks) {
       assertEquals(id, cw.get("factual_id"));
