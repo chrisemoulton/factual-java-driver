@@ -34,7 +34,7 @@ import com.google.common.io.Closeables;
  * @author aaron
  */
 public class Factual {
-  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.7.4";
+  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.7.5";
   private static final String DEFAULT_HOST_HEADER = "api.v3.factual.com";
   private String factHome = "http://api.v3.factual.com/";
   private String host = DEFAULT_HOST_HEADER;
@@ -282,8 +282,8 @@ public class Factual {
    *          "places")
    * @param factualId
    *          the factual id on which the insert is run
-   * @param insert
-   *          the insert parameters to run against <tt>table</tt>
+   * @param clear
+   *          the clear parameters to run against <tt>table</tt>
    * @param metadata
    *          the metadata to send with information on this request
    * @return the response of running <tt>insert</tt> against Factual.
@@ -460,7 +460,7 @@ public class Factual {
    *          the path to run the request against
    * @param params
    *          the url-encoded parameter string to send with the request
-   * @return
+   * @return the response body from running this GET request against Factual.
    */
   public String get(String path, String params) {
     return request(new SimpleGetRequest(path, params)).getContent();
