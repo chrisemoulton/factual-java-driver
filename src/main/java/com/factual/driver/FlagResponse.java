@@ -13,8 +13,6 @@ public class FlagResponse extends Response {
 
   /**
    * Constructor, parses from a JSON response String.
-   * 
-   * @param json the JSON response String returned by Factual.
    */
   public FlagResponse(InternalResponse resp) {
     this.resp = resp;

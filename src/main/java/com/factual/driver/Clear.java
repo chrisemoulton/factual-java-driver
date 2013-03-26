@@ -12,9 +12,6 @@ public class Clear {
   /**
    * Constructor for a submit with values initialized as key value pairs in
    * mapping.
-   * 
-   * @param values
-   *          values this submit is initialized with
    */
   public Clear(List<String> fields) {
     for (String field : fields)

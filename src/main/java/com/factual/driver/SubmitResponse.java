@@ -16,8 +16,6 @@ public class SubmitResponse extends Response {
 
   /**
    * Constructor, parses from a JSON response String.
-   * 
-   * @param json the JSON response String returned by Factual.
    */
   public SubmitResponse(InternalResponse resp) {
     this.resp = resp;

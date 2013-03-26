@@ -16,9 +16,6 @@ public class InsertResponse extends Response {
 
   /**
    * Constructor, parses from a JSON response String.
-   * 
-   * @param json
-   *          the JSON response String returned by Factual.
    */
   public InsertResponse(InternalResponse resp) {
     this.resp = resp;

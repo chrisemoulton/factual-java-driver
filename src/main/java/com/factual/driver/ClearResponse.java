@@ -15,9 +15,6 @@ public class ClearResponse extends Response {
 
   /**
    * Constructor, parses from a JSON response String.
-   * 
-   * @param json
-   *          the JSON response String returned by Factual.
    */
   public ClearResponse(InternalResponse resp) {
     this.resp = resp;

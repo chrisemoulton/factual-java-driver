@@ -11,8 +11,6 @@ public class RowResponse extends ReadResponse {
 
   /**
    * Constructor, parses from a JSON response String.
-   * 
-   * @param json the JSON response String returned by Factual.
    */
   public RowResponse(InternalResponse resp) {
     super(resp);
