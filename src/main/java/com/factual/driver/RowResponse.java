@@ -16,7 +16,7 @@ public class RowResponse extends ReadResponse {
     super(resp);
   }
 
-  public boolean isDeprected() {
+  public boolean isDeprecated() {
     return resp.getStatusCode() == 301;
   }
 

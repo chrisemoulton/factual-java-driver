@@ -1135,7 +1135,7 @@ public class FactualTest {
     RowResponse resp = factual.fetchRow("places", factualId);
     assertOk(resp);
     assertTrue(factualId.equals(resp.getRowData().get("factual_id")));
-    assertFalse(resp.isDeprected());
+    assertFalse(resp.isDeprecated());
   }
 
   @Test
@@ -1144,7 +1144,7 @@ public class FactualTest {
     RowResponse resp = factual.fetchRow("places", factualId, new RowQuery().only("name"));
     assertOk(resp);
     assertTrue("Icbm".equals(resp.getRowData().get("name")));
-    assertFalse(resp.isDeprected());
+    assertFalse(resp.isDeprecated());
   }
 
   @Test
