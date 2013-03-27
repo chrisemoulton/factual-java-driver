@@ -22,9 +22,15 @@ public class ColumnSchema {
     description = (String)map.get(Constants.SCHEMA_COLUMN_DESCRIPTION);
     label = (String)map.get(Constants.SCHEMA_COLUMN_LABEL);
     datatype = (String)map.get(Constants.SCHEMA_COLUMN_DATATYPE);
-    faceted = (Boolean)map.get(Constants.SCHEMA_COLUMN_FACETED);
-    sortable = (Boolean)map.get(Constants.SCHEMA_COLUMN_SORTABLE);
-    searchable = (Boolean)map.get(Constants.SCHEMA_COLUMN_SEARCHABLE);
+    faceted = resolveBoolean(map.get(Constants.SCHEMA_COLUMN_FACETED), false);
+    sortable = resolveBoolean(map.get(Constants.SCHEMA_COLUMN_SORTABLE), false);
+    searchable = resolveBoolean(map.get(Constants.SCHEMA_COLUMN_SEARCHABLE), false);
+  }
+
+  private boolean resolveBoolean(Object val, boolean defaultVal) {
+    if (val instanceof Boolean)
+      return (Boolean) val;
+    return defaultVal;
   }
 
 }

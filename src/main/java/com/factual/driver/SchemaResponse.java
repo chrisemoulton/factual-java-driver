@@ -16,24 +16,21 @@ import com.google.common.collect.Maps;
  * @author aaron
  */
 public class SchemaResponse extends Response implements Tabular {
-  private final String json;
   private final Map<String, ColumnSchema> columnSchemas;
   private final String title;
   private final boolean searchEnabled;
   private final boolean geoEnabled;
   private final String description;
   private final List<Map<String, Object>> data;
-
+  private InternalResponse resp = null;
 
   /**
    * Constructor, parses from a JSON response String.
-   * 
-   * @param json the JSON response String returned by Factual.
    */
-  public SchemaResponse(String json) {
-    this.json = json;
+  public SchemaResponse(InternalResponse resp) {
+    this.resp = resp;
     try{
-      JSONObject rootJsonObj = new JSONObject(json);
+      JSONObject rootJsonObj = new JSONObject(resp.getContent());
       Response.withMeta(this, rootJsonObj);
       JSONObject respObj = rootJsonObj.getJSONObject(Constants.RESPONSE);
       JSONObject view = respObj.getJSONObject(Constants.SCHEMA_VIEW);
@@ -77,7 +74,7 @@ public class SchemaResponse extends Response implements Tabular {
    */
   @Override
   public String getJson() {
-    return json;
+    return resp.getContent();
   }
 
   /**

@@ -1,3 +1,9 @@
+## 1.7.5
+ * Add "includes" and "includes_any" filters
+
+## 1.7.4
+ * Add row queries
+
 ## 1.7.3
  * Fix debugging print output.
 
