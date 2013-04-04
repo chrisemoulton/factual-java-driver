@@ -9,21 +9,18 @@ import org.json.JSONObject;
  * @author brandon
  */
 public class InsertResponse extends Response {
-  private String json = null;
+  private InternalResponse resp = null;
   private String factualId;
   private String commitId;
   private boolean newEntity;
 
   /**
    * Constructor, parses from a JSON response String.
-   * 
-   * @param json
-   *          the JSON response String returned by Factual.
    */
-  public InsertResponse(String json) {
-    this.json = json;
+  public InsertResponse(InternalResponse resp) {
+    this.resp = resp;
     try {
-      JSONObject rootJsonObj = new JSONObject(json);
+      JSONObject rootJsonObj = new JSONObject(resp.getContent());
       Response.withMeta(this, rootJsonObj);
       parseResponse(rootJsonObj.getJSONObject(Constants.RESPONSE));
     } catch (JSONException e) {
@@ -61,6 +58,6 @@ public class InsertResponse extends Response {
 
   @Override
   public String getJson() {
-    return json;
+    return resp.getContent();
   }
 }

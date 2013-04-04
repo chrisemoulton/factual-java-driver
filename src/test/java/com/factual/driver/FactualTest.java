@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -26,6 +27,7 @@ import org.junit.Test;
 import org.yaml.snakeyaml.Yaml;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Closeables;
 
@@ -72,7 +74,7 @@ public class FactualTest {
 
     ColumnSchema nameSchema = schema.getColumnSchema("name");
     assertEquals("name", nameSchema.name);
-    assertEquals("primitive.String", nameSchema.datatype);
+    assertEquals("String", nameSchema.datatype);
   }
 
   /**
@@ -311,7 +313,7 @@ public class FactualTest {
     assertNotEmpty(resp);
     assertIn(resp, "region", "CA", "NM", "FL");
 
-    q = new Query().field("region").in(new ArrayList() {
+    q = new Query().field("region").inList(new ArrayList() {
       {
         add("CA");
         add("NM");
@@ -413,11 +415,11 @@ public class FactualTest {
     ReadResponse resp = factual.fetch(
         "crosswalk",
         new Query().field("factual_id").isEqual(
-        "97598010-433f-4946-8fd5-4a6dd1639d77"));
+        "860fed91-3a52-44c8-af7b-8095eb943da1"));
     assertOk(resp);
     List<Map<String, Object>> crosswalks = resp.getData();
     assertFalse(crosswalks.isEmpty());
-    assertFactualId(crosswalks, "97598010-433f-4946-8fd5-4a6dd1639d77");
+    assertFactualId(crosswalks, "860fed91-3a52-44c8-af7b-8095eb943da1");
   }
 
   @Test
@@ -425,12 +427,12 @@ public class FactualTest {
     ReadResponse resp = factual.fetch(
         "crosswalk",
         new Query().field("factual_id")
-        .isEqual("97598010-433f-4946-8fd5-4a6dd1639d77").field("namespace")
+        .isEqual("860fed91-3a52-44c8-af7b-8095eb943da1").field("namespace")
         .isEqual("loopt"));
     List<Map<String, Object>> crosswalks = resp.getData();
     assertOk(resp);
     assertEquals(1, crosswalks.size());
-    assertFactualId(crosswalks, "97598010-433f-4946-8fd5-4a6dd1639d77");
+    assertFactualId(crosswalks, "860fed91-3a52-44c8-af7b-8095eb943da1");
     assertNamespace(crosswalks, "loopt");
   }
 
@@ -449,7 +451,7 @@ public class FactualTest {
     ReadResponse resp = factual.fetch(
         "crosswalk",
         new Query().field("factual_id")
-        .isEqual("97598010-433f-4946-8fd5-4a6dd1639d77").limit(1));
+        .isEqual("860fed91-3a52-44c8-af7b-8095eb943da1").limit(1));
     List<Map<String, Object>> crosswalks = resp.getData();
 
     assertOk(resp);
@@ -789,7 +791,7 @@ public class FactualTest {
   @Test
   public void testFlagInaccurate() {
     FlagResponse resp = factual.flagInaccurate(SANDBOX_TABLE,
-        "f33527e0-a8b4-4808-a820-2686f18cb00c",
+        "158294f8-3300-4841-9e49-c23d5d670d07",
         new Metadata().user("test_driver_user"));
     assertOk(resp);
   }
@@ -797,7 +799,7 @@ public class FactualTest {
   @Test
   public void testFlagInappropriate() {
     FlagResponse resp = factual.flagInappropriate(SANDBOX_TABLE,
-        "f33527e0-a8b4-4808-a820-2686f18cb00c",
+        "158294f8-3300-4841-9e49-c23d5d670d07",
         new Metadata().user("test_driver_user"));
     assertOk(resp);
   }
@@ -805,7 +807,7 @@ public class FactualTest {
   @Test
   public void testFlagNonExistent() {
     FlagResponse resp = factual.flagNonExistent(SANDBOX_TABLE,
-        "f33527e0-a8b4-4808-a820-2686f18cb00c",
+        "158294f8-3300-4841-9e49-c23d5d670d07",
         new Metadata().user("test_driver_user"));
     assertOk(resp);
   }
@@ -813,7 +815,7 @@ public class FactualTest {
   @Test
   public void testFlagSpam() {
     FlagResponse resp = factual.flagSpam(SANDBOX_TABLE,
-        "f33527e0-a8b4-4808-a820-2686f18cb00c",
+        "158294f8-3300-4841-9e49-c23d5d670d07",
         new Metadata().user("test_driver_user"));
     assertOk(resp);
   }
@@ -821,7 +823,7 @@ public class FactualTest {
   @Test
   public void testFlagOther() {
     FlagResponse resp = factual.flagOther(SANDBOX_TABLE,
-        "f33527e0-a8b4-4808-a820-2686f18cb00c",
+        "158294f8-3300-4841-9e49-c23d5d670d07",
         new Metadata().user("test_driver_user"));
     assertOk(resp);
   }
@@ -1125,6 +1127,67 @@ public class FactualTest {
     query.limit(50).offset(0);
     ReadResponse r = factual.fetch("monetize-data", query);
     assertOk(r);
+  }
+
+  @Test
+  public void testFetchRow1() {
+    String factualId = "0000022c-4ab3-4f5d-8e67-6a6ff1826a93";
+    RowResponse resp = factual.fetchRow("places", factualId);
+    assertOk(resp);
+    assertTrue(factualId.equals(resp.getRowData().get("factual_id")));
+    assertFalse(resp.isDeprecated());
+  }
+
+  @Test
+  public void testFetchRow2() {
+    String factualId = "0000022c-4ab3-4f5d-8e67-6a6ff1826a93";
+    RowResponse resp = factual.fetchRow("places", factualId, new RowQuery().only("name"));
+    assertOk(resp);
+    assertTrue("Icbm".equals(resp.getRowData().get("name")));
+    assertFalse(resp.isDeprecated());
+  }
+
+  @Test
+  public void testIncludes1() throws JSONException {
+    int categoryId = 10;
+    Query q = new Query().field("category_ids").includes(categoryId);
+    ReadResponse resp = factual.fetch(TABLE, q);
+    assertOk(resp);
+    for (Map<String, Object> data : resp.getData()) {
+      JSONArray categoryIds = (JSONArray) data.get("category_ids");
+      boolean found = false;
+      for (int i=0;i<categoryIds.length();i++) {
+        if (categoryIds.getInt(i) == categoryId) {
+          found = true;
+          break;
+        }
+      }
+      assertTrue(found);
+    }
+  }
+
+  @Test
+  public void testIncludes2() throws JSONException {
+    List<Object> categoryIds = Lists.newArrayList();
+    categoryIds.add(10);
+    categoryIds.add(120);
+    Query q = new Query().field("category_ids").includesAnyList(categoryIds);
+    ReadResponse resp = factual.fetch(TABLE, q);
+    assertOk(resp);
+
+    for (Map<String, Object> data : resp.getData()) {
+      boolean found = false;
+      for (Object categoryId : categoryIds) {
+        JSONArray rowCategoryIds = (JSONArray) data.get("category_ids");
+        for (int i=0;i<rowCategoryIds.length();i++) {
+          if (((Integer)rowCategoryIds.get(i)).intValue() == ((Integer) categoryId).intValue()) {
+            found = true;
+            break;
+          }
+        }
+      }
+      assertTrue(found);
+    }
   }
 
   private void assertFactualId(List<Map<String, Object>> crosswalks, String id) {

@@ -1,3 +1,8 @@
+## 1.7.5-android
+ * Add row queries
+ * Fix debugging print output.
+ * Add "includes" and "includes_any" filters
+
 ## 1.7.2-android
  * Update resolve and match paths to use the latest API.
  * Deprecate .equal and add .isEqual for building query filters

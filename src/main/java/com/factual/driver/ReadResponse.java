@@ -20,19 +20,17 @@ import com.google.common.collect.Lists;
  * @author aaron
  */
 public class ReadResponse extends Response implements Tabular {
-  private final String json;
+  protected InternalResponse resp = null;
   private List<Map<String, Object>> data = Lists.newArrayList();
 
 
   /**
    * Constructor, parses from a JSON response String.
-   * 
-   * @param json the JSON response String returned by Factual.
    */
-  public ReadResponse(String json) {
-    this.json = json;
+  public ReadResponse(InternalResponse resp) {
+    this.resp = resp;
     try{
-      JSONObject rootJsonObj = new JSONObject(json);
+      JSONObject rootJsonObj = new JSONObject(resp.getContent());
       Response.withMeta(this, rootJsonObj);
       data = JsonUtil.data(rootJsonObj.getJSONObject(Constants.RESPONSE).getJSONArray(Constants.QUERY_DATA));
     } catch (JSONException e) {
@@ -45,7 +43,7 @@ public class ReadResponse extends Response implements Tabular {
    */
   @Override
   public String getJson() {
-    return json;
+    return resp.getContent();
   }
 
   /**
