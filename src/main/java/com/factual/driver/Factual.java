@@ -178,8 +178,8 @@ public class Factual {
    *          the geopulse query to run.
    * @return the response of running <tt>geopulse</tt> against Factual.
    */
-  public ReadResponse geopulse(Geopulse geopulse) {
-    return new ReadResponse(getInternal(urlForGeopulse(), geopulse.toUrlParams()));
+  public GeopulseResponse geopulse(Geopulse geopulse) {
+    return new GeopulseResponse(getInternal(urlForGeopulse(), geopulse.toUrlParams()));
   }
 
   /**
@@ -880,6 +880,18 @@ public class Factual {
     public void printDebug();
 
     public LineCallback getLineCallback();
+  }
+
+  protected static class GeopulseRequest extends RequestImpl {
+    public GeopulseRequest(String path, Map<String, Object> params) {
+      super(path, params);
+    }
+
+    @Override
+    public Response getResponse(InternalResponse resp) {
+      return new GeopulseResponse(resp);
+    }
+
   }
 
   protected static class ReadRequest extends RequestImpl {

@@ -700,6 +700,7 @@ public class FactualTest {
   }
 
   @Test
+  @Ignore
   public void testSubmitAdd() {
     Submit submit = new Submit()
     .setValue("longitude", 100)
@@ -712,6 +713,7 @@ public class FactualTest {
   }
 
   @Test
+  @Ignore
   public void testSubmitEdit() {
     Submit submit = new Submit().setValue("longitude", 100);
     SubmitResponse resp = factual.submit(SANDBOX_TABLE,
@@ -723,6 +725,7 @@ public class FactualTest {
   }
 
   @Test
+  @Ignore
   public void testSubmitDelete() {
     Submit submit = new Submit().removeValue("longitude");
     SubmitResponse resp = factual.submit(SANDBOX_TABLE,
@@ -734,6 +737,7 @@ public class FactualTest {
   }
 
   @Test
+  @Ignore
   public void testInsertAdd() {
     Insert insert = new Insert().setValue("longitude", 100);
     InsertResponse resp = factual.insert(SANDBOX_TABLE, insert,
@@ -744,6 +748,7 @@ public class FactualTest {
   }
 
   @Test
+  @Ignore
   public void testInsertEdit() {
     Insert insert = new Insert().setValue("longitude", 100);
     InsertResponse resp = factual.insert(SANDBOX_TABLE,
@@ -755,7 +760,7 @@ public class FactualTest {
   }
 
   @Test
-  @Ignore("Until API supports it")
+  @Ignore
   public void testInsertDelete() {
     Insert insert = new Insert().removeValue("longitude");
     InsertResponse resp = factual.insert(SANDBOX_TABLE,
@@ -767,6 +772,7 @@ public class FactualTest {
   }
 
   @Test
+  @Ignore
   public void testClear() {
     String factualId = "1d93c1ed-8cf3-4d58-94e0-05bbcd827cba";
     Clear clear = new Clear();
@@ -780,6 +786,7 @@ public class FactualTest {
   }
 
   @Test
+  @Ignore
   public void testFlagDuplicate() {
     FlagResponse resp = factual.flagDuplicate(SANDBOX_TABLE,
         "158294f8-3300-4841-9e49-c23d5d670d07",
@@ -789,6 +796,7 @@ public class FactualTest {
   }
 
   @Test
+  @Ignore
   public void testFlagInaccurate() {
     FlagResponse resp = factual.flagInaccurate(SANDBOX_TABLE,
         "158294f8-3300-4841-9e49-c23d5d670d07",
@@ -797,6 +805,7 @@ public class FactualTest {
   }
 
   @Test
+  @Ignore
   public void testFlagInappropriate() {
     FlagResponse resp = factual.flagInappropriate(SANDBOX_TABLE,
         "158294f8-3300-4841-9e49-c23d5d670d07",
@@ -805,6 +814,7 @@ public class FactualTest {
   }
 
   @Test
+  @Ignore
   public void testFlagNonExistent() {
     FlagResponse resp = factual.flagNonExistent(SANDBOX_TABLE,
         "158294f8-3300-4841-9e49-c23d5d670d07",
@@ -813,6 +823,7 @@ public class FactualTest {
   }
 
   @Test
+  @Ignore
   public void testFlagSpam() {
     FlagResponse resp = factual.flagSpam(SANDBOX_TABLE,
         "158294f8-3300-4841-9e49-c23d5d670d07",
@@ -821,6 +832,7 @@ public class FactualTest {
   }
 
   @Test
+  @Ignore
   public void testFlagOther() {
     FlagResponse resp = factual.flagOther(SANDBOX_TABLE,
         "158294f8-3300-4841-9e49-c23d5d670d07",
@@ -830,11 +842,11 @@ public class FactualTest {
 
   @Test
   public void testGeopulse() {
-    ReadResponse resp = factual.geopulse(new Geopulse(new Point(latitude,
-        longitude)).only("commercial_density", "commercial_profile"));
-    Map<String, Object> pulse = resp.getData().get(0);
-    assertTrue(pulse.containsKey("commercial_profile"));
-    assertTrue(pulse.containsKey("commercial_density"));
+    GeopulseResponse resp = factual.geopulse(new Geopulse(new Point(latitude,
+        longitude)).only("area_statistics", "race_and_ethnicity"));
+    Map<String, Map<String, Object>> pulse = resp.getData();
+    assertTrue(pulse.get("demographics").containsKey("area_statistics"));
+    assertTrue(pulse.get("demographics").containsKey("race_and_ethnicity"));
     assertOk(resp);
   }
 

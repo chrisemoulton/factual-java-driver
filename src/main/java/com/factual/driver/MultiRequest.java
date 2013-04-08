@@ -1,11 +1,10 @@
 package com.factual.driver;
 
-import java.util.Iterator;
-import java.util.Map;
 import java.util.HashMap;
-import java.util.Map.Entry;
+import java.util.Map;
 
 import com.factual.driver.Factual.FacetRequest;
+import com.factual.driver.Factual.GeopulseRequest;
 import com.factual.driver.Factual.RawReadRequest;
 import com.factual.driver.Factual.ReadRequest;
 import com.factual.driver.Factual.RequestImpl;
@@ -94,9 +93,9 @@ public class MultiRequest {
    *          the geopulse query to run
    */
   public void addQuery(String queryName, Geopulse query) {
-    queries.put(queryName, new ReadRequest(Factual.urlForGeopulse(), query.toUrlParams()));
+    queries.put(queryName, new GeopulseRequest(Factual.urlForGeopulse(), query.toUrlParams()));
   }
-  
+
   /**
    * Remove a query from the next multi request.
    * 
@@ -106,7 +105,7 @@ public class MultiRequest {
   public void removeQuery(String queryName) {
     queries.remove(queryName);
   }
-  
+
   /*
   public Iterator<Entry<String, String>> iterator() {
      Map<String, String> nameURLMap = new HashMap<String, String>();
@@ -115,8 +114,8 @@ public class MultiRequest {
      }
      return nameURLMap.entrySet().iterator();
   }
-  */
-  
+   */
+
   protected Map<String, RequestImpl> getQueries() {
     return queries;
   }
