@@ -1,3 +1,6 @@
+## 1.7.6
+ * Update for latest geopulse API changes
+
 ## 1.7.5
  * Add "includes" and "includes_any" filters
 
