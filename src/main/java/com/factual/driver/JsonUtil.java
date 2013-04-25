@@ -44,6 +44,10 @@ public class JsonUtil {
   }
 
   private static Map<String, Object> row(JSONObject jo) throws JSONException {
+    return toMap(jo);
+  }
+
+  public static Map<String, Object> toMap(JSONObject jo) throws JSONException {
     Map<String, Object> row = Maps.newHashMap();
     Iterator<?> iter = jo.keys();
     while(iter.hasNext()) {

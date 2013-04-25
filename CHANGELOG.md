@@ -1,3 +1,6 @@
+## 1.7.6-android
+ * Update for latest geopulse API changes
+ 
 ## 1.7.5-android
  * Add row queries
  * Fix debugging print output.

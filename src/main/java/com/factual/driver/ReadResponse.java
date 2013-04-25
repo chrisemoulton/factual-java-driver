@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -32,7 +33,13 @@ public class ReadResponse extends Response implements Tabular {
     try{
       JSONObject rootJsonObj = new JSONObject(resp.getContent());
       Response.withMeta(this, rootJsonObj);
-      data = JsonUtil.data(rootJsonObj.getJSONObject(Constants.RESPONSE).getJSONArray(Constants.QUERY_DATA));
+      JSONObject respJson = rootJsonObj.getJSONObject(Constants.RESPONSE);
+      Object dataObj = respJson.get(Constants.QUERY_DATA);
+      if (dataObj instanceof JSONArray) {
+        data = JsonUtil.data(respJson.getJSONArray(Constants.QUERY_DATA));
+      } else if (dataObj instanceof JSONObject) {
+        data.add(JsonUtil.toMap((JSONObject) dataObj));
+      }
     } catch (JSONException e) {
       throw new RuntimeException(e);
     }
