@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.factual.driver.Factual.FacetRequest;
-import com.factual.driver.Factual.GeopulseRequest;
 import com.factual.driver.Factual.RawReadRequest;
 import com.factual.driver.Factual.ReadRequest;
 import com.factual.driver.Factual.RequestImpl;
@@ -93,7 +92,7 @@ public class MultiRequest {
    *          the geopulse query to run
    */
   public void addQuery(String queryName, Geopulse query) {
-    queries.put(queryName, new GeopulseRequest(Factual.urlForGeopulse(), query.toUrlParams()));
+    queries.put(queryName, new ReadRequest(Factual.urlForGeopulse(), query.toUrlParams()));
   }
 
   /**
