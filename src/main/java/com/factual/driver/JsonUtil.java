@@ -28,7 +28,7 @@ public class JsonUtil {
     }
     return data;
   }
-  
+
   /**
    * Takes a JSONObject of records, where each record is a dictionary, and
    * returns the translated Map of Maps.
@@ -37,13 +37,17 @@ public class JsonUtil {
     Map<String, Map<String, Object>> data = Maps.newHashMap();
     Iterator<?> iter = jo.keys();
     while (iter.hasNext()) {
-    	String key = iter.next().toString();
-    	data.put(key, row(jo.getJSONObject(key)));
+      String key = iter.next().toString();
+      data.put(key, row(jo.getJSONObject(key)));
     }
     return data;
   }
-  
+
   private static Map<String, Object> row(JSONObject jo) throws JSONException {
+    return toMap(jo);
+  }
+
+  public static Map<String, Object> toMap(JSONObject jo) throws JSONException {
     Map<String, Object> row = Maps.newHashMap();
     Iterator<?> iter = jo.keys();
     while(iter.hasNext()) {
@@ -53,9 +57,9 @@ public class JsonUtil {
     }
     return row;
   }
-  
+
   /**
-   * Serialize a Java object to json.  
+   * Serialize a Java object to json.
    * Use Maps and Lists to specify object and array structures respectively.
    * 
    * For example, the following value as input:
@@ -66,7 +70,7 @@ public class JsonUtil {
    * 	new HashMap() {{
    * 		put("name", new HashMap() {{
    *  			put("$bw", "McDonald's");
-   *  		}});	
+   *  		}});
    *  		put("category", new HashMap() {{
    *  			put("$bw", "Food & Beverage");
    *  		}});
@@ -78,18 +82,18 @@ public class JsonUtil {
    * {"$and":[{"name":{"$bw":"McDonald's"},"category":{"$bw":"Food & Beverage"}}
    * 
    * @param obj the object to be serialized as json
-   * @return the json string representing the passed in object 
+   * @return the json string representing the passed in object
    */
   public static String toJsonStr(Object obj) {
-	try {
-	  return new ObjectMapper().writeValueAsString(obj);
-	} catch (JsonGenerationException e) {
-	  throw new RuntimeException(e);
-	} catch (JsonMappingException e) {
-	  throw new RuntimeException(e);
-	} catch (IOException e) {
-	  throw new RuntimeException(e);
-	}
+    try {
+      return new ObjectMapper().writeValueAsString(obj);
+    } catch (JsonGenerationException e) {
+      throw new RuntimeException(e);
+    } catch (JsonMappingException e) {
+      throw new RuntimeException(e);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
-  
+
 }
