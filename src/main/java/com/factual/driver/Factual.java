@@ -609,6 +609,7 @@ public class Factual {
    * @return the response from Factual for the Resolve request.
    */
   public ResolveResponse resolves(String tableId, ResolveQuery query) {
+	query.allCandidates();
     return fetch(tableId, query);
   }
 

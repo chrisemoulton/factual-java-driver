@@ -470,6 +470,14 @@ public class FactualTest {
     assertTrue(resp.isResolved());
     assertTrue(resp.getResolved().get("name").equals("McDonald's"));
   }
+  
+  @Test
+  public void testResolves() {
+    ResolveResponse resp = factual.resolves(new ResolveQuery()
+	  .add("name", "McDonalds")
+	  .add("locality", "Los Angeles"));
+    assertTrue(resp.getData().size() > 1);
+  }
 
   @Test
   public void testMatch() {
@@ -1201,7 +1209,7 @@ public class FactualTest {
       assertTrue(found);
     }
   }
-
+  
   private void assertFactualId(List<Map<String, Object>> crosswalks, String id) {
     for (Map<String, Object> cw : crosswalks) {
       assertEquals(id, cw.get("factual_id"));
