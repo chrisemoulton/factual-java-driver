@@ -7,6 +7,7 @@ This is the official [Java driver](https://github.com/Factual/factual-java-drive
 
 ### Querying Factual Data
 
+* [Get a Single Row](https://github.com/Factual/factual-java-driver/wiki/Get-a-Single-Row)
 * [Query Filters](https://github.com/Factual/factual-java-driver/wiki/Query-Filters)
 * [Field Selection](https://github.com/Factual/factual-java-driver/wiki/Field-Selection)
 * [Row Filters](https://github.com/Factual/factual-java-driver/wiki/Row-Filters)
