@@ -170,8 +170,8 @@ public class Query implements Filterable {
    * @param circle The circle within which to bound the results.
    * @return this Query.
    */
-  public Query within(Circle circle) {
-    queryParams.setParam(Constants.FILTER_GEO, circle);
+  public Query within(Shape shape) {
+    queryParams.setParam(Constants.FILTER_GEO, shape);
     return this;
   }
   
