@@ -7,6 +7,10 @@ public class Constants {
   protected static final String CENTER = "$center";
   protected static final String METERS = "$meters";
 
+  // Rectangle
+  protected static final String RECTANGLE = "$rect";
+  
+  
   // Point
   protected static final String POINT = "$point";
 

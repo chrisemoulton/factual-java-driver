@@ -34,7 +34,7 @@ import com.google.common.io.Closeables;
  * @author aaron
  */
 public class Factual {
-  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.7.6-android";
+  private static final String DRIVER_HEADER_TAG = "factual-java-driver-v1.7.7-android";
   private static final String DEFAULT_HOST_HEADER = "api.v3.factual.com";
   private String factHome = "http://api.v3.factual.com/";
   private String host = DEFAULT_HOST_HEADER;
@@ -615,6 +615,7 @@ public class Factual {
    * @return the response from Factual for the Resolve request.
    */
   public ResolveResponse resolves(String tableId, ResolveQuery query) {
+    query.allCandidates();
     return fetch(tableId, query);
   }
 

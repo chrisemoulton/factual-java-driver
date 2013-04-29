@@ -8,7 +8,7 @@ import java.util.HashMap;
  *
  * @author aaron
  */
-public class Circle {
+public class Circle extends Shape {
   private final double centerLat;
   private final double centerLong;
   private final int meters;
@@ -26,23 +26,15 @@ public class Circle {
     this.centerLong = centerLong;
     this.meters = meters;
   }
-
-  /**
-   * View this circle as a json string representation
-   * 
-   * @return a json string representation of this Circle
-   */
-  public String toJsonStr() {
-    return JsonUtil.toJsonStr(toJsonObject());
-  }
-
+  
   /**
    * View this Circle as an object representation that can be serialized as json
    * 
    * @return an object representation of this circle that can be serialized as json
    */
   @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
-  private Object toJsonObject() {
+  @Override
+  public Object toJsonObject() {
     return new HashMap() {
       {
         put(Constants.CIRCLE, new HashMap() {
@@ -53,11 +45,6 @@ public class Circle {
         });
       }
     };
-  }
-
-  @Override
-  public String toString() {
-    return toJsonStr();
   }
 
 }

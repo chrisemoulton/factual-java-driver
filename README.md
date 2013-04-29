@@ -9,10 +9,15 @@ Note if using Maven that the version for Android is as follows:
     <dependency>
       <groupId>com.factual</groupId>
       <artifactId>factual-java-driver</artifactId>
-      <version>1.7.6-android</version>
+      <version>1.7.7-android</version>
     </dependency>
 
-## Tips
+* [Query Filters](https://github.com/Factual/factual-java-driver/wiki/Query-Filters)
+* [Field Selection](https://github.com/Factual/factual-java-driver/wiki/Field-Selection)
+* [Row Filters](https://github.com/Factual/factual-java-driver/wiki/Row-Filters)
+* [Geo Filters](https://github.com/Factual/factual-java-driver/wiki/Geo-Filters)
+* [Paging: Limit and Offset](https://github.com/Factual/factual-java-driver/wiki/Paging)
+* [Sorting Results](https://github.com/Factual/factual-java-driver/wiki/Sorting-Results)
 
 * Ensure your application's AndroidManifest.xml has Internet access enabled: 
 

@@ -58,6 +58,10 @@ public class Parameters {
 		params.put(key, new SimpleData(value));
 	}
 	
+	protected void unsetParam(String key) {
+		params.remove(key);
+	}
+	
 	protected Map<String, Object> toUrlParams() {
 		return toUrlParams(null);
 	}

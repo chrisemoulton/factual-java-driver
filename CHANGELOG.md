@@ -1,3 +1,8 @@
+## 1.7.7-android
+ * Add resolve debug to see all candidates
+ * Add shape query
+ * Add method to get rows near a point
+
 ## 1.7.6-android
  * Update for latest geopulse API changes
  
