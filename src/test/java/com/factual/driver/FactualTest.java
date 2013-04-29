@@ -171,6 +171,24 @@ public class FactualTest {
 
   }
 
+  @Test
+  public void testWithinRectangle() {
+    ReadResponse resp = factual.fetch(TABLE, new Query()
+    .within(new Rectangle(34.06110, -118.42283, 34.05771, -118.41399)));
+
+    assertOk(resp);
+    assertTrue(resp.size() > 0);
+  }
+
+  @Test
+  public void testNear() {
+    ReadResponse resp = factual.fetch(TABLE, new Query()
+    .near(new Point(34.06018, -118.41835)));
+
+    assertOk(resp);
+    assertTrue(resp.size() > 0);
+  }
+
   /**
    * Return rows from the global places database with a name equal to "Stand"
    * within 5000 meters of the specified lat/lng
@@ -470,12 +488,12 @@ public class FactualTest {
     assertTrue(resp.isResolved());
     assertTrue(resp.getResolved().get("name").equals("McDonald's"));
   }
-  
+
   @Test
   public void testResolves() {
     ResolveResponse resp = factual.resolves(new ResolveQuery()
-	  .add("name", "McDonalds")
-	  .add("locality", "Los Angeles"));
+    .add("name", "McDonalds")
+    .add("locality", "Los Angeles"));
     assertTrue(resp.getData().size() > 1);
   }
 
@@ -1209,7 +1227,7 @@ public class FactualTest {
       assertTrue(found);
     }
   }
-  
+
   private void assertFactualId(List<Map<String, Object>> crosswalks, String id) {
     for (Map<String, Object> cw : crosswalks) {
       assertEquals(id, cw.get("factual_id"));

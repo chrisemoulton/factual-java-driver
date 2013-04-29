@@ -2,7 +2,28 @@ package com.factual.driver;
 
 import java.util.HashMap;
 
+/**
+ * General representation of a Shape, for the purpose of geo filters.
+ * 
+ * @author aaron
+ */
 public abstract class Shape {
+
+  /**
+   * The driver relies on calling toString() to get the representation
+   * of Shapes.
+   */
+  @Override
+  public String toString() {
+    return toJsonStr();
+  }
+
+  /**
+   * @return the full JSON representation of this Shape.
+   */
+  private String toJsonStr() {
+    return JsonUtil.toJsonStr(withinStruct());
+  }
 
   /**
    * Can be used by Shape implementations to get the full 'within'
@@ -11,34 +32,18 @@ public abstract class Shape {
    * @return the 'within' structure for a query.
    */
   @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
-  public Object withinStruct() {
+  private Object withinStruct() {
     return new HashMap(){{
-      put("$within", toJsonObject());  
+      put("$within", toJsonObject());
     }};
   }
-  
-  /**
-   * @return the full JSON representation of this Shape.
-   */
-  public String toJsonStr() {
-    return JsonUtil.toJsonStr(withinStruct());
-  }
-  
+
   /**
    * All Shapes must implement this to return a structure that represents
-   * the shape with data that can be JSON-ized. 
+   * the shape with data that can be JSON-ized.
    * 
    * @return a structure that represents the shape
    */
   public abstract Object toJsonObject();
-  
-  /**
-   * The driver relies on calling toString() to get the representation
-   * of Shapes.
-   */
-  @Override
-  public String toString() {
-    return toJsonStr();
-  }  
 
 }
