@@ -174,6 +174,18 @@ public class Query implements Filterable {
     queryParams.setParam(Constants.FILTER_GEO, circle);
     return this;
   }
+  
+  /**
+   * Adds a filter to return results that are geographically near the
+   * specified Point.
+   * 
+   * @param point The point for which all results should be geographically near.
+   * @return this Query.
+   */
+  public Query near(Point point) {
+	queryParams.setParam(Constants.FILTER_GEO, point);
+    return this;
+  }
 
   /**
    * Used to nest AND'ed predicates.
