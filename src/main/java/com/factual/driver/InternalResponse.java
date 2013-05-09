@@ -17,18 +17,24 @@ public class InternalResponse {
   private final int statusCode;
 
   public InternalResponse(HttpResponse response, LineCallback cb) throws IOException {
-
-    BufferedReader br = new BufferedReader(new InputStreamReader(response
-        .getContent()));
-    String line = null;
-    StringBuffer sb = new StringBuffer();
-    while ((line = br.readLine()) != null) {
-      if (cb != null)
-        cb.onLine(line);
-      sb.append(line);
+    BufferedReader br = null;
+    try {
+      br = new BufferedReader(new InputStreamReader(response
+          .getContent()));
+      String line = null;
+      StringBuffer sb = new StringBuffer();
+      while ((line = br.readLine()) != null) {
+        if (cb != null)
+          cb.onLine(line);
+        sb.append(line);
+      }
+      this.content = sb.toString();
+      this.statusCode = response.getStatusCode();
+    } finally {
+      if (br != null) {
+        br.close();
+      }
     }
-    this.content = sb.toString();
-    this.statusCode = response.getStatusCode();
   }
 
   public InternalResponse(String content) {

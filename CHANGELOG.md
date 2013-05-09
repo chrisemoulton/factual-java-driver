@@ -1,3 +1,6 @@
+## 1.7.8
+ * Close response input stream
+
 ## 1.7.7
  * Add resolve debug to see all candidates
  * Add shape query

@@ -4,7 +4,7 @@
 
   <groupId>com.factual</groupId>
   <artifactId>factual-java-driver</artifactId>
-  <version>1.7.7</version>
+  <version>1.7.8</version>
   <packaging>jar</packaging>
 
   <name>factual-java-driver</name>
