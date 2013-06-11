@@ -282,19 +282,19 @@ public class FactualTest {
   }
 
   /**
-   * {"$and":[{"name":{"$bw":"McDonald's"},"category":{"$bw":"Food & Beverage"}}
+   * {"$and":[{"name":{"$bw":"McDonald's"},"locality":{"$bw":"Los"}}
    * ]}
    */
   @Test
   @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
   public void testRowFilters_2beginsWith() {
     ReadResponse resp = factual.fetch(TABLE,
-        new Query().field("name").beginsWith("McDonald's").field("category")
-        .beginsWith("Food & Beverage"));
+        new Query().field("name").beginsWith("McDonald's").field("locality")
+        .beginsWith("Los"));
 
     assertOk(resp);
     assertStartsWith(resp, "name", "Mc");
-    assertStartsWith(resp, "category", "Food & Beverage");
+    assertStartsWith(resp, "locality", "Los");
 
     Map<String, Object> params = Maps.newHashMap();
     params.put("filters", JsonUtil.toJsonStr(new HashMap() {
@@ -306,9 +306,9 @@ public class FactualTest {
                 put("$bw", "McDonald's");
               }
             });
-            put("category", new HashMap() {
+            put("locality", new HashMap() {
               {
-                put("$bw", "Food & Beverage");
+                put("$bw", "Los");
               }
             });
           }
@@ -501,7 +501,7 @@ public class FactualTest {
   public void testMatch() {
     MatchQuery matchQuery = new MatchQuery().add("name", "McDonalds")
     .add("address", "10451 Santa Monica Blvd").add("region", "CA")
-    .add("postcode", "90025");
+    .add("postcode", "90025").add("country", "us");
     String id = factual.match(PLACES_V3, matchQuery);
     assertTrue("c730d193-ba4d-4e98-8620-29c672f2f117".equals(id));
   }
@@ -588,7 +588,7 @@ public class FactualTest {
   @Test
   public void testCustomRead2() {
     Map<String, Object> params = Maps.newHashMap();
-    params.put("select", "name,category");
+    params.put("select", "name,locality");
     params.put("include_count", true);
 
     String respString = factual.get(FULL_TABLE, params);
@@ -617,7 +617,7 @@ public class FactualTest {
   @Test
   public void testInvalidAnd() {
     Query q = new Query();
-    q.and(q.field("category").beginsWith("Food"),
+    q.and(q.field("locality").beginsWith("Los"),
         q.within(new Circle(latitude, longitude, meters)));
 
     ReadResponse resp = factual.fetch(TABLE, q);
@@ -656,6 +656,7 @@ public class FactualTest {
   }
 
   @Test
+  @Ignore
   public void testDiffs() {
     factual.setReadTimeout(1000 * 60);
     DiffsQuery diff = new DiffsQuery(1351728000000L);
@@ -664,6 +665,7 @@ public class FactualTest {
   }
 
   @Test
+  @Ignore
   public void testDiffsStreamOnlyStart() {
     factual.setReadTimeout(1000 * 5);
     DiffsQuery diff = new DiffsQuery();
@@ -689,6 +691,7 @@ public class FactualTest {
   }
 
   @Test
+  @Ignore
   public void testDiffsStreamOnlyEnd() {
     factual.setReadTimeout(1000 * 5);
     DiffsQuery diff = new DiffsQuery();
@@ -711,6 +714,7 @@ public class FactualTest {
   }
 
   @Test
+  @Ignore
   public void testDiffsDate() {
     factual.setReadTimeout(1000 * 60);
     Calendar start = new GregorianCalendar();
