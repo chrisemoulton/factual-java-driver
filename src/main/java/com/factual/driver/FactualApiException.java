@@ -11,7 +11,6 @@ import com.google.api.client.http.HttpResponse;
 public class FactualApiException extends RuntimeException {
   private String requestUrl;
   private String requestMethod;
-  private HttpResponse response;
   private int statusCode;
   private String statusMessage;
 
@@ -33,10 +32,9 @@ public class FactualApiException extends RuntimeException {
     return this;
   }
 
-  public FactualApiException response(HttpResponse response) {
-    this.response = response;
-    this.statusCode = response.getStatusCode();
-    this.statusMessage = response.getStatusMessage();
+  public FactualApiException response(int statusCode, String message) {
+    this.statusCode = statusCode;
+    this.statusMessage = message;
     return this;
   }
 
@@ -67,19 +65,5 @@ public class FactualApiException extends RuntimeException {
    */
   public String getRequestMethod() {
     return requestMethod;
-  }
-
-  /**
-   * @deprecated remove dependency on api specific to google client api. Use
-   *             getStatusMessage() and getStatusCode() instead to find
-   *             information on the response. Access to HttpResponse is
-   *             unavailable from google-client-api version 1.9.0-beta and
-   *             later.
-   * @return the full HttpResponse object, representing the problematic response
-   *         from Factual.
-   */
-  @Deprecated
-  public HttpResponse getResponse() {
-    return response;
   }
 }

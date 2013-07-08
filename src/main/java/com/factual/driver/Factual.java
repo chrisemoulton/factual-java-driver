@@ -747,7 +747,7 @@ public class Factual {
       return internalResponse;
     } catch (HttpResponseException e) {
       throw new FactualApiException(e).requestUrl(urlStr)
-      .requestMethod(requestMethod).response(e.getResponse());
+      .requestMethod(requestMethod).response(e.getStatusCode(), e.getMessage());
     } catch (IOException e) {
       throw new FactualApiException(e).requestUrl(urlStr).requestMethod(
           requestMethod);
@@ -772,7 +772,7 @@ public class Factual {
       return new FactualStream(br, fullQuery.getLineCallback());
     } catch (HttpResponseException e) {
       throw new FactualApiException(e).requestUrl(urlStr)
-      .requestMethod(requestMethod).response(e.getResponse());
+      .requestMethod(requestMethod).response(e.getStatusCode(), e.getMessage());
     } catch (IOException e) {
       throw new FactualApiException(e).requestUrl(urlStr).requestMethod(
           requestMethod);
